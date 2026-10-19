@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 07 accepted
+- Double-entry integer-credit ledger, opening balances, inventory and cash reconciliation, capitalized construction, loans/principal/interest, payroll/rent/marketing, payables and prolonged-default bankruptcy. Tests prove net-worth/profit reconciliation, no profit from loans, asset commissioning, tamper rejection and identical JSON replay. Browser verifies profit/capex reporting alongside weekly order review.
+- Validation: 31 tests, build and browser smoke pass; `23a8423`.
+
 ## 2026-10-20 — Sprint 06 accepted
 - Localized cost-basis inventory lots, cash/material/labor/capacity-limited production, owned-node shipping with graph lead times and reserved cargo. Fulfillment consumes only local stock; tests prove transit isolation, no negative inventory, no phantom sales, lot COGS and deterministic save/resume. Save version 3 migrates old aggregate inventory into opening lots.
 - Validation: 27 tests, build and browser smoke pass; `3a4ec83`.
