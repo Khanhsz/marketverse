@@ -15,8 +15,8 @@
 | 11 | Weekly Reports & Analytics | completed | 42 tests + build + Chromium PASS; `fdca9e4`; validation/SPRINT_11.md |
 | 12 | Economic Events & Markets | completed | 44 tests + build + Chromium PASS; `9e2e96d`; validation/SPRINT_12.md |
 | 13 | National Campaign | completed | 46 tests + build + Chromium PASS; `6e542ea`; validation/SPRINT_13.md |
-| 14 | Balance & Scenario Testing | in progress | multi-seed simulations |
-| 15 | UX Polish & Onboarding | queued | laptop usability & accessibility |
+| 14 | Balance & Scenario Testing | completed | 48 tests + build + Chromium PASS; `e5b5f21`; validation/SPRINT_14.md |
+| 15 | UX Polish & Onboarding | in progress | laptop usability & accessibility |
 | 16 | Alpha QA & Release Candidate | queued | end-to-end acceptance |
 
 ## Integration principles

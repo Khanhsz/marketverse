@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 14 accepted
+- Replicable five-policy, four-seed sweep completes 20 campaigns of 104 weeks with zero bankruptcies, 14 profitable outcomes and no physical/cash/fulfillment invariant failures. Three policies profit across all four seeds; losing volume/brand outcomes remain in raw results. Adversarial order/loan/replay checks pass. Tracked balance methodology and JSON/Markdown results record roughly 40 ms maximum p95 engine turn time.
+- Validation: 48 tests, build and browser smoke pass; `e5b5f21`.
+
 ## 2026-10-20 — Sprint 13 accepted
 - Eight economically distinct connected cities, four rival archetypes, equipped starter companies and a 104-week national campaign alongside the preserved foundation sandbox. Six weighted objectives measure operating profit, liquidity, realized share, innovation, brand and geographic reach; cash alone cannot win. Tests complete all 104 weeks with quarterly JSON replay checkpoints and valid terminal scoring; browser starts and advances a national campaign.
 - Validation: 46 tests, build and browser smoke pass; `6e542ea`.
