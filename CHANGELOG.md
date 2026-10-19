@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 06 accepted
+- Localized cost-basis inventory lots, cash/material/labor/capacity-limited production, owned-node shipping with graph lead times and reserved cargo. Fulfillment consumes only local stock; tests prove transit isolation, no negative inventory, no phantom sales, lot COGS and deterministic save/resume. Save version 3 migrates old aggregate inventory into opening lots.
+- Validation: 27 tests, build and browser smoke pass; `3a4ec83`.
+
 ## 2026-10-20 — Sprint 05 accepted
 - Deterministic city/segment/SKU demand with affordability, segment fit, quality and an explicit no-purchase option. Hamilton integer allocation conserves buyers and is order-stable; tests verify price elasticity, quality response and no revenue from preferences. Browser inspects the persisted demand report.
 - Validation: 24 tests, build and browser smoke pass; `9d8240e`.

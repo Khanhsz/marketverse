@@ -7,8 +7,8 @@
 | 03 | Cities, Companies & Facilities | completed | 17 tests + build + Chromium entities/recovery smoke PASS; `8d6cf05`; see validation/SPRINT_03.md |
 | 04 | Weekly Decision Engine | completed | 21 tests + build + Chromium PASS; `2d66fb6`; validation/SPRINT_04.md |
 | 05 | Customer Segments & Demand | completed | 24 tests + build + Chromium PASS; `9d8240e`; validation/SPRINT_05.md |
-| 06 | Production, Inventory & Logistics | in progress | constrained physical flows |
-| 07 | Finance & Cash Flow | queued | auditable ledger and solvency |
+| 06 | Production, Inventory & Logistics | completed | 27 tests + build + Chromium PASS; `3a4ec83`; validation/SPRINT_06.md |
+| 07 | Finance & Cash Flow | in progress | auditable ledger and solvency |
 | 08 | Competitor AI | queued | fair, bounded resource decisions |
 | 09 | Product Design & R&D | queued | SKU + tech progression |
 | 10 | Marketing, Brand & HR | queued | multi-strategy staffing & marketing |
