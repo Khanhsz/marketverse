@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 05 accepted
+- Deterministic city/segment/SKU demand with affordability, segment fit, quality and an explicit no-purchase option. Hamilton integer allocation conserves buyers and is order-stable; tests verify price elasticity, quality response and no revenue from preferences. Browser inspects the persisted demand report.
+- Validation: 24 tests, build and browser smoke pass; `9d8240e`.
+
 ## 2026-10-20 — Sprint 04 accepted
 - Typed weekly review, atomic idempotent commands, persistent price/production policies, budgeted construction/research/shipment queues and version-1 migration. Browser commits a 70,000-credit plan, reloads and verifies retained policies, project progress and cash.
 - Validation: 21 tests, build and browser smoke pass; `2d66fb6`.

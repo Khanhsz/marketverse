@@ -6,8 +6,8 @@
 | 02 | Country Strategy Map | completed | 13 tests + build + Chromium camera/layers smoke PASS; `08038c2`; see validation/SPRINT_02.md |
 | 03 | Cities, Companies & Facilities | completed | 17 tests + build + Chromium entities/recovery smoke PASS; `8d6cf05`; see validation/SPRINT_03.md |
 | 04 | Weekly Decision Engine | completed | 21 tests + build + Chromium PASS; `2d66fb6`; validation/SPRINT_04.md |
-| 05 | Customer Segments & Demand | in progress | reproducible demand and preference allocation |
-| 06 | Production, Inventory & Logistics | queued | constrained physical flows |
+| 05 | Customer Segments & Demand | completed | 24 tests + build + Chromium PASS; `9d8240e`; validation/SPRINT_05.md |
+| 06 | Production, Inventory & Logistics | in progress | constrained physical flows |
 | 07 | Finance & Cash Flow | queued | auditable ledger and solvency |
 | 08 | Competitor AI | queued | fair, bounded resource decisions |
 | 09 | Product Design & R&D | queued | SKU + tech progression |
