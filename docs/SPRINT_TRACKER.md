@@ -1,11 +1,28 @@
-## Sprint 01 — Foundation
-Status: source committed, **not yet accepted**. Required: GitHub Actions build PASS and browser smoke test. Ten behavioral unit tests run directly against the TypeScript engine using Node 22 type stripping. Economic simulation intentionally absent.
+# MarketVerse Sprint Tracker
 
-## Sprint 02 — Country Strategy Map
-Backlog: large draggable map, pan/zoom, cursor-centered zoom, context panels, selectable entities, map layers, no fog.
+| Sprint | Name | Status | Proof / next gate |
+|---:|---|---|---|
+| 01 | Foundation & Data Schema | awaiting browser validation | GitHub CI build+10 behavior tests PASS at `7606717`; real browser smoke pending |
+| 02 | Country Strategy Map | queued | pan/zoom/layers/no fog |
+| 03 | Cities, Companies & Facilities | queued | selectable geolocated assets |
+| 04 | Weekly Decision Engine | queued | policies persist, queued jobs |
+| 05 | Customer Segments & Demand | queued | reproducible demand and preference allocation |
+| 06 | Production, Inventory & Logistics | queued | constrained physical flows |
+| 07 | Finance & Cash Flow | queued | auditable ledger and solvency |
+| 08 | Competitor AI | queued | fair, bounded resource decisions |
+| 09 | Product Design & R&D | queued | SKU + tech progression |
+| 10 | Marketing, Brand & HR | queued | multi-strategy staffing & marketing |
+| 11 | Weekly Reports & Analytics | queued | causal KPI explanation |
+| 12 | Economic Events & Markets | queued | seeded plausible macro shocks |
+| 13 | National Campaign | queued | 8 cities, 4 AI, 104-week goals |
+| 14 | Balance & Scenario Testing | queued | multi-seed simulations |
+| 15 | UX Polish & Onboarding | queued | laptop usability & accessibility |
+| 16 | Alpha QA & Release Candidate | queued | end-to-end acceptance |
 
-## Roadmap
-03 cities/companies; 04 weekly decision state; 05 demand; 06 production/logistics; 07 finance; 08 competitor AI; 09 product/R&D; 10 marketing/HR; 11 analytics; 12 economy/events; 13 campaign 8 cities; 14 balancing; 15 UX; 16 QA and Alpha.
-
-## Autonomy
-GitHub CI does **not** autonomously write code. No OpenAI API billing or unattended coding agent configured. ChatGPT Work/Codex must be separately scheduled and authorized.
+## Integration principles
+- This project is not complete at Sprint 01; CI passing is necessary but not sufficient.
+- Every Sprint brief and acceptance checklist is under `docs/sprints/`.
+- Detailed architecture and economic formulas live in `docs/`.
+- On completion, update BOTH this file and `docs/AUTOPILOT_STATE.json` in a tested commit.
+- Sprint instructions in the repository are the permanent memory handoff for new Work/Codex conversations.
+- **No background Codex runner has been configured yet.** GitHub CI will run automatically upon code pushes; it will not produce code.
