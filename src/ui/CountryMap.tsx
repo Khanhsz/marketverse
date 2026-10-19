@@ -24,7 +24,7 @@ export function CountryMap(props: Props) {
   const [layer, setLayer] = useState<Layer>('Market');
   const layerRef = useRef<Layer>(layer); layerRef.current = layer;
   const draw = useRef<() => void>(() => {});
-  const controls = useRef<(action: 'in' | 'out' | 'reset') => void>(() => {});
+  const controls = useRef<(action: 'in' | 'out' | 'reset' | 'focus') => void>(() => {});
   const [failure, setFailure] = useState('');
 
   useEffect(() => {
@@ -32,13 +32,18 @@ export function CountryMap(props: Props) {
     if (!element) return;
     let disposed = false;
     let initialized = false;
+    let renderFrame=0;
     let observer: ResizeObserver | undefined;
     let cleanup = () => {};
     const app = new Application();
     void app.init({ background: '#e9eeec', antialias: true, resolution: window.devicePixelRatio || 1, autoDensity: true }).then(() => {
       initialized = true;
       if (disposed) { app.destroy(true, { children: true }); return; }
+      app.stop(); // The map is static between interactions; render only when dirty.
       element.appendChild(app.canvas);
+      app.canvas.tabIndex=0;app.canvas.setAttribute('role','application');app.canvas.setAttribute('aria-label','Country map: arrow keys pan, plus or minus zoom, Home fits view');
+      const labels:{caption:Text;size:number;selected:boolean}[]=[];
+      let selectedLabel=false;
       const world = new Container(); app.stage.addChild(world);
       let view: Viewport = { width: element.clientWidth, height: element.clientHeight };
       let camera: Camera = fitCamera(view);
@@ -47,12 +52,15 @@ export function CountryMap(props: Props) {
         world.position.set(view.width / 2 - camera.x * camera.scale, view.height / 2 - camera.y * camera.scale);
         element.dataset.camera = JSON.stringify(camera);
         element.dataset.layer = layerRef.current;
+        for(const item of labels){item.caption.visible=item.size>=22||item.selected||camera.scale>=fitCamera(view).scale*1.6;item.caption.scale.set(Math.max(1,(item.size>=22?12:10)/(item.size*camera.scale)));}
+        if(!renderFrame)renderFrame=requestAnimationFrame(()=>{renderFrame=0;if(!disposed)app.render();});
       };
       const label = (text: string, x: number, y: number, size = 22, color = 0x41594f) => {
         const caption = new Text({ text, style: { fill: color, fontSize: size, fontFamily: 'Arial', fontWeight: 'bold' } });
-        caption.position.set(x, y); world.addChild(caption);
+        caption.position.set(x, y); world.addChild(caption);labels.push({caption,size,selected:selectedLabel});
       };
       draw.current = () => {
+        labels.length=0;selectedLabel=false;
         for (const child of world.removeChildren()) child.destroy();
         const { cities, facilities, companies, selectedCityId, selection } = current.current;
         const active = layerRef.current;
@@ -69,6 +77,7 @@ export function CountryMap(props: Props) {
         roads.stroke({ color: active === 'Logistics' ? 0x618c80 : 0xf8faf8, width: active === 'Logistics' ? 10 : 7 }); world.addChildAt(roads, 1);
         for (const city of cities) {
           const x = city.x * MAP_UNITS, y = city.y * MAP_UNITS;
+          selectedLabel=city.id===selectedCityId;
           const selected = city.id === selectedCityId,metric=current.current.metrics.find(m=>m.cityId===city.id);
           if (active === 'Market' || active === 'Economy') {
             const halo = new Graphics().circle(x, y, active === 'Market' ? Math.sqrt(city.population) / 16 : city.power * 50).fill({ color: active === 'Market' ? 0x82a898 : 0xb9ad83, alpha: 0.26 });
@@ -77,7 +86,7 @@ export function CountryMap(props: Props) {
           if (selected) world.addChild(new Graphics().circle(x, y, 36).stroke({ color: 0x24554b, width: 3 }));
           world.addChild(new Graphics().roundRect(x - 15, y - 15, 30, 30, 6).fill(selected ? 0x24554b : 0x6d8880));
           label(city.name.toUpperCase(), x + 40, y - 18);
-          if (active === 'Market') label(`${(city.population / 1000000).toFixed(2)}M · ${metric?.potential||0} potential buyers`, x + 40, y + 12, 16);
+          if (active === 'Market') label(`${(city.population / 1000000).toFixed(2)}M · ${metric?.potential==null?'DEMAND AFTER FIRST WEEK':metric.potential+' potential buyers'}`, x + 40, y + 12, 16);
           if (active === 'Economy') label(`PURCHASING POWER ${city.power.toFixed(2)}×`, x + 40, y + 12, 16);
           if(active === 'Operations')label(`PLAYER STOCK ${metric?.stock||0} · MADE ${metric?.produced||0}`,x+40,y+12,16);
           if(active === 'Logistics')label(`INCOMING ${metric?.incoming||0} UNITS`,x+40,y+12,16);
@@ -150,8 +159,13 @@ export function CountryMap(props: Props) {
         camera = zoomCamera(camera, view, point(event), Math.exp(-Math.max(-500, Math.min(500, pixels)) * 0.002)); applyCamera();
       };
       controls.current = action => {
-        camera = action === 'reset' ? fitCamera(view) : zoomCamera(camera, view, { x: view.width / 2, y: view.height / 2 }, action === 'in' ? 1.3 : 1 / 1.3); applyCamera();
+        camera = action === 'focus' ? {...camera,x:(current.current.cities.find(c=>c.id===current.current.selectedCityId)?.x||480)*MAP_UNITS,y:(current.current.cities.find(c=>c.id===current.current.selectedCityId)?.y||320)*MAP_UNITS} : action === 'reset' ? fitCamera(view) : zoomCamera(camera, view, { x: view.width / 2, y: view.height / 2 }, action === 'in' ? 1.3 : 1 / 1.3); applyCamera();
       };
+      const keydown=(event:KeyboardEvent)=>{
+        if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();event.stopPropagation();const dx=event.key==='ArrowLeft'?40:event.key==='ArrowRight'?-40:0,dy=event.key==='ArrowUp'?40:event.key==='ArrowDown'?-40:0;camera=panCamera(camera,dx,dy);applyCamera();}
+        if(['+','=','-','Home'].includes(event.key)){event.preventDefault();event.stopPropagation();controls.current(event.key==='Home'?'reset':event.key==='-'?'out':'in');}
+      };
+      app.canvas.addEventListener('keydown',keydown);
       app.canvas.addEventListener('pointerdown', down);
       app.canvas.addEventListener('pointermove', move);
       app.canvas.addEventListener('pointerup', end);
@@ -159,18 +173,20 @@ export function CountryMap(props: Props) {
       app.canvas.addEventListener('lostpointercapture', end);
       app.canvas.addEventListener('wheel', wheel, { passive: false });
       cleanup = () => {
+        app.canvas.removeEventListener('keydown',keydown);
         app.canvas.removeEventListener('pointerdown', down); app.canvas.removeEventListener('pointermove', move);
         app.canvas.removeEventListener('pointerup', end); app.canvas.removeEventListener('pointercancel', end);
         app.canvas.removeEventListener('lostpointercapture', end); app.canvas.removeEventListener('wheel', wheel);
       };
     }).catch(error => { if (!disposed) setFailure(String(error)); });
-    return () => { disposed = true; observer?.disconnect(); cleanup(); draw.current = () => {}; controls.current = () => {}; if (initialized) app.destroy(true, { children: true }); };
+    return () => { disposed = true; cancelAnimationFrame(renderFrame);observer?.disconnect(); cleanup(); draw.current = () => {}; controls.current = () => {}; if (initialized) app.destroy(true, { children: true }); };
   }, []);
   useEffect(() => { draw.current(); }, [props.cities, props.facilities, props.companies, props.selectedCityId, props.selection, props.metrics, layer]);
   return <div className="map" data-error={failure || undefined}>
-    <div ref={mount} className="mapSurface" role="img" aria-label="Country strategy map with selectable cities" />
+    <div ref={mount} className="mapSurface" role="group" aria-label="Interactive country map" />
+    <label className="cityPicker">City<select aria-label="Select city" value={props.selectedCityId} onChange={e=>props.onSelect({kind:'city',id:e.target.value})}>{props.cities.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
     <div className="mapLayers" role="group" aria-label="Map layers">{layers.map(name => <button key={name} aria-pressed={layer === name} onClick={() => setLayer(name)}>{name}</button>)}</div>
-    <div className="mapControls" role="group" aria-label="Map camera"><button aria-label="Zoom in" onClick={() => controls.current('in')}>+</button><button aria-label="Zoom out" onClick={() => controls.current('out')}>−</button><button onClick={() => controls.current('reset')}>Reset view</button></div>
+    <div className="mapControls" role="group" aria-label="Map camera"><button aria-label="Zoom in" onClick={() => controls.current('in')}>+</button><button aria-label="Zoom out" onClick={() => controls.current('out')}>−</button><button className="wide" onClick={() => controls.current('reset')}>Reset view</button><button className="wide" onClick={()=>controls.current('focus')}>Center selection</button></div>
     <p className="mapLegend" aria-live="polite">{failure ? `Map unavailable: ${failure}` : legends[layer]}<span>Drag to pan · Scroll to zoom · Select a city</span></p>
   </div>;
 }

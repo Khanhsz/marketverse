@@ -6,5 +6,5 @@ try {
     await server.listen();
     process.env.SMOKE_URL = 'http://127.0.0.1:5174/';
   }
-  await import('./browser-smoke.mjs');
+  await import(process.env.BROWSER_SUITE||'./browser-smoke.mjs');
 } finally { await server?.close(); }

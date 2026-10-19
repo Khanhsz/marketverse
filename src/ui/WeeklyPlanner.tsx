@@ -1,3 +1,4 @@
+import { Modal } from './Modal';
 import { STAFF_ROLES } from '../engine/people';
 import type { StaffRole } from '../engine/people';
 import { ATTRIBUTE_NAMES, defaultUpgrade } from '../engine/products';
@@ -30,7 +31,7 @@ export function WeeklyPlanner({game,cityId,onCommit,onClose}:Props) {
   try { const preview=structuredClone(game);applyOrders(preview,game.playerId,orders,[]);cost=game.companies.find(c=>c.id===game.playerId)!.cash-preview.companies.find(c=>c.id===game.playerId)!.cash; }catch(e){reviewError=String(e instanceof Error?e.message:e);}
   const add=(request:ProjectRequest)=>{setError('');setProjects(old=>[...old,request]);};
   const cityOptions=game.cities.map(c=><option key={c.id} value={c.id}>{c.name}</option>);
-  return <div className="modalShade" onKeyDown={event=>{if(event.key==='Escape')onClose();}}><section className="planner" role="dialog" aria-modal="true" aria-labelledby="planner-title">
+  return <Modal titleId="planner-title" onClose={onClose}>
     <div className="plannerHead"><h2 id="planner-title">Review week {game.absoluteWeek}</h2><button onClick={onClose} autoFocus>Cancel</button></div>
     <p>Policies persist until changed. New projects reserve cash immediately and progress one week per committed turn.</p>
     <h3>Product policies</h3>
@@ -42,5 +43,5 @@ export function WeeklyPlanner({game,cityId,onCommit,onClose}:Props) {
     <p><strong>Upfront project cost: {cost.toLocaleString()} credits</strong> · Available cash: {game.companies.find(c=>c.id===game.playerId)!.cash.toLocaleString()}</p>
     {(reviewError||error)&&<p role="alert">{reviewError||error}</p>}
     <div className="plannerActions"><button onClick={onClose}>Keep planning</button><button className="primary" disabled={!!reviewError} onClick={()=>{try{onCommit(orders);}catch(e){setError(String(e instanceof Error?e.message:e));}}}>Commit week</button></div>
-  </section></div>;
+  </Modal>;
 }

@@ -1,10 +1,10 @@
 import type { GameState, WeekReport } from './game.ts';
-export type CityMetrics = {cityId:string;potential:number;sold:number;playerShare:number|null;stock:number;produced:number;incoming:number};
+export type CityMetrics = {cityId:string;potential:number|null;sold:number;playerShare:number|null;stock:number;produced:number;incoming:number};
 export function mapMetrics(state:GameState):CityMetrics[]{
   const report=state.reports.at(-1),owned=(id:string)=>state.products.find(p=>p.id===id)?.companyId===state.playerId;
   return state.cities.map(city=>{
     const sales=report?.sales?.filter(s=>s.cityId===city.id)||[],sold=sales.reduce((n,s)=>n+s.units,0),player=sales.filter(s=>owned(s.productId)).reduce((n,s)=>n+s.units,0);
-    return {cityId:city.id,potential:report?.demand?.filter(d=>d.cityId===city.id).reduce((n,d)=>n+d.potential,0)||0,sold,playerShare:sold?player/sold:null,stock:state.stocks.filter(l=>l.cityId===city.id&&owned(l.productId)).reduce((n,l)=>n+l.quantity,0),produced:report?.production?.filter(p=>owned(p.productId)&&state.facilities.find(f=>f.id===p.facilityId)?.cityId===city.id).reduce((n,p)=>n+p.units,0)||0,incoming:state.projects.filter(p=>p.kind==='shipment'&&p.cityId===city.id&&p.companyId===state.playerId&&p.status==='active').reduce((n,p)=>n+(p.kind==='shipment'?p.quantity:0),0)};
+    return {cityId:city.id,potential:report?.demand?report.demand.filter(d=>d.cityId===city.id).reduce((n,d)=>n+d.potential,0):null,sold,playerShare:sold?player/sold:null,stock:state.stocks.filter(l=>l.cityId===city.id&&owned(l.productId)).reduce((n,l)=>n+l.quantity,0),produced:report?.production?.filter(p=>owned(p.productId)&&state.facilities.find(f=>f.id===p.facilityId)?.cityId===city.id).reduce((n,p)=>n+p.units,0)||0,incoming:state.projects.filter(p=>p.kind==='shipment'&&p.cityId===city.id&&p.companyId===state.playerId&&p.status==='active').reduce((n,p)=>n+(p.kind==='shipment'?p.quantity:0),0)};
   });
 }
 export function aggregateReports(state:GameState,companyId:string,start:number,end:number){

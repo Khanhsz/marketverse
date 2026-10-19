@@ -7,3 +7,42 @@
 .productCard{border:1px solid #d2e0d8;padding:12px;margin:10px 0;font-size:11px}.productCard p{margin:6px 0;line-height:1.5}
 
 .reportTotals{display:flex;gap:18px;flex-wrap:wrap;background:#e5eee9;padding:12px}.reportTotals p{display:grid;gap:5px;margin:4px;font-size:11px}.reports table{border-collapse:collapse;width:100%;font-size:11px;margin:18px 0}.reports caption{text-align:left;padding:8px 0;font-weight:700}.reports td,.reports th{padding:9px 7px;text-align:left;border-bottom:1px solid #d8e4dc}.reports svg{width:100%;max-height:180px}.reports p{line-height:1.6}
+/* Laptop accessibility and stable modal layout. */
+:root { color: #293e34; }
+.planner { margin: auto; width: min(920px, calc(100vw - 48px)); color: #293e34; }
+.planner::backdrop { background: #253c35a6; }
+.workspace.panelCollapsed { grid-template-columns: 62px minmax(0, 1fr); }
+.panel[hidden] { display: none; }
+.panel p { font-size: 12px; line-height: 1.6; }
+.panel h1 { font-size: 27px; }
+.muted, .stat, .metrics small, .panel small, .logo span, .footer span { color: #536d5f; }
+.entityLink { font-size: 12px; min-height: 30px; width: 100%; }
+.stat { gap: 12px; }
+.stat span { text-align: right; }
+.mapControls { display: grid; grid-template-columns: 1fr 1fr; width: 150px; bottom: 54px; }
+.mapControls .wide { grid-column: 1 / -1; }
+.mapLegend { right: 188px; bottom: 45px; font-size: 11px; }
+.cityPicker { position: absolute; top: 15px; right: 16px; display: flex; gap: 8px; align-items: center; color: #426456; font-size: 12px; }
+.cityPicker select { width: 145px; padding: 6px; border: 1px solid #bccfc3; color: #294b3c; background: #f8faf9; border-radius: 4px; }
+.formRow label { font-size: 12px; }
+.guideSteps { padding-left: 20px; line-height: 1.7; }
+.guideSteps li { padding: 6px 0; }
+.checkLabel { display: flex; gap: 8px; align-items: center; min-height: 32px; }
+canvas:focus-visible { outline: 3px solid #a27226; outline-offset: -4px; }
+.reports td, .reports th { font-size: 12px; }
+@media (max-width: 1100px) {
+  .logo span { display: none; }
+  .metrics { gap: 22px; }
+  .workspace { grid-template-columns: 54px minmax(0,1fr) 280px; }
+  .workspace.panelCollapsed { grid-template-columns: 54px minmax(0,1fr); }
+  .panel { padding: 22px 18px; }
+  .overlay { font-size: 10px; left: 16px; }
+  .cityPicker { gap: 4px; right: 10px; }
+  .cityPicker select { width: 125px; }
+  .mapLayers { left: 16px; gap: 4px; }
+  .mapLayers button { padding: 8px; }
+  .mapLegend { left: 16px; }
+  .footer span { display: none; }
+}
+.notice, .segment, .mapLegend span { color: #536d5f; }
+.bar i { background: #4d7a65; }

@@ -127,6 +127,7 @@ try {
   await page.reload();await ready();
   const committed=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
   assert.ok(committed.reports.at(-1).demand.some(d=>d.cityId==='central'&&d.potential>0));
+  await page.locator('.demandReport summary').click();
   assert.match(await page.locator('.demandReport').innerText(),/potential/);
   assert.match(await page.locator('.financialReport').innerText(),/Profit/);
   assert.equal(committed.reports.at(-1).financials.find(f=>f.companyId==='player').capex,40000);
@@ -143,6 +144,7 @@ try {
   assert.ok(coreRun.companies.every(c=>c.cash>=0));
   assert.equal(coreRun.staff.player.production,2);
   assert.ok(coreRun.macro.events.some(e=>e.week===13));
+  await page.locator('.macroReport summary').click();
   assert.match(await page.locator('.macroReport').innerText(),/Week 13/);
   assert.ok(coreRun.brand['player|north|mainstream']>0);
   assert.ok(coreRun.products.some(p=>p.parentId==='nova'&&p.revision===2));
@@ -167,6 +169,22 @@ try {
   assert.equal(national.cities.length,8);assert.equal(national.companies.length,5);assert.equal(new Set(national.companies.filter(c=>c.control==='ai').map(c=>c.strategy)).size,4);
   await page.getByRole('button',{name:'NEXT WEEK'}).click();await page.getByRole('button',{name:'Commit week',exact:true}).click();
   assert.match(await page.locator('.campaignReport').innerText(),/Completed 1 \/ 104/);
+  // Keyboard alternatives and native dialog focus containment/return.
+  await page.getByLabel('Select city',{exact:true}).selectOption('lake');assert.equal(await page.locator('h1').innerText(),'Lakeview');
+  const focusedMap=page.getByRole('application',{name:'Country map: arrow keys pan, plus or minus zoom, Home fits view'});
+  await focusedMap.focus();const keyCamera=await camera();await page.keyboard.press('ArrowRight');assert.ok((await camera()).x>keyCamera.x);
+  await page.keyboard.press('Home');assert.equal((await camera()).x,960);
+  await page.getByRole('button',{name:'Toggle details',exact:true}).click();assert.equal(await page.locator('#selection-panel').isHidden(),true);
+  await page.getByRole('button',{name:'Toggle details',exact:true}).click();assert.equal(await page.locator('#selection-panel').isVisible(),true);
+  await page.getByRole('button',{name:'NEXT WEEK'}).focus();await page.keyboard.press('n');await page.getByRole('dialog').waitFor();
+  for(let i=0;i<5;i++)await page.keyboard.press('Shift+Tab');
+  assert.equal(await page.evaluate(()=>document.querySelector('dialog').contains(document.activeElement)),true);
+  await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
+  assert.equal(await page.evaluate(()=>document.activeElement.textContent),'NEXT WEEK →');
+  await page.keyboard.press('?');assert.match(await page.getByRole('dialog').innerText(),/Cargo in transit cannot be sold/);
+  await page.getByLabel('Enable single-key shortcuts',{exact:true}).uncheck();await page.keyboard.press('Escape');
+  await page.keyboard.press('n');assert.equal(await page.getByRole('dialog').count(),0);
+  await page.getByRole('button',{name:'How to play',exact:true}).click();await page.getByLabel('Enable single-key shortcuts',{exact:true}).check();await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});

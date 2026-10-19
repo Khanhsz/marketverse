@@ -1,0 +1,39 @@
+{
+  "browser": "Chromium headless with software SwiftShader",
+  "scope": "Eight-city national map; focused keyboard pan; no guarantee for other hardware",
+  "results": [
+    {
+      "width": 1024,
+      "height": 768,
+      "devicePixelRatio": 1,
+      "p95FrameMs": 17.100000000093132,
+      "maxFrameMs": 19.5,
+      "sampleCount": 59,
+      "uncaughtErrors": 0,
+      "horizontalOverflow": false,
+      "canvasCount": 1
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "devicePixelRatio": 1,
+      "p95FrameMs": 16.800000000279397,
+      "maxFrameMs": 16.899999999906868,
+      "sampleCount": 59,
+      "uncaughtErrors": 0,
+      "horizontalOverflow": false,
+      "canvasCount": 1
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "devicePixelRatio": 2,
+      "p95FrameMs": 45.200000000186265,
+      "maxFrameMs": 45.59999999962747,
+      "sampleCount": 59,
+      "uncaughtErrors": 0,
+      "horizontalOverflow": false,
+      "canvasCount": 1
+    }
+  ]
+}

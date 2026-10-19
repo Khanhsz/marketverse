@@ -1,8 +1,9 @@
+import { Guide } from './Guide';
 import { createNationalCampaign, scoreCampaign } from '../engine/campaign';
 import { ReportsPanel } from './ReportsPanel';
 import { mapMetrics } from '../engine/analytics';
 import { brandKey } from '../engine/people';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { localStock } from '../engine/operations';
 import { WeeklyPlanner } from './WeeklyPlanner';
 import { CountryMap } from './CountryMap';
@@ -21,6 +22,9 @@ function loadGame() {
   return { game: createInitialGame(), recovery: '' };
 }
 export function App() {
+  const panelRef=useRef<HTMLElement>(null);
+  const [panelOpen,setPanelOpen]=useState(true),[guideOpen,setGuideOpen]=useState(false);
+  const [shortcuts,setShortcuts]=useState(()=>{try{return localStorage.getItem('marketverse:shortcuts')!=='off';}catch{return true;}});
   const [reportsOpen,setReportsOpen]=useState(false);
   const [plannerOpen,setPlannerOpen]=useState(false);
   const committedWeek=useRef(0);
@@ -38,6 +42,11 @@ export function App() {
   const cityId = context.kind === 'city' ? context.entity.id : context.kind === 'facility' ? context.entity.cityId : game.facilities.find(f => f.companyId === context.entity.id)?.cityId;
   const city = game.cities.find(c => c.id === cityId) || game.cities[0];
   const player = game.companies.find(c => c.id === game.playerId)!;
+  const metrics=useMemo(()=>mapMetrics(game),[game]);
+  const campaignScore=useMemo(()=>game.campaign.score||scoreCampaign(game),[game]);
+  useEffect(()=>{panelRef.current?.scrollTo({top:0});},[selection,game.campaign.mode]);
+  useEffect(()=>{try{localStorage.setItem('marketverse:shortcuts',shortcuts?'on':'off');}catch{}},[shortcuts]);
+  useEffect(()=>{const key=(event:KeyboardEvent)=>{const target=event.target;if(!(target instanceof HTMLElement))return;if(!shortcuts||plannerOpen||reportsOpen||guideOpen||target.matches('input,select,textarea')||target.isContentEditable||event.ctrlKey||event.metaKey||event.altKey)return;if(event.key.toLowerCase()==='n'&&!recovery&&game.campaign.status==='active'){event.preventDefault();setPlannerOpen(true);}if(event.key.toLowerCase()==='r'){event.preventDefault();setReportsOpen(true);}if(event.key==='?'){event.preventDefault();setGuideOpen(true);}if(event.key==='['){event.preventDefault();setPanelOpen(open=>!open);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[shortcuts,plannerOpen,reportsOpen,guideOpen,recovery,game.campaign.status]);
   const choose = (value: Selection) => { if (resolveSelection(game, value)) setSelection(value); };
   const cityButton = (id: string) => <button className="entityLink" key={id} onClick={() => choose({kind:'city',id})}>{game.cities.find(c=>c.id===id)?.name}</button>;
   const ownerButton = (id: string) => <button className="entityLink" onClick={() => choose({kind:'company',id})}>{game.companies.find(c=>c.id===id)?.name}</button>;
@@ -49,12 +58,12 @@ export function App() {
     <header className="header"><div className="logo">◆ MARKETVERSE <span>COUNTRY STRATEGY</span></div>
       <div className="metrics"><div><small>PERIOD</small><b>Y{game.year.toString().padStart(2,'0')} · W{game.week.toString().padStart(2,'0')}</b></div><div><small>CASH</small><b>{number(player.cash)}</b></div><div><small>CITIES</small><b>{game.cities.length}</b></div></div>
     </header>
-    <div className="workspace"><nav className="rail"><button aria-label="Map" aria-pressed={context.kind==='city'} onClick={()=>choose({kind:'city',id:city.id})}>⌖</button><button aria-label="Company" aria-pressed={context.kind==='company'} onClick={()=>choose({kind:'company',id:player.id})}>▦</button><button aria-label="Reports" onClick={()=>setReportsOpen(true)}>≋</button></nav>
+    <div className={`workspace ${panelOpen?'':'panelCollapsed'}`}><nav className="rail"><button aria-label="Map" aria-pressed={context.kind==='city'} onClick={()=>choose({kind:'city',id:city.id})}>⌖</button><button aria-label="Company" aria-pressed={context.kind==='company'} onClick={()=>choose({kind:'company',id:player.id})}>▦</button><button aria-label="Reports" onClick={()=>setReportsOpen(true)}>≋</button><button aria-label="Toggle details" aria-expanded={panelOpen} aria-controls="selection-panel" onClick={()=>setPanelOpen(!panelOpen)}>☷</button><button aria-label="How to play" onClick={()=>setGuideOpen(true)}>?</button></nav>
       <main className="mapArea"><div className="overlay">COUNTRY STRATEGY MAP</div>
-        <CountryMap cities={game.cities} facilities={game.facilities} companies={game.companies} selectedCityId={city.id} selection={selection} metrics={mapMetrics(game)} onSelect={choose}/>
+        <CountryMap cities={game.cities} facilities={game.facilities} companies={game.companies} selectedCityId={city.id} selection={selection} metrics={metrics} onSelect={choose}/>
         <div className="mapFoot">{game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST</div>
       </main>
-      <aside className="panel" aria-label="Selection details" data-selection={`${context.kind}:${context.entity.id}`}>
+      <aside ref={panelRef} id="selection-panel" className="panel" hidden={!panelOpen} aria-label="Selection details" data-selection={`${context.kind}:${context.entity.id}`}>
         <small>{context.kind.toUpperCase()} INTELLIGENCE</small><h1>{context.entity.name}</h1>
         {context.kind === 'city' && <>
           <p className="muted">Regional economic overview</p><hr/>
@@ -77,18 +86,19 @@ export function App() {
           <h3>PRODUCT PORTFOLIO</h3>{game.products.filter(p=>p.companyId===context.entity.id).map(p=><div className="productCard" key={p.id}><strong>{p.name}</strong><p>R{p.revision} · {p.lifecycle} · {p.segment}</p><p>Price {p.price} · unit cost {p.cost} · stock {p.inventory}</p><p>Quality {p.quality} · Design {p.attributes.design} · Performance {p.attributes.performance} · Durability {p.attributes.durability}</p></div>)}<h3>FACILITIES</h3>{game.facilities.filter(f=>f.companyId===context.entity.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button>{cityButton(f.cityId)}</div>)}
           {context.entity.strategy&&<p>Strategy: {context.entity.strategy}</p>}<h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
         </>}
-        {game.reports.at(-1)?.demand&&<details className="demandReport" open><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
-        <h3>LOCAL INVENTORY · {city.name}</h3>{game.products.map(p=><p className="muted" key={p.id}>{p.name}: {localStock(game,p.id,city.id)} units</p>)}
+        {game.reports.at(-1)?.demand&&<details className="demandReport"><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
+        <h3>LOCAL INVENTORY · {city.name}</h3>{game.products.filter(p=>p.companyId===player.id||localStock(game,p.id,city.id)>0).map(p=><p className="muted" key={p.id}>{p.name}: {localStock(game,p.id,city.id)} units</p>)}
         {game.reports.at(-1)?.financials&&<details className="financialReport" open><summary>Financial results · last week</summary>{game.reports.at(-1)!.financials!.filter(f=>f.companyId===player.id).map(f=><div key={f.companyId}><p>Revenue {number(f.revenue)} · COGS {number(f.cogs)}</p><p>Expenses {number(f.expenses)} · Profit {number(f.profit)}</p><p>Cash change {number(f.cashChange)} · Capex {number(f.capex)}</p><p>Payables {number(f.payables)} · Net worth {number(f.netWorth)}</p></div>)}</details>}
-        <details className="staffReport"><summary>People and brand</summary><p>Production {game.staff[player.id].production} · Sales {game.staff[player.id].sales} · Research {game.staff[player.id].research}</p>{(['value','mainstream','premium'] as const).map(segment=><p key={segment}>{segment} awareness in {city.name}: {Math.round((game.brand[brandKey(player.id,city.id,segment)]||0)*100)}%</p>)}</details><details className="macroReport" open><summary>Economy and events</summary><p>Purchasing-power index {game.macro.index.toFixed(3)} · Seasonal demand {game.macro.seasonal.toFixed(3)}×</p>{game.macro.events.slice(-2).map(e=><p key={e.id}>Week {e.week}: {e.title} · {(e.delta*100).toFixed(1)} index points</p>)}</details><h3>PROJECT QUEUE</h3>{game.projects.filter(p=>p.companyId===player.id&&p.status==='active').map(p=><p className="queueItem" key={p.id}>{p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}</p>)}
+        <details className="staffReport"><summary>People and brand</summary><p>Production {game.staff[player.id].production} · Sales {game.staff[player.id].sales} · Research {game.staff[player.id].research}</p>{(['value','mainstream','premium'] as const).map(segment=><p key={segment}>{segment} awareness in {city.name}: {Math.round((game.brand[brandKey(player.id,city.id,segment)]||0)*100)}%</p>)}</details><details className="macroReport"><summary>Economy and events</summary><p>Purchasing-power index {game.macro.index.toFixed(3)} · Seasonal demand {game.macro.seasonal.toFixed(3)}×</p>{game.macro.events.slice(-2).map(e=><p key={e.id}>Week {e.week}: {e.title} · {(e.delta*100).toFixed(1)} index points</p>)}</details><h3>PROJECT QUEUE</h3>{game.projects.filter(p=>p.companyId===player.id&&p.status==='active').map(p=><p className="queueItem" key={p.id}>{p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}</p>)}
         {game.reports.length>0&&<details><summary>Last weekly report</summary>{game.reports.at(-1)!.events.map((e,i)=><p className="muted" key={i}>{e}</p>)}<p>Cash change: {game.reports.at(-1)!.cashDelta[player.id]}</p></details>}
         <div className="notice">Sales use local stock; shipments require owned facilities at both ends. Production requires a factory and a persistent target.</div>
-        <details className="campaignReport" open><summary>{game.campaign.mode==='national'?'104-week national campaign':'Foundation sandbox'}</summary>{game.campaign.mode==='national'&&<><p>Completed {game.absoluteWeek-game.campaign.startWeek} / 104 weeks · {game.campaign.status}</p><p>Multi-axis score: {(game.campaign.score||scoreCampaign(game)).total}/100</p>{(game.campaign.score||scoreCampaign(game)).axes.map(a=><p key={a.name}>{a.name}: {a.value.toFixed(2)} / {a.target} {a.met?'✓':''}</p>)}</>}<button className="entityLink" onClick={()=>{if(window.confirm('Start a new 104-week national campaign? Existing progress will be replaced.')){setGame(createNationalCampaign());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>Start national campaign</button></details>
+        <details className="campaignReport" open><summary>{game.campaign.mode==='national'?'104-week national campaign':'Foundation sandbox'}</summary>{game.campaign.mode==='national'&&<><p>Completed {game.absoluteWeek-game.campaign.startWeek} / 104 weeks · {game.campaign.status}</p><p>Multi-axis score: {campaignScore.total}/100</p>{campaignScore.axes.map(a=><p key={a.name}>{a.name}: {a.value.toFixed(2)} / {a.target} {a.met?'✓':''}</p>)}</>}<button className="entityLink" onClick={()=>{if(window.confirm('Start a new 104-week national campaign? Existing progress will be replaced.')){setGame(createNationalCampaign());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>Start national campaign</button></details>
         <button className="entityLink" onClick={exportGame}>Export save</button>
       </aside>
     </div>
     {(recovery || storageError) && <div className="saveWarning" role="alert"><strong>{recovery?'Saved game could not be loaded. Original data is preserved; gameplay is paused.':storageError}</strong><button onClick={exportGame}>{recovery?'Export original save':'Export save'}</button><span>Use Reset only when you are ready to discard the saved game.</span></div>}
     <footer className="footer"><div>● {recovery || storageError?'SAVE NEEDS ATTENTION':'LOCAL SAVE'} <span>· Weekly engine active · Orders · Inventory · Finance active</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game? This discards the existing save.')){setGame(createInitialGame());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>RESET</button><button className="next" disabled={!!recovery||(game.campaign.mode==='national'&&game.campaign.status!=='active')} onClick={()=>setPlannerOpen(true)}>NEXT WEEK →</button></div></footer>
+    {guideOpen&&<Guide onClose={()=>setGuideOpen(false)} shortcuts={shortcuts} onShortcuts={setShortcuts}/> }
     {reportsOpen&&<ReportsPanel game={game} onClose={()=>setReportsOpen(false)}/> }
     {plannerOpen&&<WeeklyPlanner game={game} cityId={city.id} onClose={()=>setPlannerOpen(false)} onCommit={orders=>{if(committedWeek.current===orders.expectedWeek)throw new Error('Week already committed');const next=advanceWeek(game,orders);committedWeek.current=orders.expectedWeek;setGame(next);setPlannerOpen(false);}}/>}
   </div>;
