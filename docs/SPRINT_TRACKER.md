@@ -13,8 +13,8 @@
 | 09 | Product Design & R&D | completed | 37 tests + build + Chromium PASS; `1cd91fd`; validation/SPRINT_09.md |
 | 10 | Marketing, Brand & HR | completed | 40 tests + build + Chromium PASS; `dd44f56`; validation/SPRINT_10.md |
 | 11 | Weekly Reports & Analytics | completed | 42 tests + build + Chromium PASS; `fdca9e4`; validation/SPRINT_11.md |
-| 12 | Economic Events & Markets | in progress | seeded plausible macro shocks |
-| 13 | National Campaign | queued | 8 cities, 4 AI, 104-week goals |
+| 12 | Economic Events & Markets | completed | 44 tests + build + Chromium PASS; `9e2e96d`; validation/SPRINT_12.md |
+| 13 | National Campaign | in progress | 8 cities, 4 AI, 104-week goals |
 | 14 | Balance & Scenario Testing | queued | multi-seed simulations |
 | 15 | UX Polish & Onboarding | queued | laptop usability & accessibility |
 | 16 | Alpha QA & Release Candidate | queued | end-to-end acceptance |

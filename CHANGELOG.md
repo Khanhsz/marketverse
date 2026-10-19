@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 12 accepted
+- Seeded bounded purchasing-power trends, population growth, seasonal demand and narrated thirteen-week macro events with recorded before/after effects. AI uses the previous public macro snapshot, preserving simultaneous-order fairness. Tests replay 52 weeks across seeds, check bounds and causal event references, seasonality, AI response and desktop runtime; browser observes the week-13 event.
+- Validation: 44 tests, build and browser smoke pass; `9e2e96d`.
+
 ## 2026-10-20 — Sprint 11 accepted
 - Measured revenue-to-profit bridge, SKU/city/segment demand and fulfillment, realized market shares, stock-versus-staff loss attribution, readable recent-profit chart and complete/partial 13-week and 52-week aggregation. Map overlays now show resolved potential, ownership share, local stock/output and incoming cargo. Tests reconcile aggregate reports directly to ledger; browser navigates week/quarter/year reports.
 - Validation: 42 tests, build and browser smoke pass; `fdca9e4`.
