@@ -160,6 +160,13 @@ try {
   await page.getByLabel('Report period',{exact:true}).selectOption('52');
   assert.match(await page.getByRole('dialog').innerText(),/52/);
   await page.getByRole('button',{name:'Close reports',exact:true}).click();
+  page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start national campaign',exact:true}).click();
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')).campaign.mode==='national');
+  await ready();
+  const national=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
+  assert.equal(national.cities.length,8);assert.equal(national.companies.length,5);assert.equal(new Set(national.companies.filter(c=>c.control==='ai').map(c=>c.strategy)).size,4);
+  await page.getByRole('button',{name:'NEXT WEEK'}).click();await page.getByRole('button',{name:'Commit week',exact:true}).click();
+  assert.match(await page.locator('.campaignReport').innerText(),/Completed 1 \/ 104/);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});
