@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 11 accepted
+- Measured revenue-to-profit bridge, SKU/city/segment demand and fulfillment, realized market shares, stock-versus-staff loss attribution, readable recent-profit chart and complete/partial 13-week and 52-week aggregation. Map overlays now show resolved potential, ownership share, local stock/output and incoming cargo. Tests reconcile aggregate reports directly to ledger; browser navigates week/quarter/year reports.
+- Validation: 42 tests, build and browser smoke pass; `fdca9e4`.
+
 ## 2026-10-20 — Sprint 10 accepted
 - Persistent city/segment media budgets build and decay bounded brand awareness only when funded; demand uses measured awareness. Two-week role-specific hiring, onboarding cost, salary payroll, research capability and finite sales/production capacity are enforced. AI hires and markets through the same rules. Browser commits targeted media and hiring, then verifies workforce arrival and awareness growth.
 - Validation: 40 tests, build and browser smoke pass; `dd44f56`.
