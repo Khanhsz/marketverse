@@ -1,3 +1,4 @@
+import {initializeMacro} from '../src/engine/macro.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialGame, validateState, serializeGame, deserializeGame } from '../src/engine/game.ts';
@@ -11,7 +12,7 @@ test('stable city/company/facility selections survive save roundtrip and array r
 test('schema accepts eight cities while preserving the three-city starter',()=>{
  const state=createInitialGame();assert.equal(state.cities.length,3);
  for(let i=3;i<8;i++)state.cities.push({...structuredClone(state.cities[0]),id:`city-${i}`,name:`City ${i}`,links:[]});
- assert.doesNotThrow(()=>validateState(state));assert.equal(deserializeGame(serializeGame(state)).cities.length,8);
+ state.macro=initializeMacro(state);assert.doesNotThrow(()=>validateState(state));assert.equal(deserializeGame(serializeGame(state)).cities.length,8);
 });
 test('placement rejects bad references, duplicate kind and duplicate HQ; all kinds use stable city references',()=>{
  const state=createInitialGame(),proposal={companyId:'player',cityId:'north',kind:'store'};

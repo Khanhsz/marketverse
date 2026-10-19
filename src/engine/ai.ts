@@ -6,7 +6,7 @@ import { AI_RULES, BUILD_RULES, RESEARCH_RULE, SHIPPING_RULE } from '../data/rul
 import { route } from './orders.ts';
 export type Archetype = keyof typeof AI_RULES;
 export type Observation = {
-  companyId:string;week:number;cash:number;staff:Staff;bankrupt:boolean;strategy:Archetype;
+  companyId:string;week:number;cash:number;staff:Staff;macro:{index:number;seasonal:number};bankrupt:boolean;strategy:Archetype;
   cities:City[];products:Product[];facilities:Facility[];projects:Project[];policy:Policy;
   stocks:{productId:string;cityId:string;quantity:number}[];
   marketPrices:{companyId:string;segment:string;price:number}[];
@@ -14,7 +14,7 @@ export type Observation = {
 export function observeMarket(state:GameState,companyId:string):Observation{
   const company=state.companies.find(c=>c.id===companyId)!;
   const own=(id:string)=>state.products.some(p=>p.id===id&&p.companyId===companyId);
-  return structuredClone({companyId,week:state.absoluteWeek,cash:company.cash,staff:state.staff[companyId],bankrupt:state.finance[companyId].bankrupt,strategy:company.strategy||'regional-specialist',cities:state.cities,products:state.products.filter(p=>p.companyId===companyId),facilities:state.facilities.filter(f=>f.companyId===companyId),projects:state.projects.filter(p=>p.companyId===companyId&&p.status==='active'),policy:state.policies[companyId],stocks:state.stocks.filter(l=>own(l.productId)).map(l=>({productId:l.productId,cityId:l.cityId,quantity:l.quantity})),marketPrices:state.products.filter(p=>p.companyId!==companyId&&(p.lifecycle==='active'||p.inventory>0)).map(p=>({companyId:p.companyId,segment:p.segment,price:p.price}))});
+  return structuredClone({companyId,week:state.absoluteWeek,cash:company.cash,staff:state.staff[companyId],macro:{index:state.macro.index,seasonal:state.macro.seasonal},bankrupt:state.finance[companyId].bankrupt,strategy:company.strategy||'regional-specialist',cities:state.cities,products:state.products.filter(p=>p.companyId===companyId),facilities:state.facilities.filter(f=>f.companyId===companyId),projects:state.projects.filter(p=>p.companyId===companyId&&p.status==='active'),policy:state.policies[companyId],stocks:state.stocks.filter(l=>own(l.productId)).map(l=>({productId:l.productId,cityId:l.cityId,quantity:l.quantity})),marketPrices:state.products.filter(p=>p.companyId!==companyId&&(p.lifecycle==='active'||p.inventory>0)).map(p=>({companyId:p.companyId,segment:p.segment,price:p.price}))});
 }
 export function planAI(observation:Observation):TurnOrders{
   const o=observation,id=`ai:${o.companyId}:${o.week}`;
@@ -39,8 +39,8 @@ export function planAI(observation:Observation):TurnOrders{
   if(o.week%config.expansionEvery===0&&candidates.length&&budget>=BUILD_RULES.store.cost){projects.push({kind:'construction',cityId:candidates[0].id,facilityKind:'store'});budget-=BUILD_RULES.store.cost;}
   for(const product of o.products){
     const observed=o.marketPrices.filter(p=>p.segment===product.segment),market=observed.length?observed.reduce((n,p)=>n+p.price,0)/observed.length:product.price;
-    policy.prices[product.id]=Math.max(Math.ceil(product.cost*1.25),Math.round(product.cost*config.markup*.8+market*.2));
-    policy.production[product.id]=factory&&product.lifecycle==='active'?config.target:0;
+    policy.prices[product.id]=Math.max(Math.ceil(product.cost*1.25),Math.round(product.cost*config.markup*(.9+.1*o.macro.index)*.8+market*.2));
+    policy.production[product.id]=factory&&product.lifecycle==='active'?Math.round(config.target*o.macro.index*o.macro.seasonal):0;
     if(product.lifecycle==='active'&&product.quality<100&&o.strategy==='premium-innovator'&&o.week%12===0&&!o.projects.some(p=>p.kind==='research'&&p.productId===product.id)&&budget>=RESEARCH_RULE.cost){projects.push({kind:'research',productId:product.id});budget-=RESEARCH_RULE.cost;}
     for(const store of o.facilities.filter(f=>f.kind==='store')){
       if(o.stocks.some(l=>l.productId===product.id&&l.cityId===store.cityId&&l.quantity>0)||o.projects.some(p=>p.kind==='shipment'&&p.productId===product.id&&p.cityId===store.cityId))continue;

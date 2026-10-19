@@ -142,6 +142,8 @@ try {
   assert.equal(coreRun.absoluteWeek,16);assert.ok(coreRun.reports.length===15);
   assert.ok(coreRun.companies.every(c=>c.cash>=0));
   assert.equal(coreRun.staff.player.production,2);
+  assert.ok(coreRun.macro.events.some(e=>e.week===13));
+  assert.match(await page.locator('.macroReport').innerText(),/Week 13/);
   assert.ok(coreRun.brand['player|north|mainstream']>0);
   assert.ok(coreRun.products.some(p=>p.parentId==='nova'&&p.revision===2));
   assert.equal(coreRun.products.find(p=>p.id==='nova').quality,68);

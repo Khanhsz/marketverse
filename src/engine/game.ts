@@ -1,3 +1,5 @@
+import { initializeMacro, resolveMacro, validateMacro } from './macro.ts';
+import type { Macro } from './macro.ts';
 import { initializeStaff, updateBrand, validatePeople } from './people.ts';
 import type { Staff } from './people.ts';
 import { validateProducts } from './products.ts';
@@ -13,15 +15,15 @@ import type { DemandCell } from './demand.ts';
 import { initialPolicies, applyOrders, progressProjects, validateOrdersState } from './orders.ts';
 import type { Policy, Project, TurnOrders } from './orders.ts';
 import { placementError } from './entities.ts';
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 export const WEEKS_PER_YEAR = 52;
 export type Segment = 'value' | 'mainstream' | 'premium';
 export type City = { id:string; name:string; x:number; y:number; population:number; power:number; segments:Record<Segment,number>; links:string[] };
 export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number; strategy?:Archetype };
 export type Product = { id:string; companyId:string; name:string; price:number; cost:number; quality:number; inventory:number; segment:Segment; attributes:Attributes; revision:number; lifecycle:'active'|'legacy'|'retired'; parentId?:string };
 export type Facility = { id:string; companyId:string; cityId:string; kind:'hq'|'store'|'factory'|'warehouse'|'rd'; name:string };
-export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[]; sales?:Sale[]; production?:Production[]; financials?:FinancialReport[] };
-export type GameState = { version:6; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[]; stocks:StockLot[]; factories:Factory[]; finance:Record<string,Finance>; ledger:Journal[]; staff:Record<string,Staff>; brand:Record<string,number> };
+export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[]; sales?:Sale[]; production?:Production[]; financials?:FinancialReport[]; macro?:{index:number;seasonal:number;eventId?:string|null} };
+export type GameState = { version:7; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[]; stocks:StockLot[]; factories:Factory[]; finance:Record<string,Finance>; ledger:Journal[]; staff:Record<string,Staff>; brand:Record<string,number>; macro:Macro };
 export function calendarOf(absoluteWeek:number) {
   if (!Number.isSafeInteger(absoluteWeek)||absoluteWeek<1) throw new RangeError('Invalid week');
   return { year:Math.floor((absoluteWeek-1)/WEEKS_PER_YEAR)+1, week:((absoluteWeek-1)%WEEKS_PER_YEAR)+1 };
@@ -48,7 +50,7 @@ export function createInitialGame(seed=20261020):GameState {
     {id:'vectra-store',companyId:'value',cityId:'south',kind:'store',name:'Vectra Retail'},
     {id:'atlas-store',companyId:'premium',cityId:'north',kind:'store',name:'Atlas Showroom'}
   ];
-  const state:GameState={version:6,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[],policies:initialPolicies({companies,products}),projects:[],commandHistory:[],stocks:initializeStocks({products,facilities,cities}),factories:[],finance:{},ledger:[],staff:{},brand:{}};
+  const state:GameState={version:7,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[],policies:initialPolicies({companies,products}),projects:[],commandHistory:[],stocks:initializeStocks({products,facilities,cities}),factories:[],finance:{},ledger:[],staff:{},brand:{},macro:initializeMacro({absoluteWeek:1,cities})};
   state.staff=initializeStaff(state);state.finance=initializeFinance(state);validateState(state);return state;
 }
 export function createRng(seed:number):()=>number {
@@ -73,6 +75,7 @@ export function validateState(s:GameState):void {
   }
   for(const p of s.products)if(!p.name||!companyIds.has(p.companyId)||!Number.isSafeInteger(p.inventory)||p.inventory<0||![p.price,p.cost,p.quality].every(v=>Number.isFinite(v)&&v>=0)||p.quality>100||!['value','mainstream','premium'].includes(p.segment))throw new Error('Invalid product');
   for(const f of s.facilities){const error=placementError(s,f,f.id);if(!f.name||error)throw new Error('Invalid facility: '+(error||'missing name'));}
+  validateMacro(s);
   validatePeople(s);
   validateProducts(s);
   validateOrdersState(s);
@@ -85,6 +88,7 @@ export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   // Form AI plans from the previous public snapshot, before player orders.
   const aiPlans=current.companies.filter(c=>c.control==='ai').map(c=>({actor:c.id,orders:planAI(observeMarket(current,c.id))}));
   const next=structuredClone(current),events:string[]=[];
+  resolveMacro(next,events);
   applyOrders(next,next.playerId,orders||{id:`turn-${current.absoluteWeek}`,expectedWeek:current.absoluteWeek,projects:[]},events);
   for(const ai of aiPlans)applyOrders(next,ai.actor,ai.orders,events);
   progressProjects(next,events);
@@ -94,10 +98,10 @@ export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   updateBrand(next);
   const financials=financialReports(next,Object.fromEntries(current.companies.map(c=>[c.id,c.cash])));
   const cashDelta=Object.fromEntries(next.companies.map(c=>[c.id,c.cash-current.companies.find(old=>old.id===c.id)!.cash]));
-  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:false,demand,...operations,financials});
+  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:false,demand,...operations,financials,macro:{index:next.macro.index,seasonal:next.macro.seasonal,eventId:next.macro.events.find(e=>e.week===current.absoluteWeek)?.id??null}});
   next.absoluteWeek++;Object.assign(next,calendarOf(next.absoluteWeek));
   validateState(next);return next;
 }
 export const SAVE_KEY='marketverse:sprint01:state';
 export function serializeGame(s:GameState):string {validateState(s);return JSON.stringify(s);}
-export function deserializeGame(raw:string):GameState {const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');if(s.version===1){s.version=2;s.policies=initialPolicies(s);s.projects=[];s.commandHistory=[];}if(s.version===2){s.version=3;s.stocks=initializeStocks(s);s.factories=[];for(const p of s.projects)if(p.kind==='shipment'&&p.status==='active')p.cargo=[{quantity:p.quantity,unitCost:s.products.find((x:Product)=>x.id===p.productId)?.cost||0}];}if(s.version===3){s.version=4;s.finance=initializeFinance(s);s.ledger=[];}if(s.version===4){s.version=5;for(const p of s.products){p.attributes||={quality:p.quality,design:p.quality,performance:p.quality,durability:p.quality};p.revision||=1;p.lifecycle||='active';}}if(s.version===5){s.version=6;s.staff=initializeStaff(s);s.brand={};for(const policy of Object.values(s.policies) as Policy[])policy.media||={};}validateState(s as GameState);return s as GameState;}
+export function deserializeGame(raw:string):GameState {const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');if(s.version===1){s.version=2;s.policies=initialPolicies(s);s.projects=[];s.commandHistory=[];}if(s.version===2){s.version=3;s.stocks=initializeStocks(s);s.factories=[];for(const p of s.projects)if(p.kind==='shipment'&&p.status==='active')p.cargo=[{quantity:p.quantity,unitCost:s.products.find((x:Product)=>x.id===p.productId)?.cost||0}];}if(s.version===3){s.version=4;s.finance=initializeFinance(s);s.ledger=[];}if(s.version===4){s.version=5;for(const p of s.products){p.attributes||={quality:p.quality,design:p.quality,performance:p.quality,durability:p.quality};p.revision||=1;p.lifecycle||='active';}}if(s.version===5){s.version=6;s.staff=initializeStaff(s);s.brand={};for(const policy of Object.values(s.policies) as Policy[])policy.media||={};}if(s.version===6){s.version=7;s.macro=initializeMacro(s);}validateState(s as GameState);return s as GameState;}
