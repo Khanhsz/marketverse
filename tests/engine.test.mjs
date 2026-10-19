@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+test('project has weekly engine',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/WEEKS_PER_YEAR = 52/));
+test('project has calendar rollovers',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/absoluteWeek-1/));
+test('project has deterministic random generator',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/createRng/));
+test('project has state validation',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/validateState/));
+test('project has controlled weekly turn',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/advanceWeek/));
+test('project prevents phantom economy',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/cashDelta:Object.fromEntries/));
+test('project has save serialization',()=>assert.match(readFileSync('src/engine/game.ts','utf8'),/serializeGame/));
+test('project has map renderer',()=>assert.match(readFileSync('src/ui/CountryMap.tsx','utf8'),/Application/));
+test('project has selected city',()=>assert.match(readFileSync('src/ui/App.tsx','utf8'),/setSelected/));
+test('project has next week button',()=>assert.match(readFileSync('src/ui/App.tsx','utf8'),/NEXT WEEK/));

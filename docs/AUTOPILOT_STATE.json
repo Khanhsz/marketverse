@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "activeSprint": 1,
+  "completedSprints": [],
+  "phase": "awaiting_ci_and_browser_smoke_test",
+  "lastSummary": "Sprint 01 source pushed; build verification pending GitHub Actions. No background coding agent activated.",
+  "lastUpdated": "2026-10-20"
+}
