@@ -1,5 +1,14 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 16 accepted · Alpha 0.1.0-alpha.1
+- All 16 roadmap sprints accepted at `alpha_candidate`; human gameplay review remains required before public release.
+- Save format 9, canonical checkpoint/command replay, exact production Chromium/Node equality, historical v1–v8 initial/pending/terminal migrations and validated import/export with preservation on failure.
+- Full production UI campaign commits 104 weeks with construction, R&D, hiring, shipping, reload, result scoring and exported save/replay recovery. Local worker verification keeps imports off the main UI thread.
+- Fixed continuous-state precision removes runtime-dependent last-bit differences; map code is split from initial app load and the earlier large-chunk warning is resolved.
+- 53 behavioral tests, formatting, TypeScript/build, browser regression, laptop/DPR profile and 20 audited 104-week balance campaigns pass. Tested source `b020d4d973ae142e966f5017cca77792150caf5d`.
+- Versioned static archive plus SHA-256/source/file manifest prepared locally. No deployment, main merge, recurring Work job, OpenAI API key or separate model API charge.
+
+
 ## 2026-10-20 — Sprint 15 accepted
 - Native focus-contained dialogs with explicit focus return, optional keyboard shortcuts, accessible city/entity alternatives and keyboard map pan/zoom/fit. Added onboarding guide, collapsible/context-reset panels, clearer type/contrast, constant-readable map labels and demand availability labels. Dirty-frame rendering avoids an idle render loop. Browser keyboard/mouse journeys pass; measured laptop/DPR profile and screenshots cover 1024, 1280 and 1440 widths.
 - Validation: 48 tests, build and browser smoke pass; `534d6a5`.

@@ -2,7 +2,7 @@
 
 A map-first, weekly business strategy simulator for laptops and desktops. Build a consumer electronics/appliances company across a fictional country, compete against four budget-bound rivals, and complete a 104-week campaign.
 
-**Alpha candidate `0.1.0-alpha.1` is in final Sprint 16 validation.** Accepted sprint evidence and the live checkpoint are in [the tracker](docs/SPRINT_TRACKER.md), [state](docs/AUTOPILOT_STATE.json) and [validation records](docs/validation/). No public deployment or unattended coding schedule is configured.
+**All 16 roadmap sprints are accepted at Alpha candidate `0.1.0-alpha.1`.** Accepted sprint evidence and the live checkpoint are in [the tracker](docs/SPRINT_TRACKER.md), [state](docs/AUTOPILOT_STATE.json) and [validation records](docs/validation/). No public deployment or unattended coding schedule is configured.
 
 ## Play and develop
 

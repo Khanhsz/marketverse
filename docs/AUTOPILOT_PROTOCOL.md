@@ -31,6 +31,6 @@ Each transition to completed requires commit SHA, test command and result, UI sm
 - Never claim autonomous continuous 24/7 coding unless a persistent authorized scheduled agent is actually enabled and observed.
 
 ## Current handoff
-Read `AUTOPILOT_STATE.json` and `SPRINT_TRACKER.md` for the authoritative status. Implementation has reached Sprint 16 Alpha validation on `codex/marketverse-sprint-continuation`; all prior sprint evidence is in `validation/`. When the state is `alpha_candidate` with completed sprints 1–16, stop new feature work and report the candidate plus human gameplay/release review steps. Do not reset the state or repeat accepted sprints.
+Read `AUTOPILOT_STATE.json` and `SPRINT_TRACKER.md` for the authoritative status. Implementation has completed all 16 sprint acceptance gates at Alpha candidate `0.1.0-alpha.1` on `codex/marketverse-sprint-continuation`; all prior sprint evidence is in `validation/`. When the state is `alpha_candidate` with completed sprints 1–16, stop new feature work and report the candidate plus human gameplay/release review steps. Do not reset the state or repeat accepted sprints.
 
 The authorized session successfully pushes this branch. Native Git access works; GitHub API requests were denied by the environment proxy, so remote CI and PR creation must be reported as unobserved until actually checked. No Work/Codex scheduling tool is exposed. No recurring job has been created, no model API key is used and no API charges are introduced.

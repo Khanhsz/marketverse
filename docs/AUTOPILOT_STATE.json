@@ -19,17 +19,26 @@
     12,
     13,
     14,
-    15
+    15,
+    16
   ],
-  "status": "in_progress",
-  "nextAction": "Read docs/sprints/16.md and implement all acceptance gates; retain completed sprint evidence.",
+  "status": "alpha_candidate",
+  "nextAction": "Human gameplay review of Alpha 0.1.0-alpha.1 using docs/ALPHA_REVIEW.md and known issues. Observe remote CI and review the branch before any merge/public release; do not automatically add further features.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "passed: Sprint 15 and previous browser regression journeys",
-    "lastValidatedCommit": "534d6a5097a3bf42a04ae6bd5923e0a86cc03eb9",
-    "lastLocalTests": 48,
-    "remoteCI": "not observed: api.github.com CONNECT denied HTTP 403"
+    "browserSmoke": "passed: production 104-week UI campaign, save import/export, local worker replay, keyboard/map regression and laptop DPR matrix",
+    "lastValidatedCommit": "b020d4d973ae142e966f5017cca77792150caf5d",
+    "lastLocalTests": 53,
+    "remoteCI": "not observed: previous GitHub API requests were proxy-denied; native Git push succeeds",
+    "alphaVersion": "0.1.0-alpha.1",
+    "alphaArtifactSha256": "2aefde66830b8d3340dc2424efdb392803a8453e7beb185f9458623cbd35351e",
+    "alphaManifest": "docs/validation/ALPHA_CANDIDATE.json",
+    "historicalSaveFixtures": 17,
+    "nodeChromiumReplayExact": true,
+    "balanceCampaigns": 20,
+    "balanceCompleted": 20,
+    "balanceProfitable": 14
   },
   "automation": {
     "requested": true,

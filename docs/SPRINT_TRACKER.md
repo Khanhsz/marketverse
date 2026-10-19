@@ -17,7 +17,7 @@
 | 13 | National Campaign | completed | 46 tests + build + Chromium PASS; `6e542ea`; validation/SPRINT_13.md |
 | 14 | Balance & Scenario Testing | completed | 48 tests + build + Chromium PASS; `e5b5f21`; validation/SPRINT_14.md |
 | 15 | UX Polish & Onboarding | completed | 48 tests + build + Chromium PASS; `534d6a5`; validation/SPRINT_15.md |
-| 16 | Alpha QA & Release Candidate | in progress | end-to-end acceptance |
+| 16 | Alpha QA & Release Candidate | completed · Alpha candidate | 53 tests + build + full production 104-week UI/replay + 20 scenarios PASS; `b020d4d`; validation/SPRINT_16.md |
 
 ## Integration principles
 - This project is not complete at Sprint 01; CI passing is necessary but not sufficient.

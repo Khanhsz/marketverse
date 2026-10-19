@@ -1,5 +1,7 @@
 # MarketVerse — 16-Sprint Development Roadmap
 
+Implementation checkpoint: **16/16 accepted at Alpha candidate `0.1.0-alpha.1`**. See `AUTOPILOT_STATE.json`, `SPRINT_TRACKER.md` and `validation/SPRINT_16.md` for tested source and evidence. Human gameplay review is still required before public release.
+
 **Sprint size:** target 2–4 hours of agent work for small scopes, variable for complex systems. The historical fast-track goal is two sprints/day (8 days) but is not a guarantee; automatic advancement is by quality gate, not clock.
 
 ## Milestones

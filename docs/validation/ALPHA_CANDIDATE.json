@@ -1,0 +1,77 @@
+{
+  "version": "0.1.0-alpha.1",
+  "sourceCommit": "b020d4d973ae142e966f5017cca77792150caf5d",
+  "saveVersion": 9,
+  "replayRulesVersion": 1,
+  "publication": "not published; human gameplay review required",
+  "files": [
+    {
+      "path": "assets/browserAll-7kYFL1a_.js",
+      "bytes": 44175,
+      "sha256": "8c7522f03a1af11d40bb09946e94d3c2b350eab024933ecd4b1a8e1137b726da"
+    },
+    {
+      "path": "assets/CanvasRenderer-C1EMHWde.js",
+      "bytes": 18472,
+      "sha256": "63e359031cb1243f5640358e831142e33c291f65060bd3d7a91b09a95c1096ec"
+    },
+    {
+      "path": "assets/CountryMap-Ce2pa38r.js",
+      "bytes": 296171,
+      "sha256": "a0e42ddf0267d2e06374d95685d7e28429b0feb6b175c6be5ea4c03e1e08919d"
+    },
+    {
+      "path": "assets/Filter-DEG5nV2F.js",
+      "bytes": 909,
+      "sha256": "7c63f3030db0916faea6d692f461a187ade51d686e7c482d76b0558134db3a97"
+    },
+    {
+      "path": "assets/getTexelRangeRects-Dv2cPb67.js",
+      "bytes": 11428,
+      "sha256": "7ea9f27bffe5592138c3b12ea695ed35ea007f08e238910038d2299cc8de5ffb"
+    },
+    {
+      "path": "assets/index-B2PU313W.css",
+      "bytes": 8200,
+      "sha256": "3da6011b688275ce7db81aeba8dacc579098be2bca1d4df2ff8751aef610c03a"
+    },
+    {
+      "path": "assets/index-D4wUMnhS.js",
+      "bytes": 304835,
+      "sha256": "c59144adb573654e6bd8e221ab4d2ea589f7559911f6bb1eacea3270e56201ac"
+    },
+    {
+      "path": "assets/RenderTargetSystem-BZGOYozb.js",
+      "bytes": 53929,
+      "sha256": "9ff543961c202b9e6c6c0bd32fb817c7226359f99a0fcbb5de120dcaafc6e280"
+    },
+    {
+      "path": "assets/replay.worker-DItaQ1GQ.js",
+      "bytes": 42094,
+      "sha256": "b7dd86844a45542e56494ffdc27cae42d867ed7b1065364da3a59d7eef992968"
+    },
+    {
+      "path": "assets/WebGLRenderer-CZNmXVoN.js",
+      "bytes": 73844,
+      "sha256": "d7f6e8f8adf1eb6922dd016275d425ad0802150699c65aab47d9da2b40f71883"
+    },
+    {
+      "path": "assets/WebGPURenderer-BIvTYq82.js",
+      "bytes": 56412,
+      "sha256": "5a978c50a2cb8c9058d4bb0509b7c60ff40af7551a95bb5868f71793cfdc0e0e"
+    },
+    {
+      "path": "assets/webworkerAll-f3-YvBQJ.js",
+      "bytes": 15216,
+      "sha256": "f3021033ba1694608bef3037cda08640d1e352f18656e7c06d2754b326792846"
+    },
+    {
+      "path": "index.html",
+      "bytes": 378,
+      "sha256": "fa95e7922cf77491b5d712df29b58b88ffafb7fbf7e8193259f795ac4e78e23a"
+    }
+  ],
+  "artifact": ".artifacts/marketverse-0.1.0-alpha.1.tar.gz",
+  "artifactBytes": 278703,
+  "artifactSha256": "2aefde66830b8d3340dc2424efdb392803a8453e7beb185f9458623cbd35351e"
+}
