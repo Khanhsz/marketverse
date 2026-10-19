@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 08 accepted
+- Four bounded AI archetypes plan solely from own resources and previous public market prices, then use shared order, construction, research, shipping and cash rules. A deterministic four-rival 16-week test audits every ledger and replay; browser advances through the playable core and displays rival strategy. Tests verify hidden player policy changes cannot affect AI plans.
+- Validation: 34 tests, build and browser smoke pass; `10dcdd9`.
+
 ## 2026-10-20 — Sprint 07 accepted
 - Double-entry integer-credit ledger, opening balances, inventory and cash reconciliation, capitalized construction, loans/principal/interest, payroll/rent/marketing, payables and prolonged-default bankruptcy. Tests prove net-worth/profit reconciliation, no profit from loans, asset commissioning, tamper rejection and identical JSON replay. Browser verifies profit/capex reporting alongside weekly order review.
 - Validation: 31 tests, build and browser smoke pass; `23a8423`.

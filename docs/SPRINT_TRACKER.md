@@ -9,8 +9,8 @@
 | 05 | Customer Segments & Demand | completed | 24 tests + build + Chromium PASS; `9d8240e`; validation/SPRINT_05.md |
 | 06 | Production, Inventory & Logistics | completed | 27 tests + build + Chromium PASS; `3a4ec83`; validation/SPRINT_06.md |
 | 07 | Finance & Cash Flow | completed | 31 tests + build + Chromium PASS; `23a8423`; validation/SPRINT_07.md |
-| 08 | Competitor AI | in progress | fair, bounded resource decisions |
-| 09 | Product Design & R&D | queued | SKU + tech progression |
+| 08 | Competitor AI | completed | 34 tests + build + Chromium PASS; `10dcdd9`; validation/SPRINT_08.md |
+| 09 | Product Design & R&D | in progress | SKU + tech progression |
 | 10 | Marketing, Brand & HR | queued | multi-strategy staffing & marketing |
 | 11 | Weekly Reports & Analytics | queued | causal KPI explanation |
 | 12 | Economic Events & Markets | queued | seeded plausible macro shocks |
