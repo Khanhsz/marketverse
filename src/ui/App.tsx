@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { localStock } from '../engine/operations';
 import { WeeklyPlanner } from './WeeklyPlanner';
 import { CountryMap } from './CountryMap';
 import { advanceWeek, createInitialGame, deserializeGame, SAVE_KEY, serializeGame } from '../engine/game';
@@ -72,9 +73,10 @@ export function App() {
           <h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
         </>}
         {game.reports.at(-1)?.demand&&<details className="demandReport" open><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
+        <h3>LOCAL INVENTORY · {city.name}</h3>{game.products.map(p=><p className="muted" key={p.id}>{p.name}: {localStock(game,p.id,city.id)} units</p>)}
         <h3>PROJECT QUEUE</h3>{game.projects.filter(p=>p.companyId===player.id&&p.status==='active').map(p=><p className="queueItem" key={p.id}>{p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}</p>)}
         {game.reports.length>0&&<details><summary>Last weekly report</summary>{game.reports.at(-1)!.events.map((e,i)=><p className="muted" key={i}>{e}</p>)}<p>Cash change: {game.reports.at(-1)!.cashDelta[player.id]}</p></details>}
-        <div className="notice">Demand, production and sales are introduced by the next simulation sprints.</div>
+        <div className="notice">Sales use local stock; shipments require owned facilities at both ends. Production requires a factory and a persistent target.</div>
         <button className="entityLink" onClick={exportGame}>Export save</button>
       </aside>
     </div>

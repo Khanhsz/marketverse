@@ -1,3 +1,5 @@
+import { consumeStock, receiveStock, localStock } from './operations.ts';
+import type { Cargo } from './operations.ts';
 import type { GameState, Facility } from './game.ts';
 import { placementError } from './entities.ts';
 import { BUILD_RULES, RESEARCH_RULE, SHIPPING_RULE } from '../data/rules.ts';
@@ -6,7 +8,7 @@ export type ProjectRequest =
   | { kind: 'construction'; cityId: string; facilityKind: Facility['kind'] }
   | { kind: 'research'; productId: string }
   | { kind: 'shipment'; productId: string; originId: string; cityId: string; quantity: number };
-export type Project = ProjectRequest & { id: string; companyId: string; cost: number; createdWeek: number; dueWeek: number; remaining: number; status: 'active' | 'completed' };
+export type Project = ProjectRequest & { id: string; companyId: string; cost: number; createdWeek: number; dueWeek: number; remaining: number; status: 'active' | 'completed'; cargo?:Cargo[] };
 export type TurnOrders = { id: string; expectedWeek: number; policy?: Policy; projects: ProjectRequest[] };
 export const integer = (n: number, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(n) && n >= min && n <= max;
 export function initialPolicies(state: Pick<GameState, 'companies' | 'products'>): Record<string, Policy> {
@@ -40,7 +42,7 @@ export function quoteProject(state: GameState, actor: string, request: ProjectRe
   const path=route(state,request.originId,request.cityId);
   if(!path)throw new Error('No transport route');
   for(const id of [request.originId,request.cityId])if(!state.facilities.some(f=>f.companyId===actor&&f.cityId===id))throw new Error('Company needs facilities at both shipment nodes');
-  if(product.inventory<request.quantity)throw new Error('Insufficient inventory');
+  if(localStock(state,product.id,request.originId)<request.quantity)throw new Error('Insufficient inventory');
   return {cost:SHIPPING_RULE.base+request.quantity*(path.length-1)*SHIPPING_RULE.perUnitPerLink,weeks:Math.min(3,path.length-1)};
 }
 export function validatePolicy(state: GameState, actor: string, policy: Policy) {
@@ -61,7 +63,7 @@ export function applyOrders(next: GameState, actor: string, orders: TurnOrders, 
     company.cash-=quote.cost;
     const id=`${actor}:${orders.id}:${index}`;
     next.projects.push({...request,id,companyId:actor,cost:quote.cost,createdWeek:next.absoluteWeek,dueWeek:next.absoluteWeek+quote.weeks,remaining:quote.weeks,status:'active'});
-    if(request.kind==='shipment')next.products.find(p=>p.id===request.productId)!.inventory-=request.quantity;
+    if(request.kind==='shipment')next.projects.at(-1)!.cargo=consumeStock(next,request.productId,request.originId,request.quantity);
     events.push(`${actor}: ${request.kind} committed (${quote.cost} credits, ${quote.weeks} weeks)`);
   }
   for(const [id,price] of Object.entries(next.policies[actor].prices))next.products.find(p=>p.id===id)!.price=price;
@@ -74,7 +76,7 @@ export function progressProjects(next: GameState, events: string[]) {
     if(project.remaining>0)continue;
     project.status='completed';
     if(project.kind==='construction')next.facilities.push({id:`${project.id}:asset`,companyId:project.companyId,cityId:project.cityId,kind:project.facilityKind,name:`${project.companyId.toUpperCase()} ${project.facilityKind.toUpperCase()}`});
-    if(project.kind==='shipment')next.products.find(p=>p.id===project.productId)!.inventory+=project.quantity;
+    if(project.kind==='shipment')receiveStock(next,project.id,project.productId,project.cityId,project.cargo||[]);
     events.push(`${project.companyId}: ${project.kind} completed (${project.id})`);
   }
 }

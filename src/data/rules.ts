@@ -11,3 +11,4 @@ export const SEGMENT_RULES = {
   premium: { referencePrice: 450, elasticity: 1.6, qualityWeight: 3.1, match: 0.7 },
 } as const;
 export const WEEKLY_PURCHASE_RATE = 0.0004;
+export const FACTORY_RULE = { capacity: 200, requiredWorkers: 4, starterWorkers: 2, materialShare: 0.75 };

@@ -1,17 +1,19 @@
+import { initializeStocks, simulateOperations, validateOperations } from './operations.ts';
+import type { StockLot, Factory, Sale, Production } from './operations.ts';
 import { calculateDemand } from './demand.ts';
 import type { DemandCell } from './demand.ts';
 import { initialPolicies, applyOrders, progressProjects, validateOrdersState } from './orders.ts';
 import type { Policy, Project, TurnOrders } from './orders.ts';
 import { placementError } from './entities.ts';
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 export const WEEKS_PER_YEAR = 52;
 export type Segment = 'value' | 'mainstream' | 'premium';
 export type City = { id:string; name:string; x:number; y:number; population:number; power:number; segments:Record<Segment,number>; links:string[] };
 export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number };
 export type Product = { id:string; companyId:string; name:string; price:number; cost:number; quality:number; inventory:number; segment:Segment };
 export type Facility = { id:string; companyId:string; cityId:string; kind:'hq'|'store'|'factory'|'warehouse'|'rd'; name:string };
-export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[] };
-export type GameState = { version:2; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[] };
+export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[]; sales?:Sale[]; production?:Production[] };
+export type GameState = { version:3; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[]; stocks:StockLot[]; factories:Factory[] };
 export function calendarOf(absoluteWeek:number) {
   if (!Number.isSafeInteger(absoluteWeek)||absoluteWeek<1) throw new RangeError('Invalid week');
   return { year:Math.floor((absoluteWeek-1)/WEEKS_PER_YEAR)+1, week:((absoluteWeek-1)%WEEKS_PER_YEAR)+1 };
@@ -38,7 +40,7 @@ export function createInitialGame(seed=20261020):GameState {
     {id:'vectra-store',companyId:'value',cityId:'south',kind:'store',name:'Vectra Retail'},
     {id:'atlas-store',companyId:'premium',cityId:'north',kind:'store',name:'Atlas Showroom'}
   ];
-  const state:GameState={version:2,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[],policies:initialPolicies({companies,products}),projects:[],commandHistory:[]};
+  const state:GameState={version:3,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[],policies:initialPolicies({companies,products}),projects:[],commandHistory:[],stocks:initializeStocks({products,facilities,cities}),factories:[]};
   validateState(state);return state;
 }
 export function createRng(seed:number):()=>number {
@@ -64,6 +66,7 @@ export function validateState(s:GameState):void {
   for(const p of s.products)if(!p.name||!companyIds.has(p.companyId)||!Number.isSafeInteger(p.inventory)||p.inventory<0||![p.price,p.cost,p.quality].every(v=>Number.isFinite(v)&&v>=0)||p.quality>100||!['value','mainstream','premium'].includes(p.segment))throw new Error('Invalid product');
   for(const f of s.facilities){const error=placementError(s,f,f.id);if(!f.name||error)throw new Error('Invalid facility: '+(error||'missing name'));}
   validateOrdersState(s);
+  validateOperations(s);
   for(const co of s.companies)if(!co.name||!['human','ai'].includes(co.control)||!Number.isFinite(co.cash)||!Number.isFinite(co.debt)||co.debt<0)throw new Error('Invalid finance');
 }
 export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
@@ -71,11 +74,13 @@ export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   const next=structuredClone(current),events:string[]=[];
   applyOrders(next,next.playerId,orders||{id:`turn-${current.absoluteWeek}`,expectedWeek:current.absoluteWeek,projects:[]},events);
   progressProjects(next,events);
+  const demand=calculateDemand(next);
+  const operations=simulateOperations(next,demand,events);
   const cashDelta=Object.fromEntries(next.companies.map(c=>[c.id,c.cash-current.companies.find(old=>old.id===c.id)!.cash]));
-  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:true,demand:calculateDemand(next)});
+  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:false,demand,...operations});
   next.absoluteWeek++;Object.assign(next,calendarOf(next.absoluteWeek));
   validateState(next);return next;
 }
 export const SAVE_KEY='marketverse:sprint01:state';
 export function serializeGame(s:GameState):string {validateState(s);return JSON.stringify(s);}
-export function deserializeGame(raw:string):GameState {const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');if(s.version===1){s.version=2;s.policies=initialPolicies(s);s.projects=[];s.commandHistory=[];}validateState(s as GameState);return s as GameState;}
+export function deserializeGame(raw:string):GameState {const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');if(s.version===1){s.version=2;s.policies=initialPolicies(s);s.projects=[];s.commandHistory=[];}if(s.version===2){s.version=3;s.stocks=initializeStocks(s);s.factories=[];for(const p of s.projects)if(p.kind==='shipment'&&p.status==='active')p.cargo=[{quantity:p.quantity,unitCost:s.products.find((x:Product)=>x.id===p.productId)?.cost||0}];}validateState(s as GameState);return s as GameState;}
