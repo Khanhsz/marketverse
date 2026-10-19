@@ -1,5 +1,10 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 01 accepted
+- Added repeatable Chromium smoke, Playwright dev tooling and dependency lockfile.
+- Verified all city selections, tabs, week advancement, local save/reload, reset, laptop layout and no page errors.
+- 10 engine tests and production build pass; transitioned to Sprint 02.
+
 ## 2026-10-20 — Agent-ready foundation
 - Canonical game design, architecture, simulation, schema, UX and sprint roadmap committed for new Codex/ChatGPT Work sessions.
 - Added explicit no-API-key automation and quality gate contract.

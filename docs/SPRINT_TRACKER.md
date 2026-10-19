@@ -2,8 +2,8 @@
 
 | Sprint | Name | Status | Proof / next gate |
 |---:|---|---|---|
-| 01 | Foundation & Data Schema | awaiting browser validation | GitHub CI build+10 behavior tests PASS at `7606717`; real browser smoke pending |
-| 02 | Country Strategy Map | queued | pan/zoom/layers/no fog |
+| 01 | Foundation & Data Schema | completed | 10 tests + typecheck/build + real Chromium smoke PASS; `eed7a83`; see validation/SPRINT_01.md |
+| 02 | Country Strategy Map | in progress | pan/zoom/layers/no fog |
 | 03 | Cities, Companies & Facilities | queued | selectable geolocated assets |
 | 04 | Weekly Decision Engine | queued | policies persist, queued jobs |
 | 05 | Customer Segments & Demand | queued | reproducible demand and preference allocation |

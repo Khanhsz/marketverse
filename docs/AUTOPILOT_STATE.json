@@ -3,21 +3,26 @@
   "project": "MarketVerse",
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
-  "activeSprint": 1,
-  "completedSprints": [],
-  "status": "awaiting_validation",
-  "nextAction": "Perform real browser smoke of Sprint 01, resolve any runtime issues, then record evidence and advance to Sprint 02.",
+  "activeSprint": 2,
+  "completedSprints": [
+    1
+  ],
+  "status": "in_progress",
+  "nextAction": "Implement Sprint 02 camera, semantic layers and browser quality gates.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "pending"
+    "browserSmoke": "passed: Chromium 1366x768, all cities, week/save/reload/reset/tabs",
+    "lastValidatedCommit": "eed7a83ce5cfe4ad6cf712e91d04ff986b7b7f01",
+    "lastLocalTests": 10
   },
   "automation": {
     "requested": true,
     "runner": "unconfigured",
     "scheduledWorkTask": "unconfigured",
     "requiresOpenAIApiKey": false,
-    "autoAdvancePolicy": "advance_on_quality_gate"
+    "autoAdvancePolicy": "advance_on_quality_gate",
+    "schedulingBlocker": "No Work/Codex scheduling tool is exposed in this authorized session."
   },
   "updatedOn": "2026-10-20"
 }

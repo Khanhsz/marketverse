@@ -15,11 +15,11 @@
 - [x] Foundation source committed and GitHub Actions verified on commit `7606717`.
 - [x] 10 engine behavioral tests passed in GitHub Actions.
 - [x] React/TypeScript/Pixi production bundle built in GitHub Actions.
-- [ ] Open app in real browser: map displays without a Pixi runtime error.
-- [ ] Click each city and verify contextual panel updates.
-- [ ] Click Next Week and check calendar progression and localStorage save.
-- [ ] Reload and verify saved week; Reset restores week 1.
-- [ ] Check viewport at typical laptop width.
+- [x] Open app in real browser: map displays without a Pixi runtime error.
+- [x] Click each city and verify contextual panel updates.
+- [x] Click Next Week and check calendar progression and localStorage save.
+- [x] Reload and verify saved week; Reset restores week 1.
+- [x] Check viewport at typical laptop width.
 
 ## Sprint transition
 Only a coding agent with actual source/test access can attest a test gate. Never treat a mock, inferred result, or checklist checkbox as a verified test. If a gate is not available in the execution environment, mark pending.
