@@ -1,0 +1,7 @@
+closing_cash,cumulative_profit,mode,reconciled,rounds,units,variant
+1088108.8,608108.8,pc_operations,True,8,1600,baseline
+844149.2,944869.2,pc_operations,True,8,2360,active
+279200.0,-10800.0,supply_network,True,6,0,baseline
+401857.4,111857.4,supply_network,True,6,987,active
+3247940.45,2747940.45,global_treasury,True,8,6353,baseline
+3352554.01,2852554.01,global_treasury,True,8,6822,active
