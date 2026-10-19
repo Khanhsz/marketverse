@@ -8,7 +8,7 @@ import { FACTORY_RULE } from '../data/rules.ts';
 export type StockLot = { id:string; productId:string; cityId:string; quantity:number; unitCost:number };
 export type Cargo = { quantity:number; unitCost:number };
 export type Factory = { facilityId:string; capacity:number; workers:number; inputs:number };
-export type Sale = {cityId:string;segment:string;productId:string;desired:number;units:number;revenue:number;cogs:number};
+export type Sale = {cityId:string;segment:string;productId:string;desired:number;units:number;revenue:number;cogs:number;lostStock:number;lostStaff:number};
 export type Production = {facilityId:string;productId:string;units:number;cost:number;materialCost:number;laborCost:number};
 export function initializeStocks(state: Pick<GameState,'products'|'facilities'|'cities'>):StockLot[] {
   return state.products.filter(p=>p.inventory>0).map(p=>({id:`opening:${p.id}`,productId:p.id,cityId:state.facilities.find(f=>f.companyId===p.companyId&&(f.kind==='hq'||f.kind==='store'))?.cityId||state.cities[0].id,quantity:p.inventory,unitCost:p.cost}));
@@ -54,13 +54,14 @@ export function simulateOperations(state:GameState,demand:DemandCell[],events:st
   for(const cell of demand)for(const allocation of cell.allocations){
     const p=state.products.find(p=>p.id===allocation.productId)!;
     const accessible=state.facilities.some(f=>f.companyId===p.companyId&&f.cityId===cell.cityId&&f.kind==='store');
+    const stockLimit=accessible?Math.min(allocation.desired,localStock(state,p.id,cell.cityId)):0;
     const units=accessible?Math.min(allocation.desired,localStock(state,p.id,cell.cityId),salesCapacity[p.companyId]):0;
     salesCapacity[p.companyId]-=units;
     const cargo=consumeStock(state,p.id,cell.cityId,units);
     const revenue=units*p.price,cogs=cargo.reduce((n,l)=>n+l.quantity*l.unitCost,0);
     post(state,p.companyId,'Fulfilled sales',{cash:revenue,revenue:-revenue});
     post(state,p.companyId,'Cost of fulfilled goods',{cogs,inventory:-cogs});
-    sales.push({cityId:cell.cityId,segment:cell.segment,productId:p.id,desired:allocation.desired,units,revenue,cogs});
+    sales.push({cityId:cell.cityId,segment:cell.segment,productId:p.id,desired:allocation.desired,units,revenue,cogs,lostStock:allocation.desired-stockLimit,lostStaff:stockLimit-units});
   }
   const fulfilled=sales.reduce((n,s)=>n+s.units,0);events.push(`${fulfilled} units fulfilled from local stock; ${sales.reduce((n,s)=>n+s.desired-s.units,0)} preferred orders unfilled.`);
   return {sales,production};

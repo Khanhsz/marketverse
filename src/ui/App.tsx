@@ -1,3 +1,5 @@
+import { ReportsPanel } from './ReportsPanel';
+import { mapMetrics } from '../engine/analytics';
 import { brandKey } from '../engine/people';
 import { useState, useEffect, useRef } from 'react';
 import { localStock } from '../engine/operations';
@@ -18,6 +20,7 @@ function loadGame() {
   return { game: createInitialGame(), recovery: '' };
 }
 export function App() {
+  const [reportsOpen,setReportsOpen]=useState(false);
   const [plannerOpen,setPlannerOpen]=useState(false);
   const committedWeek=useRef(0);
   const [loaded] = useState(loadGame);
@@ -45,9 +48,9 @@ export function App() {
     <header className="header"><div className="logo">◆ MARKETVERSE <span>COUNTRY STRATEGY</span></div>
       <div className="metrics"><div><small>PERIOD</small><b>Y{game.year.toString().padStart(2,'0')} · W{game.week.toString().padStart(2,'0')}</b></div><div><small>CASH</small><b>{number(player.cash)}</b></div><div><small>CITIES</small><b>{game.cities.length}</b></div></div>
     </header>
-    <div className="workspace"><nav className="rail"><button aria-label="Map" aria-pressed={context.kind==='city'} onClick={()=>choose({kind:'city',id:city.id})}>⌖</button><button aria-label="Company" aria-pressed={context.kind==='company'} onClick={()=>choose({kind:'company',id:player.id})}>▦</button></nav>
+    <div className="workspace"><nav className="rail"><button aria-label="Map" aria-pressed={context.kind==='city'} onClick={()=>choose({kind:'city',id:city.id})}>⌖</button><button aria-label="Company" aria-pressed={context.kind==='company'} onClick={()=>choose({kind:'company',id:player.id})}>▦</button><button aria-label="Reports" onClick={()=>setReportsOpen(true)}>≋</button></nav>
       <main className="mapArea"><div className="overlay">COUNTRY STRATEGY MAP</div>
-        <CountryMap cities={game.cities} facilities={game.facilities} companies={game.companies} selectedCityId={city.id} selection={selection} onSelect={choose}/>
+        <CountryMap cities={game.cities} facilities={game.facilities} companies={game.companies} selectedCityId={city.id} selection={selection} metrics={mapMetrics(game)} onSelect={choose}/>
         <div className="mapFoot">{game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST</div>
       </main>
       <aside className="panel" aria-label="Selection details" data-selection={`${context.kind}:${context.entity.id}`}>
@@ -84,6 +87,7 @@ export function App() {
     </div>
     {(recovery || storageError) && <div className="saveWarning" role="alert"><strong>{recovery?'Saved game could not be loaded. Original data is preserved; gameplay is paused.':storageError}</strong><button onClick={exportGame}>{recovery?'Export original save':'Export save'}</button><span>Use Reset only when you are ready to discard the saved game.</span></div>}
     <footer className="footer"><div>● {recovery || storageError?'SAVE NEEDS ATTENTION':'LOCAL SAVE'} <span>· Weekly engine active · Orders · Inventory · Finance active</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game? This discards the existing save.')){setGame(createInitialGame());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>RESET</button><button className="next" disabled={!!recovery} onClick={()=>setPlannerOpen(true)}>NEXT WEEK →</button></div></footer>
+    {reportsOpen&&<ReportsPanel game={game} onClose={()=>setReportsOpen(false)}/> }
     {plannerOpen&&<WeeklyPlanner game={game} cityId={city.id} onClose={()=>setPlannerOpen(false)} onCommit={orders=>{if(committedWeek.current===orders.expectedWeek)throw new Error('Week already committed');const next=advanceWeek(game,orders);committedWeek.current=orders.expectedWeek;setGame(next);setPlannerOpen(false);}}/>}
   </div>;
 }

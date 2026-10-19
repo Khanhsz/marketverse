@@ -148,6 +148,16 @@ try {
   await page.getByRole('button',{name:'Company',exact:true}).click();
   assert.match(await page.locator('.panel').innerText(),/R2/);
   assert.match(await page.locator('.panel').innerText(),/Performance/);
+  await page.getByRole('button',{name:'Reports',exact:true}).click();
+  assert.match(await page.getByRole('dialog').innerText(),/Recognized profit components/);
+  assert.equal(await page.getByRole('img',{name:'Profit over the last thirteen completed weeks'}).count(),1);
+  await page.getByLabel('Report period',{exact:true}).selectOption('13');
+  assert.match(await page.getByRole('dialog').innerText(),/Partial period/);
+  await page.getByRole('button',{name:'Previous period',exact:true}).click();
+  assert.match(await page.getByRole('dialog').innerText(),/13\/13 reported/);
+  await page.getByLabel('Report period',{exact:true}).selectOption('52');
+  assert.match(await page.getByRole('dialog').innerText(),/52/);
+  await page.getByRole('button',{name:'Close reports',exact:true}).click();
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});

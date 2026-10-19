@@ -1,3 +1,4 @@
+import type { CityMetrics } from '../engine/analytics';
 import { useEffect, useRef, useState } from 'react';
 import { Application, Container, Graphics, Text } from 'pixi.js';
 import type { City, Facility, Company } from '../engine/game';
@@ -5,14 +6,14 @@ import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './ca
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 
-type Props = { cities: City[]; facilities: Facility[]; companies: Company[]; selectedCityId: string; selection: Selection; onSelect: (selection: Selection) => void };
+type Props = { cities: City[]; facilities: Facility[]; companies: Company[]; selectedCityId: string; selection: Selection; metrics:CityMetrics[]; onSelect: (selection: Selection) => void };
 const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] as const;
 type Layer = typeof layers[number];
 const legends: Record<Layer, string> = {
-  Market: 'Population · Value / Mainstream / Premium segments',
-  Competition: 'Dark green: NOVA · Slate: VECTRA · Ochre: ATLAS',
+  Market: 'Population and last resolved week potential buyers',
+  Competition: 'Ownership colors and measured player share of fulfilled units',
   Operations: 'Facility labels show existing assets; select for operational details',
-  Logistics: 'Existing transport links · Lead times and costs not yet simulated',
+  Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
 const ownerColor = (id: string) => id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
@@ -68,7 +69,7 @@ export function CountryMap(props: Props) {
         roads.stroke({ color: active === 'Logistics' ? 0x618c80 : 0xf8faf8, width: active === 'Logistics' ? 10 : 7 }); world.addChildAt(roads, 1);
         for (const city of cities) {
           const x = city.x * MAP_UNITS, y = city.y * MAP_UNITS;
-          const selected = city.id === selectedCityId;
+          const selected = city.id === selectedCityId,metric=current.current.metrics.find(m=>m.cityId===city.id);
           if (active === 'Market' || active === 'Economy') {
             const halo = new Graphics().circle(x, y, active === 'Market' ? Math.sqrt(city.population) / 16 : city.power * 50).fill({ color: active === 'Market' ? 0x82a898 : 0xb9ad83, alpha: 0.26 });
             world.addChild(halo);
@@ -76,8 +77,11 @@ export function CountryMap(props: Props) {
           if (selected) world.addChild(new Graphics().circle(x, y, 36).stroke({ color: 0x24554b, width: 3 }));
           world.addChild(new Graphics().roundRect(x - 15, y - 15, 30, 30, 6).fill(selected ? 0x24554b : 0x6d8880));
           label(city.name.toUpperCase(), x + 40, y - 18);
-          if (active === 'Market') label(`${(city.population / 1000000).toFixed(2)}M · ${Object.values(city.segments).map(v => Math.round(v * 100)).join(' / ')}%`, x + 40, y + 12, 16);
+          if (active === 'Market') label(`${(city.population / 1000000).toFixed(2)}M · ${metric?.potential||0} potential buyers`, x + 40, y + 12, 16);
           if (active === 'Economy') label(`PURCHASING POWER ${city.power.toFixed(2)}×`, x + 40, y + 12, 16);
+          if(active === 'Operations')label(`PLAYER STOCK ${metric?.stock||0} · MADE ${metric?.produced||0}`,x+40,y+12,16);
+          if(active === 'Logistics')label(`INCOMING ${metric?.incoming||0} UNITS`,x+40,y+12,16);
+          if(active === 'Competition')label(metric?.playerShare===null?'NO SALES YET':`PLAYER SHARE ${((metric?.playerShare||0)*100).toFixed(1)}%`,x+40,y+12,16);
           const assets = facilities.filter(f => f.cityId === city.id);
           assets.forEach((f, index) => {
             const fx = x - 28 + index * 32, fy = y + 52;
@@ -162,7 +166,7 @@ export function CountryMap(props: Props) {
     }).catch(error => { if (!disposed) setFailure(String(error)); });
     return () => { disposed = true; observer?.disconnect(); cleanup(); draw.current = () => {}; controls.current = () => {}; if (initialized) app.destroy(true, { children: true }); };
   }, []);
-  useEffect(() => { draw.current(); }, [props.cities, props.facilities, props.companies, props.selectedCityId, props.selection, layer]);
+  useEffect(() => { draw.current(); }, [props.cities, props.facilities, props.companies, props.selectedCityId, props.selection, props.metrics, layer]);
   return <div className="map" data-error={failure || undefined}>
     <div ref={mount} className="mapSurface" role="img" aria-label="Country strategy map with selectable cities" />
     <div className="mapLayers" role="group" aria-label="Map layers">{layers.map(name => <button key={name} aria-pressed={layer === name} onClick={() => setLayer(name)}>{name}</button>)}</div>
