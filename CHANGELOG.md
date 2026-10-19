@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 13 accepted
+- Eight economically distinct connected cities, four rival archetypes, equipped starter companies and a 104-week national campaign alongside the preserved foundation sandbox. Six weighted objectives measure operating profit, liquidity, realized share, innovation, brand and geographic reach; cash alone cannot win. Tests complete all 104 weeks with quarterly JSON replay checkpoints and valid terminal scoring; browser starts and advances a national campaign.
+- Validation: 46 tests, build and browser smoke pass; `6e542ea`.
+
 ## 2026-10-20 — Sprint 12 accepted
 - Seeded bounded purchasing-power trends, population growth, seasonal demand and narrated thirteen-week macro events with recorded before/after effects. AI uses the previous public macro snapshot, preserving simultaneous-order fairness. Tests replay 52 weeks across seeds, check bounds and causal event references, seasonality, AI response and desktop runtime; browser observes the week-13 event.
 - Validation: 44 tests, build and browser smoke pass; `9e2e96d`.
