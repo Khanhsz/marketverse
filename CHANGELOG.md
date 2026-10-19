@@ -1,5 +1,10 @@
 # MarketVerse Changelog
 
+## Render playtest deployment preparation
+- Added `render.yaml` for a Node 22.23.3 production build published as a Render Static Site from the completed Alpha branch, with automatic deployments disabled.
+- Added `docs/RENDER.md` with private-repository connection, manual setup, playtest and browser-local save instructions. No Render service or public URL has been created; account connection and site creation require the owner's Render session.
+- Local validation: `npm run verify` (53 tests, formatting, TypeScript/build), `npm run test:browser` and sprint-state check pass. Render-side Blueprint validation/build and GitHub CI have not been observed.
+
 ## 2026-10-20 — Sprint 16 accepted · Alpha 0.1.0-alpha.1
 - All 16 roadmap sprints accepted at `alpha_candidate`; human gameplay review remains required before public release.
 - Save format 9, canonical checkpoint/command replay, exact production Chromium/Node equality, historical v1–v8 initial/pending/terminal migrations and validated import/export with preservation on failure.

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: marketverse
+    runtime: static
+    branch: codex/marketverse-sprint-continuation
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
+    staticPublishPath: ./dist
+    autoDeploy: false
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.3
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

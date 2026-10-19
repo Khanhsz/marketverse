@@ -39,6 +39,8 @@ Browser runners own and stop their temporary servers. Install the managed browse
 
 Use `npm run preview` to inspect the production build. No publishing or deployment is performed by these commands.
 
+To host a playable Alpha on Render, use the checked-in [Static Site Blueprint and deployment instructions](docs/RENDER.md). No backend or API key is needed. The Blueprint is prepared; no live site has been created by this repository configuration.
+
 ## Canonical project records
 
 Start with [AGENTS.md](AGENTS.md), then read the current state and sprint brief. The [16-sprint roadmap](docs/ROADMAP.md), [game design](docs/GAME_DESIGN.md), [architecture](docs/ARCHITECTURE.md), [simulation contract](docs/SIMULATION_SPEC.md), [save schema](docs/DATA_SCHEMA.md) and [quality gates](docs/QUALITY_GATES.md) explain scope and evidence.

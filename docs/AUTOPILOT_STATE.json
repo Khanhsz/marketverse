@@ -49,5 +49,15 @@
     "schedulingBlocker": "No Work/Codex scheduling tool is exposed in this authorized session.",
     "workingBranch": "codex/marketverse-sprint-continuation"
   },
+  "deployment": {
+    "provider": "render",
+    "type": "static_site",
+    "status": "configuration_prepared_not_deployed",
+    "blueprint": "render.yaml",
+    "branch": "codex/marketverse-sprint-continuation",
+    "autoDeploy": false,
+    "localValidation": "npm run verify: 53 tests and build passed; npm run test:browser passed",
+    "blocker": "No Render connector or authenticated Render session is available. Owner must connect the private GitHub repository and create the Static Site. No live URL exists yet."
+  },
   "updatedOn": "2026-10-20"
 }

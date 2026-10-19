@@ -20,6 +20,9 @@
 | 16 | Alpha QA & Release Candidate | completed · Alpha candidate | 53 tests + build + full production 104-week UI/replay + 20 scenarios PASS; `b020d4d`; validation/SPRINT_16.md |
 
 ## Integration principles
+
+Render playtest follow-up: `render.yaml` and `docs/RENDER.md` prepare a manually deployed Static Site from the Alpha branch. Local `npm run verify` (53 tests/build), browser smoke and state validation pass. No Render service has been created; account connection/site creation remains an owner action. All 16 sprint acceptances remain unchanged.
+
 - This project is not complete at Sprint 01; CI passing is necessary but not sufficient.
 - Every Sprint brief and acceptance checklist is under `docs/sprints/`.
 - Detailed architecture and economic formulas live in `docs/`.
