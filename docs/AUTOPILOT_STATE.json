@@ -3,20 +3,21 @@
   "project": "MarketVerse",
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
-  "activeSprint": 4,
+  "activeSprint": 5,
   "completedSprints": [
     1,
     2,
-    3
+    3,
+    4
   ],
   "status": "in_progress",
-  "nextAction": "Implement Sprint 04 typed weekly decisions, persistent policies, commit review, costed construction/R&D/shipping queues and versioned save migration. Read docs/sprints/04.md.",
+  "nextAction": "Read docs/sprints/05.md and implement all acceptance gates; retain completed sprint evidence.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "passed: Sprint 03 entity selection/ownership/transport/all facility kinds and malformed-save recovery; Sprint 02 and foundation regression",
-    "lastValidatedCommit": "8d6cf05f300d740de1fb6b6a4f8766c979edcfa4",
-    "lastLocalTests": 17,
+    "browserSmoke": "passed: Sprint 04 and previous browser regression journeys",
+    "lastValidatedCommit": "2d66fb648dd5a3de134e254dd0781a31dc7e082b",
+    "lastLocalTests": 21,
     "remoteCI": "not observed: api.github.com CONNECT denied HTTP 403"
   },
   "automation": {

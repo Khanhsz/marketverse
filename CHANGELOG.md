@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 04 accepted
+- Typed weekly review, atomic idempotent commands, persistent price/production policies, budgeted construction/research/shipment queues and version-1 migration. Browser commits a 70,000-credit plan, reloads and verifies retained policies, project progress and cash.
+- Validation: 21 tests, build and browser smoke pass; `2d66fb6`.
+
 ## 2026-10-20 — Sprint 03 accepted
 - Stable city/company/facility selection from map markers and contextual navigation; all five facility kinds supported.
 - Validated ownership, reciprocal transport references, eight-city capability and placement constraints while preserving the three-city starter.
