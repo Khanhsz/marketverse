@@ -84,6 +84,7 @@ try {
   const p = await screen(390-14,160+48); // company diamond: world offset (-28,+96)
   await page.mouse.click(p.x,p.y);
   assert.equal(await page.locator('.panel').getAttribute('data-selection'),'company:premium');
+  assert.match(await page.locator('.panel').innerText(),/premium-innovator/);
   await page.getByRole('button',{name:'Atlas Showroom',exact:true}).click();
   assert.equal(await page.locator('.panel').getAttribute('data-selection'),'facility:atlas-store');
   assert.match(await page.locator('.panel').innerText(),/Competitor owned/);
@@ -131,6 +132,13 @@ try {
   await page.getByRole('button',{name:'NEXT WEEK'}).click();
   assert.equal(await page.getByLabel('Price (nova)',{exact:true}).inputValue(),'270');
   await page.getByRole('button',{name:'Cancel',exact:true}).click();
+  for(let turn=0;turn<14;turn++){
+    await page.getByRole('button',{name:'NEXT WEEK'}).click();
+    await page.getByRole('button',{name:'Commit week',exact:true}).click();
+  }
+  const coreRun=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
+  assert.equal(coreRun.absoluteWeek,16);assert.ok(coreRun.reports.length===15);
+  assert.ok(coreRun.companies.every(c=>c.cash>=0));
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});

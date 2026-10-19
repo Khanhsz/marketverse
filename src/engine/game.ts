@@ -1,3 +1,5 @@
+import { observeMarket, planAI } from './ai.ts';
+import type { Archetype } from './ai.ts';
 import { initializeFinance, validateFinance, settleExpenses, financialReports } from './finance.ts';
 import type { Finance, Journal, FinancialReport } from './finance.ts';
 import { initializeStocks, simulateOperations, validateOperations } from './operations.ts';
@@ -11,7 +13,7 @@ export const SCHEMA_VERSION = 4;
 export const WEEKS_PER_YEAR = 52;
 export type Segment = 'value' | 'mainstream' | 'premium';
 export type City = { id:string; name:string; x:number; y:number; population:number; power:number; segments:Record<Segment,number>; links:string[] };
-export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number };
+export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number; strategy?:Archetype };
 export type Product = { id:string; companyId:string; name:string; price:number; cost:number; quality:number; inventory:number; segment:Segment };
 export type Facility = { id:string; companyId:string; cityId:string; kind:'hq'|'store'|'factory'|'warehouse'|'rd'; name:string };
 export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[]; sales?:Sale[]; production?:Production[]; financials?:FinancialReport[] };
@@ -28,8 +30,8 @@ export function createInitialGame(seed=20261020):GameState {
   ];
   const companies:Company[]=[
     {id:'player',name:'NOVA INDUSTRIES',control:'human',cash:2500000,debt:0},
-    {id:'value',name:'VECTRA',control:'ai',cash:3200000,debt:200000},
-    {id:'premium',name:'ATLAS LABS',control:'ai',cash:4100000,debt:0}
+    {id:'value',name:'VECTRA',control:'ai',strategy:'cost-leader',cash:3200000,debt:200000},
+    {id:'premium',name:'ATLAS LABS',control:'ai',strategy:'premium-innovator',cash:4100000,debt:0}
   ];
   const products:Product[]=[
     {id:'nova',companyId:'player',name:'NOVA AIR / 01',price:239,cost:124,quality:68,inventory:400,segment:'mainstream'},
@@ -74,8 +76,11 @@ export function validateState(s:GameState):void {
 }
 export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   validateState(current);
+  // Form AI plans from the previous public snapshot, before player orders.
+  const aiPlans=current.companies.filter(c=>c.control==='ai').map(c=>({actor:c.id,orders:planAI(observeMarket(current,c.id))}));
   const next=structuredClone(current),events:string[]=[];
   applyOrders(next,next.playerId,orders||{id:`turn-${current.absoluteWeek}`,expectedWeek:current.absoluteWeek,projects:[]},events);
+  for(const ai of aiPlans)applyOrders(next,ai.actor,ai.orders,events);
   progressProjects(next,events);
   const demand=calculateDemand(next);
   const operations=simulateOperations(next,demand,events);

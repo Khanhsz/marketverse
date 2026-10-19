@@ -13,3 +13,9 @@ export const SEGMENT_RULES = {
 export const WEEKLY_PURCHASE_RATE = 0.0004;
 export const FACTORY_RULE = { capacity: 200, requiredWorkers: 4, starterWorkers: 2, materialShare: 0.75 };
 export const FINANCE_RULES = { weeklyInterest: 0.001, debtLimit: 500000, wage: 300, inputUnit: 60, defaultWeeks: 4, rent: {hq:1000,store:800,factory:1800,warehouse:600,rd:1200} };
+export const AI_RULES = {
+  'cost-leader': {markup:1.5,target:180,expansionEvery:12,reserve:150000},
+  'premium-innovator': {markup:2.4,target:100,expansionEvery:16,reserve:200000},
+  'regional-specialist': {markup:1.9,target:120,expansionEvery:10,reserve:120000},
+  'aggressive-expander': {markup:1.65,target:170,expansionEvery:6,reserve:100000},
+} as const;

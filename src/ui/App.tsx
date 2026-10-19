@@ -70,7 +70,7 @@ export function App() {
           <p className="muted">{context.entity.control==='human'?'Player company':'AI competitor'} · {context.entity.id}</p><hr/>
           <div className="stat">CASH <b>{number(context.entity.cash)}</b></div><div className="stat">DEBT <b>{number(context.entity.debt)}</b></div>
           <h3>FACILITIES</h3>{game.facilities.filter(f=>f.companyId===context.entity.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button>{cityButton(f.cityId)}</div>)}
-          <h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
+          {context.entity.strategy&&<p>Strategy: {context.entity.strategy}</p>}<h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
         </>}
         {game.reports.at(-1)?.demand&&<details className="demandReport" open><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
         <h3>LOCAL INVENTORY · {city.name}</h3>{game.products.map(p=><p className="muted" key={p.id}>{p.name}: {localStock(game,p.id,city.id)} units</p>)}

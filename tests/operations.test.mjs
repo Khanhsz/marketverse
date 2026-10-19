@@ -22,5 +22,5 @@ test('factory output obeys target, labor capacity, material spending and cash bu
  s.factories[0].workers=4;s.companies[0].cash=500;s.finance=initializeFinance(s);n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,4);assert.ok(n.companies[0].cash>=0);
 });
 test('sales cost basis comes from consumed lots and revenue equals fulfilled quantity times price',()=>{
- const s=createInitialGame();const n=advanceWeek(s);for(const sale of n.reports.at(-1).sales){const p=s.products.find(p=>p.id===sale.productId);assert.equal(sale.revenue,sale.units*p.price);assert.equal(sale.cogs,sale.units*p.cost);assert.ok(sale.units<=sale.desired);}
+ const s=createInitialGame();const n=advanceWeek(s);for(const sale of n.reports.at(-1).sales){const p=s.products.find(p=>p.id===sale.productId);assert.equal(sale.revenue,sale.units*n.products.find(x=>x.id===p.id).price);assert.equal(sale.cogs,sale.units*p.cost);assert.ok(sale.units<=sale.desired);}
 });
