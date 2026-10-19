@@ -3,19 +3,18 @@
 **Weekly turn-based, map-first business strategy game.** React + TypeScript + PixiJS with a deterministic business simulation engine.
 
 ## Development status — 20 October 2026
-- Sprint 01 foundation source and 10 behavioral engine tests committed.
-- GitHub Actions CI successfully ran unit tests and production build for commit `7606717`.
-- Browser UI smoke verification remains pending; do not mark Sprint 01 fully accepted.
-- Sprint 02: Country Strategy Map with drag/zoom and map layers, queued after acceptance.
-- GitHub **does not yet autonomously execute Codex**. Enabling eligible Work/Codex scheduling requires an authorized setup outside the repository, without an API key.
+- Sprint 01 and Sprint 02 accepted with local engine/build/browser evidence in `docs/validation/`.
+- Sprint 03 active; see `docs/AUTOPILOT_STATE.json` and the tracker for the latest checkpoint.
+- GitHub Actions verifies code; no unattended coding schedule is configured.
 
 ## Quick start
 Requires Node.js 22.
 ```bash
-npm install
+npm ci
 npm run verify
 npm run dev
 ```
+Run `npm run test:browser` for isolated real-browser smoke (it starts/stops its own Vite server). Requires system Chromium or `npx playwright install chromium`; override the executable with `CHROMIUM_PATH`. `SMOKE_URL` can target an existing server. No API key required.
 
 ## Canonical agent instructions
 - **Start:** [AGENTS.md](AGENTS.md) and [Work/Codex bootstrap](docs/WORK_CODEX_BOOTSTRAP.md)

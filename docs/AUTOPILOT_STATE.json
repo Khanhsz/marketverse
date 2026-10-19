@@ -3,18 +3,19 @@
   "project": "MarketVerse",
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
-  "activeSprint": 2,
+  "activeSprint": 3,
   "completedSprints": [
-    1
+    1,
+    2
   ],
   "status": "in_progress",
-  "nextAction": "Implement Sprint 02 camera, semantic layers and browser quality gates.",
+  "nextAction": "Implement Sprint 03 stable entity selection, context panels, placement constraints and validation.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "passed: Chromium 1366x768, all cities, week/save/reload/reset/tabs",
-    "lastValidatedCommit": "eed7a83ce5cfe4ad6cf712e91d04ff986b7b7f01",
-    "lastLocalTests": 10
+    "browserSmoke": "passed: Sprint 02 pan, cursor zoom, drag suppression, selection, layers, camera retention, reset and foundation regression",
+    "lastValidatedCommit": "08038c222a51d676f4dae787ce4ae1199d1f1506",
+    "lastLocalTests": 13
   },
   "automation": {
     "requested": true,
