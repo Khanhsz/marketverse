@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 10 accepted
+- Persistent city/segment media budgets build and decay bounded brand awareness only when funded; demand uses measured awareness. Two-week role-specific hiring, onboarding cost, salary payroll, research capability and finite sales/production capacity are enforced. AI hires and markets through the same rules. Browser commits targeted media and hiring, then verifies workforce arrival and awareness growth.
+- Validation: 40 tests, build and browser smoke pass; `dd44f56`.
+
 ## 2026-10-20 — Sprint 09 accepted
 - Versioned SKUs with quality/design/performance/durability, segment positioning and explicit component/assembly BOM. R&D spends cash and takes multiple turns to create a new SKU, retaining original attributes and lot cost on old stock; ambitious designs cost more. Migration preserves previous SKU economics. Browser observes the completed R2 portfolio after committing a design.
 - Validation: 37 tests, build and browser smoke pass; `1cd91fd`.
