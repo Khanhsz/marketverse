@@ -1,0 +1,91 @@
+import type { GameState, Facility } from './game.ts';
+import { placementError } from './entities.ts';
+import { BUILD_RULES, RESEARCH_RULE, SHIPPING_RULE } from '../data/rules.ts';
+export type Policy = { prices: Record<string, number>; production: Record<string, number>; marketing: number; staff: number };
+export type ProjectRequest =
+  | { kind: 'construction'; cityId: string; facilityKind: Facility['kind'] }
+  | { kind: 'research'; productId: string }
+  | { kind: 'shipment'; productId: string; originId: string; cityId: string; quantity: number };
+export type Project = ProjectRequest & { id: string; companyId: string; cost: number; createdWeek: number; dueWeek: number; remaining: number; status: 'active' | 'completed' };
+export type TurnOrders = { id: string; expectedWeek: number; policy?: Policy; projects: ProjectRequest[] };
+export const integer = (n: number, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(n) && n >= min && n <= max;
+export function initialPolicies(state: Pick<GameState, 'companies' | 'products'>): Record<string, Policy> {
+  return Object.fromEntries(state.companies.map(c => [c.id, { prices: Object.fromEntries(state.products.filter(p => p.companyId === c.id).map(p => [p.id, p.price])), production: {}, marketing: 0, staff: 0 }]));
+}
+export function route(state: Pick<GameState, 'cities'>, from: string, to: string): string[] | undefined {
+  if (!state.cities.some(c=>c.id===from) || !state.cities.some(c=>c.id===to)) return;
+  const queue = [[from]], seen = new Set([from]);
+  while(queue.length) {
+    const path=queue.shift()!,last=path.at(-1)!;
+    if(last===to)return path;
+    for(const next of [...state.cities.find(c=>c.id===last)!.links].sort())if(!seen.has(next)){seen.add(next);queue.push([...path,next]);}
+  }
+}
+export function quoteProject(state: GameState, actor: string, request: ProjectRequest): { cost: number; weeks: number } {
+  if (!state.companies.some(c=>c.id===actor)) throw new Error('Unknown company');
+  if (request.kind === 'construction') {
+    const pending=state.projects.filter((p):p is Project & {kind:'construction'}=>p.status==='active'&&p.kind==='construction').map(p=>({id:p.id,name:p.id,companyId:p.companyId,cityId:p.cityId,kind:p.facilityKind} as Facility));
+    const error=placementError({...state,facilities:[...state.facilities,...pending]}, {companyId:actor,cityId:request.cityId,kind:request.facilityKind});
+    if(error)throw new Error(error);
+    return BUILD_RULES[request.facilityKind];
+  }
+  const product=state.products.find(p=>p.id===request.productId&&p.companyId===actor);
+  if(!product)throw new Error('Product is not owned by company');
+  if(request.kind==='research') {
+    if(state.projects.some(p=>p.kind==='research'&&p.productId===request.productId&&p.status==='active'))throw new Error('Research already queued');
+    return RESEARCH_RULE;
+  }
+  if(request.kind!=='shipment'||!integer(request.quantity,1))throw new Error('Invalid shipment');
+  if(request.originId===request.cityId)throw new Error('Shipment needs different cities');
+  const path=route(state,request.originId,request.cityId);
+  if(!path)throw new Error('No transport route');
+  for(const id of [request.originId,request.cityId])if(!state.facilities.some(f=>f.companyId===actor&&f.cityId===id))throw new Error('Company needs facilities at both shipment nodes');
+  if(product.inventory<request.quantity)throw new Error('Insufficient inventory');
+  return {cost:SHIPPING_RULE.base+request.quantity*(path.length-1)*SHIPPING_RULE.perUnitPerLink,weeks:Math.min(3,path.length-1)};
+}
+export function validatePolicy(state: GameState, actor: string, policy: Policy) {
+  if(!policy||!policy.prices||!policy.production||!integer(policy.marketing,0,1000000)||!integer(policy.staff,0,1000))throw new Error('Invalid policy');
+  for(const [ids,minimum] of [[policy.prices,1],[policy.production,0]] as const)for(const [id,value] of Object.entries(ids)) {
+    if(!state.products.some(p=>p.id===id&&p.companyId===actor)||!integer(value,minimum,1000000))throw new Error('Invalid product policy');
+  }
+}
+/** Mutates only a newly cloned turn state; caller owns transaction validation. */
+export function applyOrders(next: GameState, actor: string, orders: TurnOrders, events: string[]) {
+  if(!orders.id||orders.expectedWeek!==next.absoluteWeek||next.commandHistory.includes(orders.id))throw new Error('Stale or duplicate turn command');
+  if(!Array.isArray(orders.projects)||orders.projects.length>20)throw new Error('Too many orders');
+  if(orders.policy){validatePolicy(next,actor,orders.policy);next.policies[actor]=structuredClone(orders.policy);}
+  const company=next.companies.find(c=>c.id===actor)!;
+  for(const [index,request] of orders.projects.entries()){
+    const quote=quoteProject(next,actor,request);
+    if(company.cash<quote.cost)throw new Error('Insufficient cash for project');
+    company.cash-=quote.cost;
+    const id=`${actor}:${orders.id}:${index}`;
+    next.projects.push({...request,id,companyId:actor,cost:quote.cost,createdWeek:next.absoluteWeek,dueWeek:next.absoluteWeek+quote.weeks,remaining:quote.weeks,status:'active'});
+    if(request.kind==='shipment')next.products.find(p=>p.id===request.productId)!.inventory-=request.quantity;
+    events.push(`${actor}: ${request.kind} committed (${quote.cost} credits, ${quote.weeks} weeks)`);
+  }
+  for(const [id,price] of Object.entries(next.policies[actor].prices))next.products.find(p=>p.id===id)!.price=price;
+  next.commandHistory.push(orders.id);
+}
+export function progressProjects(next: GameState, events: string[]) {
+  for(const project of next.projects){
+    if(project.status!=='active')continue;
+    project.remaining--;
+    if(project.remaining>0)continue;
+    project.status='completed';
+    if(project.kind==='construction')next.facilities.push({id:`${project.id}:asset`,companyId:project.companyId,cityId:project.cityId,kind:project.facilityKind,name:`${project.companyId.toUpperCase()} ${project.facilityKind.toUpperCase()}`});
+    if(project.kind==='shipment')next.products.find(p=>p.id===project.productId)!.inventory+=project.quantity;
+    events.push(`${project.companyId}: ${project.kind} completed (${project.id})`);
+  }
+}
+export function validateOrdersState(state: GameState) {
+  if(!state.policies||!Array.isArray(state.projects)||!Array.isArray(state.commandHistory)||new Set(state.commandHistory).size!==state.commandHistory.length)throw new Error('Invalid order state');
+  for(const company of state.companies)validatePolicy(state,company.id,state.policies[company.id]);
+  if(new Set(state.projects.map(p=>p.id)).size!==state.projects.length)throw new Error('Duplicate project');
+  for(const p of state.projects){
+    if(!p.id||!state.companies.some(c=>c.id===p.companyId)||!['construction','research','shipment'].includes(p.kind)||!['active','completed'].includes(p.status)||!integer(p.remaining)||!integer(p.cost)||!integer(p.createdWeek,1)||!integer(p.dueWeek,p.createdWeek+1)||p.dueWeek-p.createdWeek>20||p.remaining!==Math.max(0,p.dueWeek-state.absoluteWeek)||(p.status==='completed')!==(p.remaining===0))throw new Error('Invalid project');
+    if(p.kind==='construction'&&(!BUILD_RULES[p.facilityKind]||!state.cities.some(c=>c.id===p.cityId)))throw new Error('Invalid construction');
+    if(p.kind!=='construction'&&!state.products.some(x=>x.id===p.productId&&x.companyId===p.companyId))throw new Error('Invalid project product');
+    if(p.kind==='shipment'&&(!integer(p.quantity,1)||!route(state,p.originId,p.cityId)))throw new Error('Invalid shipment route');
+  }
+}

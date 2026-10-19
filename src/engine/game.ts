@@ -1,13 +1,15 @@
+import { initialPolicies, applyOrders, progressProjects, validateOrdersState } from './orders.ts';
+import type { Policy, Project, TurnOrders } from './orders.ts';
 import { placementError } from './entities.ts';
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const WEEKS_PER_YEAR = 52;
 export type Segment = 'value' | 'mainstream' | 'premium';
 export type City = { id:string; name:string; x:number; y:number; population:number; power:number; segments:Record<Segment,number>; links:string[] };
 export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number };
 export type Product = { id:string; companyId:string; name:string; price:number; cost:number; quality:number; inventory:number; segment:Segment };
 export type Facility = { id:string; companyId:string; cityId:string; kind:'hq'|'store'|'factory'|'warehouse'|'rd'; name:string };
-export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:true };
-export type GameState = { version:1; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[] };
+export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean };
+export type GameState = { version:2; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[] };
 export function calendarOf(absoluteWeek:number) {
   if (!Number.isSafeInteger(absoluteWeek)||absoluteWeek<1) throw new RangeError('Invalid week');
   return { year:Math.floor((absoluteWeek-1)/WEEKS_PER_YEAR)+1, week:((absoluteWeek-1)%WEEKS_PER_YEAR)+1 };
@@ -34,7 +36,7 @@ export function createInitialGame(seed=20261020):GameState {
     {id:'vectra-store',companyId:'value',cityId:'south',kind:'store',name:'Vectra Retail'},
     {id:'atlas-store',companyId:'premium',cityId:'north',kind:'store',name:'Atlas Showroom'}
   ];
-  const state:GameState={version:1,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[]};
+  const state:GameState={version:2,gameId:'marketverse-'+seed,seed,absoluteWeek:1,year:1,week:1,playerId:'player',cities,companies,products,facilities,reports:[],policies:initialPolicies({companies,products}),projects:[],commandHistory:[]};
   validateState(state);return state;
 }
 export function createRng(seed:number):()=>number {
@@ -59,16 +61,19 @@ export function validateState(s:GameState):void {
   }
   for(const p of s.products)if(!p.name||!companyIds.has(p.companyId)||!Number.isSafeInteger(p.inventory)||p.inventory<0||![p.price,p.cost,p.quality].every(v=>Number.isFinite(v)&&v>=0)||p.quality>100||!['value','mainstream','premium'].includes(p.segment))throw new Error('Invalid product');
   for(const f of s.facilities){const error=placementError(s,f,f.id);if(!f.name||error)throw new Error('Invalid facility: '+(error||'missing name'));}
+  validateOrdersState(s);
   for(const co of s.companies)if(!co.name||!['human','ai'].includes(co.control)||!Number.isFinite(co.cash)||!Number.isFinite(co.debt)||co.debt<0)throw new Error('Invalid finance');
 }
-export function advanceWeek(current:GameState):GameState {
+export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   validateState(current);
-  const nextWeek=current.absoluteWeek+1;
-  const c=calendarOf(nextWeek);
-  const report:WeekReport={week:current.absoluteWeek,events:['Weekly calendar advanced; economic simulation pending later sprints.'],cashDelta:Object.fromEntries(current.companies.map(x=>[x.id,0])),placeholder:true};
-  const next:GameState={...current,absoluteWeek:nextWeek,...c,reports:[...current.reports,report]};
+  const next=structuredClone(current),events:string[]=[];
+  applyOrders(next,next.playerId,orders||{id:`turn-${current.absoluteWeek}`,expectedWeek:current.absoluteWeek,projects:[]},events);
+  progressProjects(next,events);
+  const cashDelta=Object.fromEntries(next.companies.map(c=>[c.id,c.cash-current.companies.find(old=>old.id===c.id)!.cash]));
+  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:true});
+  next.absoluteWeek++;Object.assign(next,calendarOf(next.absoluteWeek));
   validateState(next);return next;
 }
 export const SAVE_KEY='marketverse:sprint01:state';
 export function serializeGame(s:GameState):string {validateState(s);return JSON.stringify(s);}
-export function deserializeGame(raw:string):GameState {const s:unknown=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');validateState(s as GameState);return s as GameState;}
+export function deserializeGame(raw:string):GameState {const s=JSON.parse(raw);if(!s||typeof s!=='object')throw new Error('Invalid save');if(s.version===1){s.version=2;s.policies=initialPolicies(s);s.projects=[];s.commandHistory=[];}validateState(s as GameState);return s as GameState;}
