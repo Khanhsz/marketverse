@@ -3,8 +3,8 @@
 **Weekly turn-based, map-first business strategy game.** React + TypeScript + PixiJS with a deterministic business simulation engine.
 
 ## Development status — 20 October 2026
-- Sprint 01 and Sprint 02 accepted with local engine/build/browser evidence in `docs/validation/`.
-- Sprint 03 active; see `docs/AUTOPILOT_STATE.json` and the tracker for the latest checkpoint.
+- Sprint 01–03 accepted with local engine/build/browser evidence in `docs/validation/`.
+- Sprint 04 active; see `docs/AUTOPILOT_STATE.json` and the tracker for the latest checkpoint.
 - GitHub Actions verifies code; no unattended coding schedule is configured.
 
 ## Quick start

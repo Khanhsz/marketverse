@@ -3,19 +3,21 @@
   "project": "MarketVerse",
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
-  "activeSprint": 3,
+  "activeSprint": 4,
   "completedSprints": [
     1,
-    2
+    2,
+    3
   ],
   "status": "in_progress",
-  "nextAction": "Implement Sprint 03 stable entity selection, context panels, placement constraints and validation.",
+  "nextAction": "Implement Sprint 04 typed weekly decisions, persistent policies, commit review, costed construction/R&D/shipping queues and versioned save migration. Read docs/sprints/04.md.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "passed: Sprint 02 pan, cursor zoom, drag suppression, selection, layers, camera retention, reset and foundation regression",
-    "lastValidatedCommit": "08038c222a51d676f4dae787ce4ae1199d1f1506",
-    "lastLocalTests": 13
+    "browserSmoke": "passed: Sprint 03 entity selection/ownership/transport/all facility kinds and malformed-save recovery; Sprint 02 and foundation regression",
+    "lastValidatedCommit": "8d6cf05f300d740de1fb6b6a4f8766c979edcfa4",
+    "lastLocalTests": 17,
+    "remoteCI": "not observed: api.github.com CONNECT denied HTTP 403"
   },
   "automation": {
     "requested": true,
@@ -23,7 +25,8 @@
     "scheduledWorkTask": "unconfigured",
     "requiresOpenAIApiKey": false,
     "autoAdvancePolicy": "advance_on_quality_gate",
-    "schedulingBlocker": "No Work/Codex scheduling tool is exposed in this authorized session."
+    "schedulingBlocker": "No Work/Codex scheduling tool is exposed in this authorized session.",
+    "workingBranch": "codex/marketverse-sprint-continuation"
   },
   "updatedOn": "2026-10-20"
 }

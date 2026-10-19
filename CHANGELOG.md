@@ -1,5 +1,11 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 03 accepted
+- Stable city/company/facility selection from map markers and contextual navigation; all five facility kinds supported.
+- Validated ownership, reciprocal transport references, eight-city capability and placement constraints while preserving the three-city starter.
+- Malformed saves remain intact with export/reset recovery. 17 tests, build and expanded real browser smoke pass.
+- Sprint 04 is the next implementation checkpoint. No recurring Work task is configured; GitHub API access is proxy-blocked.
+
 ## 2026-10-20 — Sprint 02 accepted
 - Persistent Pixi renderer, vector country, pointer pan and bounded cursor-anchored zoom, camera controls and resize retention.
 - Five labeled state-driven layers: Market, Competition, Operations, Logistics, Economy.

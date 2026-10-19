@@ -30,5 +30,7 @@ Each transition to completed requires commit SHA, test command and result, UI sm
 - No recursive GitHub Actions calling external models and no usage of OPENAI_API_KEY.
 - Never claim autonomous continuous 24/7 coding unless a persistent authorized scheduled agent is actually enabled and observed.
 
-## Sprint 01 state
-Initial CI at `7606717` has passed 10 engine tests and build. An actual browser/UI smoke is not yet verified, so it is NOT completed. The next authorized action is to verify the browser and fix issues; then begin Sprint 02.
+## Current handoff
+Read `AUTOPILOT_STATE.json` and `SPRINT_TRACKER.md` for the active sprint. Sprint 01–03 are accepted with evidence in `validation/`; Sprint 04 is next. Continue on `codex/marketverse-sprint-continuation` until reviewed. GitHub Actions runs engine/build/browser validation but is not a coding scheduler.
+
+The authorized 2026-10-20 session successfully pushed this working branch. Native Git access works; GitHub API CONNECT requests were denied by the environment proxy (HTTP 403), so remote CI status and PR creation have not been verified. No Work/Codex task-scheduling tool is exposed. No recurring job was created and no API key is required.

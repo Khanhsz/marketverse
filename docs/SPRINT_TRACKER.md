@@ -4,8 +4,8 @@
 |---:|---|---|---|
 | 01 | Foundation & Data Schema | completed | 10 tests + typecheck/build + real Chromium smoke PASS; `eed7a83`; see validation/SPRINT_01.md |
 | 02 | Country Strategy Map | completed | 13 tests + build + Chromium camera/layers smoke PASS; `08038c2`; see validation/SPRINT_02.md |
-| 03 | Cities, Companies & Facilities | in progress | selectable geolocated assets |
-| 04 | Weekly Decision Engine | queued | policies persist, queued jobs |
+| 03 | Cities, Companies & Facilities | completed | 17 tests + build + Chromium entities/recovery smoke PASS; `8d6cf05`; see validation/SPRINT_03.md |
+| 04 | Weekly Decision Engine | in progress | policies persist, queued jobs |
 | 05 | Customer Segments & Demand | queued | reproducible demand and preference allocation |
 | 06 | Production, Inventory & Logistics | queued | constrained physical flows |
 | 07 | Finance & Cash Flow | queued | auditable ledger and solvency |

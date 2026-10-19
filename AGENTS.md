@@ -5,7 +5,7 @@
 ## Immediate execution sequence
 1. Read `docs/AUTOPILOT_STATE.json`, `docs/SPRINT_TRACKER.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/GAME_DESIGN.md`, `docs/SIMULATION_SPEC.md`, and the current sprint in `docs/sprints/`.
 2. Inspect source and git history; do not assume a historical chat or ZIP is available.
-3. Work on exactly the active sprint, first completing any outstanding acceptance gate. Sprint 01 is **NOT accepted** until browser smoke testing has been recorded, even though GitHub CI passed.
+3. Work on exactly the active sprint, first completing any outstanding acceptance gate. Sprint 01–03 acceptance evidence is recorded in `docs/validation/`; follow the current state rather than reopening accepted work.
 4. Implement in small integrated commits. Run `npm run verify` and relevant browser tests. Fix regressions before advancing.
 5. Update `docs/SPRINT_TRACKER.md`, `docs/AUTOPILOT_STATE.json` and `CHANGELOG.md` with evidence, tested commit and remaining blockers.
 6. When ALL gates pass, mark the sprint completed and increment activeSprint to the next item, then continue in the SAME authorized execution if possible. Otherwise stop with a resumable checkpoint.
@@ -33,7 +33,7 @@
 - Prioritize laptop layout; do not replace the map with a dashboard.
 
 ## Quality gate
-For each sprint: typecheck/build PASS, relevant behavioral tests PASS, no serious regression, browser smoke on affected UI, docs updated, commit saved. `npm run verify` currently checks Node tests and Vite build. Existing 10 engine tests and CI succeeded for the Sprint 01 scaffold; browser smoke remains unverified.
+For each sprint: typecheck/build PASS, relevant behavioral tests PASS, no serious regression, browser smoke on affected UI, docs updated, commit saved. `npm run verify` currently checks Node tests and Vite build. There are currently 17 local engine/entity/camera tests and a repeatable `npm run test:browser` gate. Sprint 01–03 browser evidence is in `docs/validation/`. Remote CI must be reported separately from local results.
 
 ## Autonomy, permissions and cost
 - User preference: ChatGPT Work / Codex through ChatGPT subscription; **NO OpenAI API key or separate API charge**.
