@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 09 accepted
+- Versioned SKUs with quality/design/performance/durability, segment positioning and explicit component/assembly BOM. R&D spends cash and takes multiple turns to create a new SKU, retaining original attributes and lot cost on old stock; ambitious designs cost more. Migration preserves previous SKU economics. Browser observes the completed R2 portfolio after committing a design.
+- Validation: 37 tests, build and browser smoke pass; `1cd91fd`.
+
 ## 2026-10-20 — Sprint 08 accepted
 - Four bounded AI archetypes plan solely from own resources and previous public market prices, then use shared order, construction, research, shipping and cash rules. A deterministic four-rival 16-week test audits every ledger and replay; browser advances through the playable core and displays rival strategy. Tests verify hidden player policy changes cannot affect AI plans.
 - Validation: 34 tests, build and browser smoke pass; `10dcdd9`.
