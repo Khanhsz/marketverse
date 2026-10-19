@@ -5,3 +5,9 @@ export const BUILD_RULES = {
 } as const;
 export const RESEARCH_RULE = { cost: 30000, weeks: 6 };
 export const SHIPPING_RULE = { base: 100, perUnitPerLink: 2 };
+export const SEGMENT_RULES = {
+  value: { referencePrice: 200, elasticity: 3.2, qualityWeight: 1.1, match: 0.65 },
+  mainstream: { referencePrice: 280, elasticity: 2.2, qualityWeight: 2.1, match: 0.7 },
+  premium: { referencePrice: 450, elasticity: 1.6, qualityWeight: 3.1, match: 0.7 },
+} as const;
+export const WEEKLY_PURCHASE_RATE = 0.0004;

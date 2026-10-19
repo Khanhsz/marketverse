@@ -123,6 +123,8 @@ try {
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week===2);
   await page.reload();await ready();
   const committed=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
+  assert.ok(committed.reports.at(-1).demand.some(d=>d.cityId==='central'&&d.potential>0));
+  assert.match(await page.locator('.demandReport').innerText(),/potential/);
   assert.equal(committed.policies.player.prices.nova,270);assert.equal(committed.projects[0].remaining,3);assert.equal(committed.companies[0].cash,2430000);
   await page.getByRole('button',{name:'NEXT WEEK'}).click();
   assert.equal(await page.getByLabel('Price (nova)',{exact:true}).inputValue(),'270');

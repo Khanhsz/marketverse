@@ -1,3 +1,5 @@
+import { calculateDemand } from './demand.ts';
+import type { DemandCell } from './demand.ts';
 import { initialPolicies, applyOrders, progressProjects, validateOrdersState } from './orders.ts';
 import type { Policy, Project, TurnOrders } from './orders.ts';
 import { placementError } from './entities.ts';
@@ -8,7 +10,7 @@ export type City = { id:string; name:string; x:number; y:number; population:numb
 export type Company = { id:string; name:string; control:'human'|'ai'; cash:number; debt:number };
 export type Product = { id:string; companyId:string; name:string; price:number; cost:number; quality:number; inventory:number; segment:Segment };
 export type Facility = { id:string; companyId:string; cityId:string; kind:'hq'|'store'|'factory'|'warehouse'|'rd'; name:string };
-export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean };
+export type WeekReport = { week:number; events:string[]; cashDelta:Record<string,number>; placeholder:boolean; demand?:DemandCell[] };
 export type GameState = { version:2; gameId:string; seed:number; absoluteWeek:number; year:number; week:number; playerId:string; cities:City[]; companies:Company[]; products:Product[]; facilities:Facility[]; reports:WeekReport[]; policies:Record<string,Policy>; projects:Project[]; commandHistory:string[] };
 export function calendarOf(absoluteWeek:number) {
   if (!Number.isSafeInteger(absoluteWeek)||absoluteWeek<1) throw new RangeError('Invalid week');
@@ -70,7 +72,7 @@ export function advanceWeek(current:GameState, orders?:TurnOrders):GameState {
   applyOrders(next,next.playerId,orders||{id:`turn-${current.absoluteWeek}`,expectedWeek:current.absoluteWeek,projects:[]},events);
   progressProjects(next,events);
   const cashDelta=Object.fromEntries(next.companies.map(c=>[c.id,c.cash-current.companies.find(old=>old.id===c.id)!.cash]));
-  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:true});
+  next.reports.push({week:current.absoluteWeek,events:events.length?events:['No new orders; policies retained.'],cashDelta,placeholder:true,demand:calculateDemand(next)});
   next.absoluteWeek++;Object.assign(next,calendarOf(next.absoluteWeek));
   validateState(next);return next;
 }
