@@ -7,7 +7,7 @@ test('review commit is atomic, persistent and rejects duplicate/stale turns',()=
  const s=createInitialGame(),before=serializeGame(s),policy={...s.policies.player,prices:{nova:260},production:{nova:90}};
  const command=order(s,[{kind:'construction',cityId:'north',facilityKind:'store'}],policy);
  const next=advanceWeek(s,command);
- assert.equal(serializeGame(s),before);assert.equal(next.products[0].price,260);assert.equal(next.projects[0].remaining,3);assert.equal(next.companies[0].cash,s.companies[0].cash-40000);
+ assert.equal(serializeGame(s),before);assert.equal(next.products[0].price,260);assert.equal(next.projects[0].remaining,3);assert.equal(next.companies[0].cash,s.companies[0].cash-40000-next.reports.at(-1).financials.find(f=>f.companyId===s.playerId).expenses);
  assert.throws(()=>advanceWeek(next,command),/Stale|duplicate/);
  assert.deepEqual(advanceWeek(next).policies.player,policy);
  assert.throws(()=>advanceWeek(s,order(s,[...command.projects,...command.projects])),/already|present/);assert.equal(serializeGame(s),before);

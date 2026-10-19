@@ -125,7 +125,9 @@ try {
   const committed=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
   assert.ok(committed.reports.at(-1).demand.some(d=>d.cityId==='central'&&d.potential>0));
   assert.match(await page.locator('.demandReport').innerText(),/potential/);
-  assert.equal(committed.policies.player.prices.nova,270);assert.equal(committed.projects[0].remaining,3);assert.equal(committed.companies[0].cash,2430000+committed.reports.at(-1).sales.filter(s=>s.productId==='nova').reduce((n,s)=>n+s.revenue,0));
+  assert.match(await page.locator('.financialReport').innerText(),/Profit/);
+  assert.equal(committed.reports.at(-1).financials.find(f=>f.companyId==='player').capex,40000);
+  assert.equal(committed.policies.player.prices.nova,270);assert.equal(committed.projects[0].remaining,3);assert.equal(committed.companies[0].cash,2460000+committed.reports.at(-1).sales.filter(s=>s.productId==='nova').reduce((n,s)=>n+s.revenue,0)-committed.reports.at(-1).financials.find(f=>f.companyId==='player').expenses);
   await page.getByRole('button',{name:'NEXT WEEK'}).click();
   assert.equal(await page.getByLabel('Price (nova)',{exact:true}).inputValue(),'270');
   await page.getByRole('button',{name:'Cancel',exact:true}).click();

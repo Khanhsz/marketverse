@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createInitialGame,advanceWeek,serializeGame,deserializeGame} from '../src/engine/game.ts';
 import {localStock,syncInventory,refreshFactories} from '../src/engine/operations.ts';
-const empty=s=>{s.stocks=[];syncInventory(s);};
+import {initializeFinance} from '../src/engine/finance.ts';
+const empty=s=>{s.stocks=[];syncInventory(s);s.finance=initializeFinance(s);s.ledger=[];};
 test('local fulfillment cannot sell absent or in-transit inventory and never makes negative stock',()=>{
- let s=createInitialGame();empty(s);let n=advanceWeek(s);assert.ok(n.reports.at(-1).sales.every(r=>r.units===0));assert.ok(n.companies.every((c,i)=>c.cash===s.companies[i].cash));
+ let s=createInitialGame();empty(s);let n=advanceWeek(s);assert.ok(n.reports.at(-1).sales.every(r=>r.units===0));assert.ok(n.reports.at(-1).financials.every(f=>f.revenue===0));
  s=createInitialGame();s.facilities.push({id:'north-wh',name:'WH',kind:'warehouse',companyId:'player',cityId:'north'});
  s.facilities.push({id:'south-store',name:'Store',kind:'store',companyId:'player',cityId:'south'});
  s.stocks.find(l=>l.productId==='nova').cityId='north';
@@ -16,9 +17,9 @@ test('local fulfillment cannot sell absent or in-transit inventory and never mak
 test('factory output obeys target, labor capacity, material spending and cash budget',()=>{
  const s=createInitialGame();s.facilities=s.facilities.filter(f=>f.kind!=='store');empty(s);s.facilities.push({id:'factory',name:'Factory',kind:'factory',companyId:'player',cityId:'central'});refreshFactories(s);
  s.policies.player.production.nova=180;
- let n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,100);assert.equal(localStock(n,'nova','central'),100);assert.equal(s.companies[0].cash-n.companies[0].cash,100*124);
+ let n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,100);assert.equal(localStock(n,'nova','central'),100);assert.equal(s.companies[0].cash-n.companies[0].cash,100*124+n.reports.at(-1).financials.find(f=>f.companyId===s.playerId).expenses);
  s.factories[0].workers=0;n=advanceWeek(s);assert.equal(n.reports.at(-1).production.length,0);
- s.factories[0].workers=4;s.companies[0].cash=500;n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,4);assert.ok(n.companies[0].cash>=0);
+ s.factories[0].workers=4;s.companies[0].cash=500;s.finance=initializeFinance(s);n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,4);assert.ok(n.companies[0].cash>=0);
 });
 test('sales cost basis comes from consumed lots and revenue equals fulfilled quantity times price',()=>{
  const s=createInitialGame();const n=advanceWeek(s);for(const sale of n.reports.at(-1).sales){const p=s.products.find(p=>p.id===sale.productId);assert.equal(sale.revenue,sale.units*p.price);assert.equal(sale.cogs,sale.units*p.cost);assert.ok(sale.units<=sale.desired);}

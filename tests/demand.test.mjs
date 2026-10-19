@@ -16,5 +16,5 @@ test('market conservation includes outside choice and is invariant to entity ord
 });
 test('unserved cities have only no-purchase and preferences do not create revenue',()=>{
  const s=createInitialGame();s.facilities=s.facilities.filter(f=>f.kind!=='store');for(const c of calculateDemand(s)){assert.equal(c.outside,c.potential);assert.deepEqual(c.allocations,[]);}
- const next=advanceWeek(s);assert.deepEqual(next.companies,s.companies);assert.deepEqual(next.products,s.products);
+ const next=advanceWeek(s);assert.ok(next.reports.at(-1).financials.every(f=>f.revenue===0));assert.deepEqual(next.products,s.products);
 });

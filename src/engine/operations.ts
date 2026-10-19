@@ -1,5 +1,7 @@
 import type { GameState, Product } from './game.ts';
 import type { DemandCell } from './demand.ts';
+import { post } from './finance.ts';
+import { FINANCE_RULES } from '../data/rules.ts';
 import { FACTORY_RULE } from '../data/rules.ts';
 export type StockLot = { id:string; productId:string; cityId:string; quantity:number; unitCost:number };
 export type Cargo = { quantity:number; unitCost:number };
@@ -28,17 +30,20 @@ export function simulateOperations(state:GameState,demand:DemandCell[],events:st
   for(const factory of [...state.factories].sort((a,b)=>a.facilityId.localeCompare(b.facilityId))){
     const facility=state.facilities.find(f=>f.id===factory.facilityId)!;
     const company=state.companies.find(c=>c.id===facility.companyId)!;
+    if(state.finance[company.id].bankrupt)continue;
     let capacity=Math.floor(factory.capacity*Math.min(1,factory.workers/FACTORY_RULE.requiredWorkers));
     for(const p of state.products.filter(p=>p.companyId===company.id).sort((a,b)=>a.id.localeCompare(b.id))){
       const target=state.policies[company.id].production[p.id]||0;
       const already=production.filter(r=>r.productId===p.id).reduce((n,r)=>n+r.units,0);
-      const unitCost=Math.max(1,p.cost),materialUnit=Math.ceil(unitCost*FACTORY_RULE.materialShare),laborUnit=unitCost-materialUnit;
+      const unitCost=Math.max(FINANCE_RULES.inputUnit,p.cost),materialUnit=FINANCE_RULES.inputUnit,laborUnit=unitCost-materialUnit;
       const budgetUnits=Math.floor(Math.max(0,company.cash)/unitCost);
       const units=Math.min(Math.max(0,target-already),capacity,budgetUnits);
       if(!units)continue;
       const buy=Math.max(0,units-factory.inputs);factory.inputs+=buy;
       const materialCost=buy*materialUnit,laborCost=units*laborUnit;
-      company.cash-=materialCost+laborCost;factory.inputs-=units;capacity-=units;
+      post(state,company.id,'Purchase component kits',{materials:materialCost,cash:-materialCost});
+      post(state,company.id,'Manufacture goods',{inventory:units*unitCost,materials:-units*materialUnit,cash:-laborCost});
+      factory.inputs-=units;capacity-=units;
       receiveStock(state,`production:${state.absoluteWeek}:${factory.facilityId}:${p.id}`,p.id,facility.cityId,[{quantity:units,unitCost}]);
       production.push({facilityId:facility.id,productId:p.id,units,cost:units*unitCost,materialCost,laborCost});
     }
@@ -49,7 +54,8 @@ export function simulateOperations(state:GameState,demand:DemandCell[],events:st
     const units=accessible?Math.min(allocation.desired,localStock(state,p.id,cell.cityId)):0;
     const cargo=consumeStock(state,p.id,cell.cityId,units);
     const revenue=units*p.price,cogs=cargo.reduce((n,l)=>n+l.quantity*l.unitCost,0);
-    state.companies.find(c=>c.id===p.companyId)!.cash+=revenue;
+    post(state,p.companyId,'Fulfilled sales',{cash:revenue,revenue:-revenue});
+    post(state,p.companyId,'Cost of fulfilled goods',{cogs,inventory:-cogs});
     sales.push({cityId:cell.cityId,segment:cell.segment,productId:p.id,desired:allocation.desired,units,revenue,cogs});
   }
   const fulfilled=sales.reduce((n,s)=>n+s.units,0);events.push(`${fulfilled} units fulfilled from local stock; ${sales.reduce((n,s)=>n+s.desired-s.units,0)} preferred orders unfilled.`);

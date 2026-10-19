@@ -49,7 +49,7 @@ test('advanceWeek does not mutate input state', () => {
 test('fulfilled sales explain cash and inventory changes without phantom resources', () => {
   const initial=createInitialGame(),next=advanceWeek(initial),report=next.reports.at(-1);
   for(const p of initial.products){const sales=report.sales.filter(s=>s.productId===p.id);assert.equal(next.products.find(x=>x.id===p.id).inventory,p.inventory-sales.reduce((n,s)=>n+s.units,0));}
-  for(const c of initial.companies){const revenue=report.sales.filter(s=>initial.products.find(p=>p.id===s.productId).companyId===c.id).reduce((n,s)=>n+s.revenue,0);assert.equal(next.companies.find(x=>x.id===c.id).cash,c.cash+revenue);}
+  for(const c of initial.companies){const revenue=report.sales.filter(s=>initial.products.find(p=>p.id===s.productId).companyId===c.id).reduce((n,s)=>n+s.revenue,0);assert.equal(next.companies.find(x=>x.id===c.id).cash,c.cash+revenue-report.financials.find(f=>f.companyId===c.id).expenses);}
 });
 test('save serialization roundtrip and invalid save rejection', () => {
   const initial = createInitialGame();

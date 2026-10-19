@@ -1,3 +1,4 @@
+import { projectPayment, post, financing } from './finance.ts';
 import { consumeStock, receiveStock, localStock } from './operations.ts';
 import type { Cargo } from './operations.ts';
 import type { GameState, Facility } from './game.ts';
@@ -9,7 +10,7 @@ export type ProjectRequest =
   | { kind: 'research'; productId: string }
   | { kind: 'shipment'; productId: string; originId: string; cityId: string; quantity: number };
 export type Project = ProjectRequest & { id: string; companyId: string; cost: number; createdWeek: number; dueWeek: number; remaining: number; status: 'active' | 'completed'; cargo?:Cargo[] };
-export type TurnOrders = { id: string; expectedWeek: number; policy?: Policy; projects: ProjectRequest[] };
+export type TurnOrders = { id: string; expectedWeek: number; policy?: Policy; projects: ProjectRequest[]; financing?:{borrow:number;repay:number} };
 export const integer = (n: number, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(n) && n >= min && n <= max;
 export function initialPolicies(state: Pick<GameState, 'companies' | 'products'>): Record<string, Policy> {
   return Object.fromEntries(state.companies.map(c => [c.id, { prices: Object.fromEntries(state.products.filter(p => p.companyId === c.id).map(p => [p.id, p.price])), production: {}, marketing: 0, staff: 0 }]));
@@ -57,10 +58,12 @@ export function applyOrders(next: GameState, actor: string, orders: TurnOrders, 
   if(!Array.isArray(orders.projects)||orders.projects.length>20)throw new Error('Too many orders');
   if(orders.policy){validatePolicy(next,actor,orders.policy);next.policies[actor]=structuredClone(orders.policy);}
   const company=next.companies.find(c=>c.id===actor)!;
+  if(next.finance[actor].bankrupt&&(orders.projects.length||orders.policy))throw new Error('Bankrupt company cannot place new orders');
+  if(orders.financing)financing(next,actor,orders.financing.borrow,orders.financing.repay);
   for(const [index,request] of orders.projects.entries()){
     const quote=quoteProject(next,actor,request);
     if(company.cash<quote.cost)throw new Error('Insufficient cash for project');
-    company.cash-=quote.cost;
+    projectPayment(next,actor,request.kind,quote.cost);
     const id=`${actor}:${orders.id}:${index}`;
     next.projects.push({...request,id,companyId:actor,cost:quote.cost,createdWeek:next.absoluteWeek,dueWeek:next.absoluteWeek+quote.weeks,remaining:quote.weeks,status:'active'});
     if(request.kind==='shipment')next.projects.at(-1)!.cargo=consumeStock(next,request.productId,request.originId,request.quantity);
@@ -75,7 +78,7 @@ export function progressProjects(next: GameState, events: string[]) {
     project.remaining--;
     if(project.remaining>0)continue;
     project.status='completed';
-    if(project.kind==='construction')next.facilities.push({id:`${project.id}:asset`,companyId:project.companyId,cityId:project.cityId,kind:project.facilityKind,name:`${project.companyId.toUpperCase()} ${project.facilityKind.toUpperCase()}`});
+    if(project.kind==='construction'){post(next,project.companyId,'Construction commissioned',{construction:-project.cost,fixedAssets:project.cost});next.facilities.push({id:`${project.id}:asset`,companyId:project.companyId,cityId:project.cityId,kind:project.facilityKind,name:`${project.companyId.toUpperCase()} ${project.facilityKind.toUpperCase()}`});}
     if(project.kind==='shipment')receiveStock(next,project.id,project.productId,project.cityId,project.cargo||[]);
     events.push(`${project.companyId}: ${project.kind} completed (${project.id})`);
   }

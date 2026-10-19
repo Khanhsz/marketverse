@@ -12,3 +12,4 @@ export const SEGMENT_RULES = {
 } as const;
 export const WEEKLY_PURCHASE_RATE = 0.0004;
 export const FACTORY_RULE = { capacity: 200, requiredWorkers: 4, starterWorkers: 2, materialShare: 0.75 };
+export const FINANCE_RULES = { weeklyInterest: 0.001, debtLimit: 500000, wage: 300, inputUnit: 60, defaultWeeks: 4, rent: {hq:1000,store:800,factory:1800,warehouse:600,rd:1200} };
