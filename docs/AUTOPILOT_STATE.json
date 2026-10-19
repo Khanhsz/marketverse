@@ -3,7 +3,7 @@
   "project": "MarketVerse",
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
-  "activeSprint": 15,
+  "activeSprint": 16,
   "completedSprints": [
     1,
     2,
@@ -18,15 +18,16 @@
     11,
     12,
     13,
-    14
+    14,
+    15
   ],
   "status": "in_progress",
-  "nextAction": "Read docs/sprints/15.md and implement all acceptance gates; retain completed sprint evidence.",
+  "nextAction": "Read docs/sprints/16.md and implement all acceptance gates; retain completed sprint evidence.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
-    "browserSmoke": "passed: Sprint 14 and previous browser regression journeys",
-    "lastValidatedCommit": "e5b5f2175cb2ffc5635444b9a5477c9e7a95c4cb",
+    "browserSmoke": "passed: Sprint 15 and previous browser regression journeys",
+    "lastValidatedCommit": "534d6a5097a3bf42a04ae6bd5923e0a86cc03eb9",
     "lastLocalTests": 48,
     "remoteCI": "not observed: api.github.com CONNECT denied HTTP 403"
   },

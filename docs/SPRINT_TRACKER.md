@@ -16,8 +16,8 @@
 | 12 | Economic Events & Markets | completed | 44 tests + build + Chromium PASS; `9e2e96d`; validation/SPRINT_12.md |
 | 13 | National Campaign | completed | 46 tests + build + Chromium PASS; `6e542ea`; validation/SPRINT_13.md |
 | 14 | Balance & Scenario Testing | completed | 48 tests + build + Chromium PASS; `e5b5f21`; validation/SPRINT_14.md |
-| 15 | UX Polish & Onboarding | in progress | laptop usability & accessibility |
-| 16 | Alpha QA & Release Candidate | queued | end-to-end acceptance |
+| 15 | UX Polish & Onboarding | completed | 48 tests + build + Chromium PASS; `534d6a5`; validation/SPRINT_15.md |
+| 16 | Alpha QA & Release Candidate | in progress | end-to-end acceptance |
 
 ## Integration principles
 - This project is not complete at Sprint 01; CI passing is necessary but not sufficient.

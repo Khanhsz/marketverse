@@ -1,5 +1,9 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — Sprint 15 accepted
+- Native focus-contained dialogs with explicit focus return, optional keyboard shortcuts, accessible city/entity alternatives and keyboard map pan/zoom/fit. Added onboarding guide, collapsible/context-reset panels, clearer type/contrast, constant-readable map labels and demand availability labels. Dirty-frame rendering avoids an idle render loop. Browser keyboard/mouse journeys pass; measured laptop/DPR profile and screenshots cover 1024, 1280 and 1440 widths.
+- Validation: 48 tests, build and browser smoke pass; `534d6a5`.
+
 ## 2026-10-20 — Sprint 14 accepted
 - Replicable five-policy, four-seed sweep completes 20 campaigns of 104 weeks with zero bankruptcies, 14 profitable outcomes and no physical/cash/fulfillment invariant failures. Three policies profit across all four seeds; losing volume/brand outcomes remain in raw results. Adversarial order/loan/replay checks pass. Tracked balance methodology and JSON/Markdown results record roughly 40 ms maximum p95 engine turn time.
 - Validation: 48 tests, build and browser smoke pass; `e5b5f21`.
