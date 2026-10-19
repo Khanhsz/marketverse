@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "verify": "npm run test && npm run build",
-    "test:browser": "node scripts/browser-smoke.mjs"
+    "test:browser": "node scripts/run-browser-smoke.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.9.0",
