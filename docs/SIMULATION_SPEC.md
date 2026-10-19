@@ -1,6 +1,6 @@
 # MarketVerse — Deterministic Weekly Simulation Specification (Target Architecture)
 
-Current `src/engine/game.ts` is Sprint 01 scaffolding; this document specifies forward implementation, not capabilities already present.
+The Alpha engine implements the following pipeline with explicit defaults in `src/data/rules.ts`. See `ARCHITECTURE.md` for actual module boundaries and `KNOWN_ISSUES.md` for simplifications. AI plans use the previous public snapshot before the new resolution event; they do not see private player orders or a macro surprise before the human could.
 
 ## Weekly pipeline
 1. Verify player commands and budgets. Save immutable snapshot of decisions.
@@ -54,3 +54,13 @@ Weekly reports expose revenue, fulfilled orders, lost demand, inventory, gross/o
 
 ## Balance
 Run multi-seed multi-strategy simulations across 104 weeks; inspect insolvency rates, runaway snowballing, dominant strategies and economic stability. Tune using config rather than hardcoded fixes.
+
+## Alpha implementation defaults
+
+One week is one atomic reviewed transaction. Money and goods are integers; continuous persisted state uses nine decimals. Weekly purchase rate is configured by population/segments/power and seasonality; exponential preference weights are quantized and Hamilton allocation includes the no-purchase option. Fulfillment first applies local-stock limits, then shared sales-staff capacity; loss attribution records that order explicitly.
+
+A factory has 200 units of nominal weekly capacity, up to four assigned production staff, purchased component kits and a cash budget. Product BOM sets total conversion cost; kits are the simplified input abstraction. Cargo retains lot cost and becomes local stock only on its arrival turn.
+
+Journal recognition separates inventory/capex from expenses and debt principal from income. Unfunded recurring costs become payables; four consecutive missed-payment weeks cause insolvency. Media builds awareness only in proportion to cash actually paid. Default policy budgets persist and therefore can create recurring losses.
+
+Campaign score weights profit, liquidity, market share, innovation, brand and reach. The sweep in `validation/` audits several policies/seeds; it is not a universal balance proof. Human gameplay review remains the public-release gate.

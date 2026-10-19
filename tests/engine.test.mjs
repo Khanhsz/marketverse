@@ -1,12 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialGame, advanceWeek, calendarOf, createRng, validateState, serializeGame, deserializeGame } from '../src/engine/game.ts';
+import {
+  createInitialGame,
+  advanceWeek,
+  calendarOf,
+  createRng,
+  validateState,
+  serializeGame,
+  deserializeGame,
+} from '../src/engine/game.ts';
 
 test('initial state has 3 cities, 3 companies and a valid player', () => {
   const s = createInitialGame();
   assert.equal(s.cities.length, 3);
   assert.equal(s.companies.length, 3);
-  assert.equal(s.companies.find(x => x.id === s.playerId).control, 'human');
+  assert.equal(s.companies.find((x) => x.id === s.playerId).control, 'human');
   assert.doesNotThrow(() => validateState(s));
 });
 test('one turn advances exactly one week and produces one report', () => {
@@ -47,9 +55,28 @@ test('advanceWeek does not mutate input state', () => {
   assert.equal(JSON.stringify(initial), before);
 });
 test('fulfilled sales explain cash and inventory changes without phantom resources', () => {
-  const initial=createInitialGame(),next=advanceWeek(initial),report=next.reports.at(-1);
-  for(const p of initial.products){const sales=report.sales.filter(s=>s.productId===p.id);assert.equal(next.products.find(x=>x.id===p.id).inventory,p.inventory-sales.reduce((n,s)=>n+s.units,0));}
-  for(const c of initial.companies){const revenue=report.sales.filter(s=>initial.products.find(p=>p.id===s.productId).companyId===c.id).reduce((n,s)=>n+s.revenue,0);assert.equal(next.companies.find(x=>x.id===c.id).cash,c.cash+revenue-report.financials.find(f=>f.companyId===c.id).expenses-report.financials.find(f=>f.companyId===c.id).capex);}
+  const initial = createInitialGame(),
+    next = advanceWeek(initial),
+    report = next.reports.at(-1);
+  for (const p of initial.products) {
+    const sales = report.sales.filter((s) => s.productId === p.id);
+    assert.equal(
+      next.products.find((x) => x.id === p.id).inventory,
+      p.inventory - sales.reduce((n, s) => n + s.units, 0),
+    );
+  }
+  for (const c of initial.companies) {
+    const revenue = report.sales
+      .filter((s) => initial.products.find((p) => p.id === s.productId).companyId === c.id)
+      .reduce((n, s) => n + s.revenue, 0);
+    assert.equal(
+      next.companies.find((x) => x.id === c.id).cash,
+      c.cash +
+        revenue -
+        report.financials.find((f) => f.companyId === c.id).expenses -
+        report.financials.find((f) => f.companyId === c.id).capex,
+    );
+  }
 });
 test('save serialization roundtrip and invalid save rejection', () => {
   const initial = createInitialGame();

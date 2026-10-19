@@ -6,7 +6,7 @@ Connect GitHub repo `Khanhsz/marketverse` in Work or Codex Cloud. Give explicit 
 ## First execution prompt
 Continue development of the private GitHub repository `Khanhsz/marketverse`. Read `AGENTS.md`, `docs/AUTOPILOT_STATE.json`, `docs/SPRINT_TRACKER.md`, the complete roadmap and the current sprint brief. Treat GitHub as the source of truth instead of relying on conversation memory.
 
-Follow the current JSON checkpoint. Sprint 01–03 now have recorded local acceptance evidence in `docs/validation/`; do not assume they are still pending. Start the active sprint brief (currently Sprint 04 weekly decisions and queues), validate all gates, then commit and push the working branch `codex/marketverse-sprint-continuation`. Fetch and inspect the remote branch before continuing; never reset or overwrite local work.
+Follow the current JSON checkpoint. Accepted sprints have recorded local acceptance evidence in `docs/validation/`; do not assume they are still pending. Start the active sprint brief when unfinished; at terminal `alpha_candidate`, report the candidate and human review requirements rather than adding features. Validate all affected gates, then commit and push the working branch `codex/marketverse-sprint-continuation`. Fetch and inspect the remote branch before continuing; never reset or overwrite local work.
 
 When a sprint meets every acceptance criterion, automatically continue to the next sprint IN THE SAME authorized running session if possible. If runtime ends or requires approval, leave a clear checkpoint and return. Never fabricate tests or say a scheduled task exists until it is configured.
 

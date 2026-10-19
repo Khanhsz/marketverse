@@ -1,0 +1,1046 @@
+{
+  "version": 5,
+  "gameId": "marketverse-20261020",
+  "seed": 20261020,
+  "absoluteWeek": 2,
+  "year": 1,
+  "week": 2,
+  "playerId": "player",
+  "cities": [
+    {
+      "id": "north",
+      "name": "Northport",
+      "x": 390,
+      "y": 160,
+      "population": 660000,
+      "power": 1.12,
+      "segments": {
+        "value": 0.29,
+        "mainstream": 0.48,
+        "premium": 0.23
+      },
+      "links": [
+        "central"
+      ]
+    },
+    {
+      "id": "central",
+      "name": "Central City",
+      "x": 550,
+      "y": 300,
+      "population": 1120000,
+      "power": 1,
+      "segments": {
+        "value": 0.34,
+        "mainstream": 0.49,
+        "premium": 0.17
+      },
+      "links": [
+        "north",
+        "south"
+      ]
+    },
+    {
+      "id": "south",
+      "name": "South Bay",
+      "x": 670,
+      "y": 440,
+      "population": 840000,
+      "power": 0.92,
+      "segments": {
+        "value": 0.42,
+        "mainstream": 0.46,
+        "premium": 0.12
+      },
+      "links": [
+        "central"
+      ]
+    }
+  ],
+  "companies": [
+    {
+      "id": "player",
+      "name": "NOVA INDUSTRIES",
+      "control": "human",
+      "cash": 2473371,
+      "debt": 0
+    },
+    {
+      "id": "value",
+      "name": "VECTRA",
+      "control": "ai",
+      "strategy": "cost-leader",
+      "cash": 3036784,
+      "debt": 200000
+    },
+    {
+      "id": "premium",
+      "name": "ATLAS LABS",
+      "control": "ai",
+      "strategy": "premium-innovator",
+      "cash": 3959104,
+      "debt": 0
+    }
+  ],
+  "products": [
+    {
+      "id": "nova",
+      "companyId": "player",
+      "name": "NOVA AIR / 01",
+      "price": 239,
+      "cost": 124,
+      "quality": 68,
+      "attributes": {
+        "quality": 68,
+        "design": 68,
+        "performance": 68,
+        "durability": 68
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 211,
+      "segment": "mainstream"
+    },
+    {
+      "id": "vectra",
+      "companyId": "value",
+      "name": "VECTRA BASIC",
+      "price": 156,
+      "cost": 100,
+      "quality": 53,
+      "attributes": {
+        "quality": 53,
+        "design": 53,
+        "performance": 53,
+        "durability": 53
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 686,
+      "segment": "value"
+    },
+    {
+      "id": "atlas",
+      "companyId": "premium",
+      "name": "ATLAS PURE",
+      "price": 464,
+      "cost": 202,
+      "quality": 86,
+      "attributes": {
+        "quality": 86,
+        "design": 86,
+        "performance": 86,
+        "durability": 86
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 234,
+      "segment": "premium"
+    }
+  ],
+  "facilities": [
+    {
+      "id": "hq",
+      "companyId": "player",
+      "cityId": "central",
+      "kind": "hq",
+      "name": "NOVA HQ"
+    },
+    {
+      "id": "store",
+      "companyId": "player",
+      "cityId": "central",
+      "kind": "store",
+      "name": "NOVA Flagship"
+    },
+    {
+      "id": "vectra-store",
+      "companyId": "value",
+      "cityId": "south",
+      "kind": "store",
+      "name": "Vectra Retail"
+    },
+    {
+      "id": "atlas-store",
+      "companyId": "premium",
+      "cityId": "north",
+      "kind": "store",
+      "name": "Atlas Showroom"
+    }
+  ],
+  "reports": [
+    {
+      "week": 1,
+      "events": [
+        "player: construction committed (40000 credits, 4 weeks)",
+        "player: research committed (30000 credits, 6 weeks)",
+        "value: construction committed (180000 credits, 10 weeks)",
+        "premium: construction committed (180000 credits, 10 weeks)",
+        "389 units fulfilled from local stock; 0 preferred orders unfilled."
+      ],
+      "cashDelta": {
+        "player": -26629,
+        "value": -163216,
+        "premium": -140896
+      },
+      "placeholder": false,
+      "demand": [
+        {
+          "cityId": "central",
+          "segment": "value",
+          "potential": 152,
+          "outside": 145,
+          "allocations": [
+            {
+              "productId": "nova",
+              "desired": 7
+            }
+          ]
+        },
+        {
+          "cityId": "central",
+          "segment": "mainstream",
+          "potential": 219,
+          "outside": 96,
+          "allocations": [
+            {
+              "productId": "nova",
+              "desired": 123
+            }
+          ]
+        },
+        {
+          "cityId": "central",
+          "segment": "premium",
+          "potential": 76,
+          "outside": 17,
+          "allocations": [
+            {
+              "productId": "nova",
+              "desired": 59
+            }
+          ]
+        },
+        {
+          "cityId": "north",
+          "segment": "value",
+          "potential": 85,
+          "outside": 85,
+          "allocations": [
+            {
+              "productId": "atlas",
+              "desired": 0
+            }
+          ]
+        },
+        {
+          "cityId": "north",
+          "segment": "mainstream",
+          "potential": 141,
+          "outside": 114,
+          "allocations": [
+            {
+              "productId": "atlas",
+              "desired": 27
+            }
+          ]
+        },
+        {
+          "cityId": "north",
+          "segment": "premium",
+          "potential": 68,
+          "outside": 9,
+          "allocations": [
+            {
+              "productId": "atlas",
+              "desired": 59
+            }
+          ]
+        },
+        {
+          "cityId": "south",
+          "segment": "value",
+          "potential": 129,
+          "outside": 105,
+          "allocations": [
+            {
+              "productId": "vectra",
+              "desired": 24
+            }
+          ]
+        },
+        {
+          "cityId": "south",
+          "segment": "mainstream",
+          "potential": 142,
+          "outside": 79,
+          "allocations": [
+            {
+              "productId": "vectra",
+              "desired": 63
+            }
+          ]
+        },
+        {
+          "cityId": "south",
+          "segment": "premium",
+          "potential": 37,
+          "outside": 10,
+          "allocations": [
+            {
+              "productId": "vectra",
+              "desired": 27
+            }
+          ]
+        }
+      ],
+      "sales": [
+        {
+          "cityId": "central",
+          "segment": "value",
+          "productId": "nova",
+          "desired": 7,
+          "units": 7,
+          "revenue": 1673,
+          "cogs": 868
+        },
+        {
+          "cityId": "central",
+          "segment": "mainstream",
+          "productId": "nova",
+          "desired": 123,
+          "units": 123,
+          "revenue": 29397,
+          "cogs": 15252
+        },
+        {
+          "cityId": "central",
+          "segment": "premium",
+          "productId": "nova",
+          "desired": 59,
+          "units": 59,
+          "revenue": 14101,
+          "cogs": 7316
+        },
+        {
+          "cityId": "north",
+          "segment": "value",
+          "productId": "atlas",
+          "desired": 0,
+          "units": 0,
+          "revenue": 0,
+          "cogs": 0
+        },
+        {
+          "cityId": "north",
+          "segment": "mainstream",
+          "productId": "atlas",
+          "desired": 27,
+          "units": 27,
+          "revenue": 12528,
+          "cogs": 5454
+        },
+        {
+          "cityId": "north",
+          "segment": "premium",
+          "productId": "atlas",
+          "desired": 59,
+          "units": 59,
+          "revenue": 27376,
+          "cogs": 11918
+        },
+        {
+          "cityId": "south",
+          "segment": "value",
+          "productId": "vectra",
+          "desired": 24,
+          "units": 24,
+          "revenue": 3744,
+          "cogs": 2400
+        },
+        {
+          "cityId": "south",
+          "segment": "mainstream",
+          "productId": "vectra",
+          "desired": 63,
+          "units": 63,
+          "revenue": 9828,
+          "cogs": 6300
+        },
+        {
+          "cityId": "south",
+          "segment": "premium",
+          "productId": "vectra",
+          "desired": 27,
+          "units": 27,
+          "revenue": 4212,
+          "cogs": 2700
+        }
+      ],
+      "production": [],
+      "financials": [
+        {
+          "companyId": "player",
+          "revenue": 45171,
+          "cogs": 23436,
+          "expenses": 31800,
+          "profit": -10065,
+          "cashChange": -26629,
+          "capex": 40000,
+          "borrowing": 0,
+          "repayment": 0,
+          "closingCash": 2473371,
+          "inventory": 26164,
+          "netWorth": 2699535,
+          "payables": 0
+        },
+        {
+          "companyId": "value",
+          "revenue": 17784,
+          "cogs": 11400,
+          "expenses": 1000,
+          "profit": 5384,
+          "cashChange": -163216,
+          "capex": 180000,
+          "borrowing": 0,
+          "repayment": 0,
+          "closingCash": 3036784,
+          "inventory": 68600,
+          "netWorth": 3125384,
+          "payables": 0
+        },
+        {
+          "companyId": "premium",
+          "revenue": 39904,
+          "cogs": 17372,
+          "expenses": 800,
+          "profit": 21732,
+          "cashChange": -140896,
+          "capex": 180000,
+          "borrowing": 0,
+          "repayment": 0,
+          "closingCash": 3959104,
+          "inventory": 47268,
+          "netWorth": 4226372,
+          "payables": 0
+        }
+      ]
+    }
+  ],
+  "policies": {
+    "player": {
+      "prices": {
+        "nova": 239
+      },
+      "production": {},
+      "marketing": 0,
+      "staff": 0
+    },
+    "value": {
+      "prices": {
+        "vectra": 156
+      },
+      "production": {
+        "vectra": 0
+      },
+      "marketing": 0,
+      "staff": 0
+    },
+    "premium": {
+      "prices": {
+        "atlas": 464
+      },
+      "production": {
+        "atlas": 0
+      },
+      "marketing": 0,
+      "staff": 0
+    }
+  },
+  "projects": [
+    {
+      "kind": "construction",
+      "cityId": "north",
+      "facilityKind": "store",
+      "id": "player:fixture:0",
+      "companyId": "player",
+      "cost": 40000,
+      "createdWeek": 1,
+      "dueWeek": 5,
+      "remaining": 3,
+      "status": "active"
+    },
+    {
+      "kind": "research",
+      "productId": "nova",
+      "id": "player:fixture:1",
+      "companyId": "player",
+      "cost": 30000,
+      "createdWeek": 1,
+      "dueWeek": 7,
+      "remaining": 5,
+      "status": "active"
+    },
+    {
+      "kind": "construction",
+      "cityId": "south",
+      "facilityKind": "factory",
+      "id": "value:ai:value:1:0",
+      "companyId": "value",
+      "cost": 180000,
+      "createdWeek": 1,
+      "dueWeek": 11,
+      "remaining": 9,
+      "status": "active"
+    },
+    {
+      "kind": "construction",
+      "cityId": "north",
+      "facilityKind": "factory",
+      "id": "premium:ai:premium:1:0",
+      "companyId": "premium",
+      "cost": 180000,
+      "createdWeek": 1,
+      "dueWeek": 11,
+      "remaining": 9,
+      "status": "active"
+    }
+  ],
+  "commandHistory": [
+    "fixture",
+    "ai:value:1",
+    "ai:premium:1"
+  ],
+  "stocks": [
+    {
+      "id": "opening:nova",
+      "productId": "nova",
+      "cityId": "central",
+      "quantity": 211,
+      "unitCost": 124
+    },
+    {
+      "id": "opening:vectra",
+      "productId": "vectra",
+      "cityId": "south",
+      "quantity": 686,
+      "unitCost": 100
+    },
+    {
+      "id": "opening:atlas",
+      "productId": "atlas",
+      "cityId": "north",
+      "quantity": 234,
+      "unitCost": 202
+    }
+  ],
+  "factories": [],
+  "finance": {
+    "player": {
+      "opening": {
+        "cash": 2500000,
+        "inventory": 49600,
+        "materials": 0,
+        "fixedAssets": 160000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -2709600,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 2473371,
+        "inventory": 26164,
+        "materials": 0,
+        "fixedAssets": 160000,
+        "construction": 40000,
+        "debt": 0,
+        "payable": 0,
+        "equity": -2709600,
+        "revenue": -45171,
+        "cogs": 23436,
+        "payroll": 0,
+        "rent": 1800,
+        "marketing": 0,
+        "research": 30000,
+        "freight": 0,
+        "interest": 0
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    },
+    "value": {
+      "opening": {
+        "cash": 3200000,
+        "inventory": 80000,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": -200000,
+        "payable": 0,
+        "equity": -3120000,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 3036784,
+        "inventory": 68600,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 180000,
+        "debt": -200000,
+        "payable": 0,
+        "equity": -3120000,
+        "revenue": -17784,
+        "cogs": 11400,
+        "payroll": 0,
+        "rent": 800,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 200
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    },
+    "premium": {
+      "opening": {
+        "cash": 4100000,
+        "inventory": 64640,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -4204640,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 3959104,
+        "inventory": 47268,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 180000,
+        "debt": 0,
+        "payable": 0,
+        "equity": -4204640,
+        "revenue": -39904,
+        "cogs": 17372,
+        "payroll": 0,
+        "rent": 800,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    }
+  },
+  "ledger": [
+    {
+      "id": "journal:1:0",
+      "week": 1,
+      "companyId": "player",
+      "memo": "construction committed",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": -40000
+        },
+        {
+          "account": "construction",
+          "amount": 40000
+        }
+      ]
+    },
+    {
+      "id": "journal:1:1",
+      "week": 1,
+      "companyId": "player",
+      "memo": "research committed",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": -30000
+        },
+        {
+          "account": "research",
+          "amount": 30000
+        }
+      ]
+    },
+    {
+      "id": "journal:1:2",
+      "week": 1,
+      "companyId": "value",
+      "memo": "construction committed",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": -180000
+        },
+        {
+          "account": "construction",
+          "amount": 180000
+        }
+      ]
+    },
+    {
+      "id": "journal:1:3",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "construction committed",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": -180000
+        },
+        {
+          "account": "construction",
+          "amount": 180000
+        }
+      ]
+    },
+    {
+      "id": "journal:1:4",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 1673
+        },
+        {
+          "account": "revenue",
+          "amount": -1673
+        }
+      ]
+    },
+    {
+      "id": "journal:1:5",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 868
+        },
+        {
+          "account": "inventory",
+          "amount": -868
+        }
+      ]
+    },
+    {
+      "id": "journal:1:6",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 29397
+        },
+        {
+          "account": "revenue",
+          "amount": -29397
+        }
+      ]
+    },
+    {
+      "id": "journal:1:7",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 15252
+        },
+        {
+          "account": "inventory",
+          "amount": -15252
+        }
+      ]
+    },
+    {
+      "id": "journal:1:8",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 14101
+        },
+        {
+          "account": "revenue",
+          "amount": -14101
+        }
+      ]
+    },
+    {
+      "id": "journal:1:9",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 7316
+        },
+        {
+          "account": "inventory",
+          "amount": -7316
+        }
+      ]
+    },
+    {
+      "id": "journal:1:10",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 12528
+        },
+        {
+          "account": "revenue",
+          "amount": -12528
+        }
+      ]
+    },
+    {
+      "id": "journal:1:11",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 5454
+        },
+        {
+          "account": "inventory",
+          "amount": -5454
+        }
+      ]
+    },
+    {
+      "id": "journal:1:12",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 27376
+        },
+        {
+          "account": "revenue",
+          "amount": -27376
+        }
+      ]
+    },
+    {
+      "id": "journal:1:13",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 11918
+        },
+        {
+          "account": "inventory",
+          "amount": -11918
+        }
+      ]
+    },
+    {
+      "id": "journal:1:14",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 3744
+        },
+        {
+          "account": "revenue",
+          "amount": -3744
+        }
+      ]
+    },
+    {
+      "id": "journal:1:15",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 2400
+        },
+        {
+          "account": "inventory",
+          "amount": -2400
+        }
+      ]
+    },
+    {
+      "id": "journal:1:16",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 9828
+        },
+        {
+          "account": "revenue",
+          "amount": -9828
+        }
+      ]
+    },
+    {
+      "id": "journal:1:17",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 6300
+        },
+        {
+          "account": "inventory",
+          "amount": -6300
+        }
+      ]
+    },
+    {
+      "id": "journal:1:18",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Fulfilled sales",
+      "lines": [
+        {
+          "account": "cash",
+          "amount": 4212
+        },
+        {
+          "account": "revenue",
+          "amount": -4212
+        }
+      ]
+    },
+    {
+      "id": "journal:1:19",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Cost of fulfilled goods",
+      "lines": [
+        {
+          "account": "cogs",
+          "amount": 2700
+        },
+        {
+          "account": "inventory",
+          "amount": -2700
+        }
+      ]
+    },
+    {
+      "id": "journal:1:20",
+      "week": 1,
+      "companyId": "player",
+      "memo": "Weekly rent",
+      "lines": [
+        {
+          "account": "rent",
+          "amount": 1800
+        },
+        {
+          "account": "cash",
+          "amount": -1800
+        }
+      ]
+    },
+    {
+      "id": "journal:1:21",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Weekly rent",
+      "lines": [
+        {
+          "account": "rent",
+          "amount": 800
+        },
+        {
+          "account": "cash",
+          "amount": -800
+        }
+      ]
+    },
+    {
+      "id": "journal:1:22",
+      "week": 1,
+      "companyId": "value",
+      "memo": "Weekly interest",
+      "lines": [
+        {
+          "account": "interest",
+          "amount": 200
+        },
+        {
+          "account": "cash",
+          "amount": -200
+        }
+      ]
+    },
+    {
+      "id": "journal:1:23",
+      "week": 1,
+      "companyId": "premium",
+      "memo": "Weekly rent",
+      "lines": [
+        {
+          "account": "rent",
+          "amount": 800
+        },
+        {
+          "account": "cash",
+          "amount": -800
+        }
+      ]
+    }
+  ]
+}

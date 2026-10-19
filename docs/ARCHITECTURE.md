@@ -1,29 +1,33 @@
-# MarketVerse — Technical Architecture
+# MarketVerse technical architecture — Alpha
 
-## Stack
-React 19 + TypeScript + Vite for app shell; PixiJS 8 for map renderer; Node 22 tests and GitHub Actions CI. No API key, paid hosting or background coding service configured.
+React 19 + TypeScript + Vite form the application shell; PixiJS 8 renders the vector map. The simulation is pure TypeScript with no browser, network, wall-clock or model API dependency. Node 22 runs its deterministic tests. Pixi is loaded separately from the initial app bundle; the static map renders only when an interaction/state update marks it dirty.
 
-## Layer boundaries
-- `src/engine/`: pure domain types, actions, transitions, random, save validation and future economics. Never import React, Pixi or browser globals.
-- `src/ui/`: React containers and Pixi canvas; display state and send typed commands, not calculate business finances.
-- `src/data/` (future): city/industry/economic configs validated at load.
-- `tests/`: fast deterministic behavior and regression tests; introduce UI smoke tests as UI grows.
-- `docs/`: product spec, sprint briefs, quality and handoff.
+## Modules
 
-## Event/data flow
-UI command -> typed validator -> weekly decision plan -> simulation pipeline -> new immutable GameState + explainable report -> UI projection/map view -> save.
+- `src/data/`: explicit country, industry, budget, capacity, AI, macro and campaign constants.
+- `src/engine/game.ts`: immutable weekly transaction, validation, schema migration and canonical saves.
+- `orders.ts`: typed persistent policies, financing, reviewed commitments and timed projects.
+- `demand.ts`: city × segment × SKU utility, outside choice and conserved integer allocation.
+- `operations.ts`: located cost-basis lots, reserved cargo, component kits, workforce/cash-constrained production and stock-limited fulfillment.
+- `finance.ts`: balanced signed-debit journal, opening balances, assets, liabilities, expenses, cash, arrears and insolvency.
+- `ai.ts`: observations limited to own resources and previous public prices/macro; four strategies use the same order executor as the player.
+- `products.ts`, `people.ts`, `macro.ts`: versioned product design, paid R&D, hiring/media/awareness and seeded seasonal economic changes.
+- `analytics.ts`, `campaign.ts`, `scenarios.ts`: reconciled reporting, multi-axis 104-week objectives and audited multi-seed policy sweeps.
+- `replay.ts`, `json.ts`, `precision.ts`, `report-validation.ts`: checkpointed command replay, canonical object order, fixed continuous-state precision and imported history validation.
+- `src/ui/`: contextual map/entity panels, native modal weekly review/reports/guide/results and a worker for imported replays.
 
-## Geographic map
-Country geometry as vector polygons/paths; city nodes and route edges as world-coordinate graph. Camera state separate from world state. Pixi used only to render and interact. After Sprint 02 add pan/zoom and semantic layers.
+## Weekly resolution
 
-## Determinism
-Use seeded PRNG, no Date.now or Math.random in game outcome decisions. All player orders are recorded for replay. Allow UI transitions to be nondeterministic only when they do not affect simulation outputs.
+Validate current state → form AI orders from the previous public snapshot → clone state → resolve seeded public macro change → apply player and AI commitments through common validation → advance projects exactly one week → allocate workforce and manufacture → compute segment demand → fulfill from local inventory → recognize expenses/payables → update funded awareness → reconcile reports/journal → record canonical player command → advance calendar and campaign.
 
-## Persistence
-Local storage for Foundation only. Longer term add indexed storage as needed, migrations and optional cloud saves. Never overwrite malformed saves without an export/recovery option.
+AI decisions intentionally precede resolution of the new macro event so they do not see a future event the human could not see while planning. Policy changes remain private until simultaneous resolution. Reports separate measured flows/accounting from modeled preference effects.
 
-## CI
-`npm run verify` runs engine tests and production build. Future additions should check state schema, gameplay invariants, UI smoke and balance scenarios. CI by itself NEVER triggers LLM coding.
+## Persistence and UI
 
-## Dependencies
-Keep packages minimal, lock versions after repository bootstrap, separate noncritical asset rendering from core rules. Avoid bundling secrets and external service tokens.
+Save format 9 accepts historical formats 1–8 through explicit migrations. Goods/money use integers; persisted awareness/macro state uses nine decimals. Canonical JSON key order and checkpointed command logs support exact replay; production Chromium and Node equality are a release gate. Imported replay verification runs in a local worker and never sends data to a service.
+
+Invalid saves remain untouched with export/reset recovery. File imports validate before replacement and require a local user confirmation. Native dialogs contain focus; optional single-key shortcuts can be disabled. Keyboard city/entity selectors provide alternatives to canvas pins. Camera position is independent of simulation and survives selection, layer switches, panel changes and resize.
+
+## Verification and release
+
+`npm run verify:alpha` combines behavior/build checks, dev browser regression, production 104-week UI journey, cross-runtime replay, laptop/DPR profile and multi-seed balance audits. GitHub Actions performs the main automated gates without an API key. The candidate archive contains a source/version/file-hash manifest; it is prepared locally, never automatically deployed. Human gameplay review is required before any public release.

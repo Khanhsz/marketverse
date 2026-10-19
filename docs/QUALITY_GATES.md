@@ -23,3 +23,7 @@
 
 ## Sprint transition
 Only a coding agent with actual source/test access can attest a test gate. Never treat a mock, inferred result, or checklist checkbox as a verified test. If a gate is not available in the execution environment, mark pending.
+
+## Alpha candidate gates
+
+Sprint 16 requires `npm run verify:alpha`: behavior/format/typecheck/build, browser regression, a full 104-week journey against the production bundle/worker, exact Node/Chromium replay equality, laptop/DPR profile, audited multi-seed scenarios and state-contract validation. See `ALPHA_REVIEW.md` for human gameplay review before any public release. Generated result files must be from the current run and target; failures must not be replaced with assumed CI results.

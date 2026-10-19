@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0-alpha.1",
+  "runId": "af346618-fbfe-4879-ada9-f7fe676440eb",
+  "production": true,
+  "browserVersion": "154.0.8037.57",
+  "saveSha256": "eb935aaa27be5464947168f2d5a64cbe4bf968813b0c07679396e53133ae941a",
+  "replaySha256": "ab56135c87f7b6366cfb97b72b26833d53b44f7c98cce8c962bb433f66eca39a",
+  "weeks": 104,
+  "cities": 8,
+  "rivals": 4,
+  "replayCommands": 104,
+  "score": 54,
+  "completedSaveRestored": true,
+  "workerReplayExact": true,
+  "malformedImportsPreserveData": true,
+  "yearReportComplete": true,
+  "uncaughtErrors": [],
+  "medianUiTurnMs": 165.8628979999994,
+  "maxUiTurnMs": 247.6472020000001,
+  "testedViewports": [
+    "1366x768 DPR1",
+    "1280x800 DPR2"
+  ]
+}

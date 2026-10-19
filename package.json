@@ -1,17 +1,25 @@
 {
   "name": "marketverse",
   "private": true,
-  "version": "0.1.0-sprint.1",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "verify": "npm run test && npm run build",
+    "verify": "npm run format:check && npm run test && npm run build",
     "test:browser": "node scripts/run-browser-smoke.mjs",
     "test:balance": "node --experimental-strip-types scripts/balance.mjs",
-    "test:profile": "BROWSER_SUITE=./browser-profile.mjs node scripts/run-browser-smoke.mjs"
+    "test:profile": "BROWSER_SUITE=./browser-profile.mjs node scripts/run-browser-smoke.mjs",
+    "test:campaign": "BROWSER_SUITE=./browser-campaign.mjs node scripts/run-browser-smoke.mjs",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"scripts/*.mjs\" \"tests/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"scripts/*.mjs\" \"tests/*.mjs\"",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:campaign:prod": "BROWSER_PRODUCTION=1 BROWSER_SUITE=./browser-campaign.mjs node scripts/run-browser-smoke.mjs",
+    "verify:alpha": "npm run verify && npm run test:browser && npm run test:campaign:prod && npm run test:replay:cross && npm run test:profile && BALANCE_OUTPUT=docs/validation/BALANCE_16.json npm run test:balance && node scripts/check-sprint-state.mjs",
+    "package:alpha": "node scripts/package-alpha.mjs",
+    "test:replay:cross": "node --experimental-strip-types scripts/check-browser-replay.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.9.0",
@@ -23,7 +31,11 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.4.0",
     "playwright": "1.64.1",
+    "prettier": "3.6.2",
     "typescript": "^5.8.0",
     "vite": "^6.3.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }

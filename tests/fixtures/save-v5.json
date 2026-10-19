@@ -1,0 +1,347 @@
+{
+  "version": 5,
+  "gameId": "marketverse-20261020",
+  "seed": 20261020,
+  "absoluteWeek": 1,
+  "year": 1,
+  "week": 1,
+  "playerId": "player",
+  "cities": [
+    {
+      "id": "north",
+      "name": "Northport",
+      "x": 390,
+      "y": 160,
+      "population": 660000,
+      "power": 1.12,
+      "segments": {
+        "value": 0.29,
+        "mainstream": 0.48,
+        "premium": 0.23
+      },
+      "links": [
+        "central"
+      ]
+    },
+    {
+      "id": "central",
+      "name": "Central City",
+      "x": 550,
+      "y": 300,
+      "population": 1120000,
+      "power": 1,
+      "segments": {
+        "value": 0.34,
+        "mainstream": 0.49,
+        "premium": 0.17
+      },
+      "links": [
+        "north",
+        "south"
+      ]
+    },
+    {
+      "id": "south",
+      "name": "South Bay",
+      "x": 670,
+      "y": 440,
+      "population": 840000,
+      "power": 0.92,
+      "segments": {
+        "value": 0.42,
+        "mainstream": 0.46,
+        "premium": 0.12
+      },
+      "links": [
+        "central"
+      ]
+    }
+  ],
+  "companies": [
+    {
+      "id": "player",
+      "name": "NOVA INDUSTRIES",
+      "control": "human",
+      "cash": 2500000,
+      "debt": 0
+    },
+    {
+      "id": "value",
+      "name": "VECTRA",
+      "control": "ai",
+      "strategy": "cost-leader",
+      "cash": 3200000,
+      "debt": 200000
+    },
+    {
+      "id": "premium",
+      "name": "ATLAS LABS",
+      "control": "ai",
+      "strategy": "premium-innovator",
+      "cash": 4100000,
+      "debt": 0
+    }
+  ],
+  "products": [
+    {
+      "id": "nova",
+      "companyId": "player",
+      "name": "NOVA AIR / 01",
+      "price": 239,
+      "cost": 124,
+      "quality": 68,
+      "attributes": {
+        "quality": 68,
+        "design": 68,
+        "performance": 68,
+        "durability": 68
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 400,
+      "segment": "mainstream"
+    },
+    {
+      "id": "vectra",
+      "companyId": "value",
+      "name": "VECTRA BASIC",
+      "price": 179,
+      "cost": 100,
+      "quality": 53,
+      "attributes": {
+        "quality": 53,
+        "design": 53,
+        "performance": 53,
+        "durability": 53
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 800,
+      "segment": "value"
+    },
+    {
+      "id": "atlas",
+      "companyId": "premium",
+      "name": "ATLAS PURE",
+      "price": 379,
+      "cost": 202,
+      "quality": 86,
+      "attributes": {
+        "quality": 86,
+        "design": 86,
+        "performance": 86,
+        "durability": 86
+      },
+      "revision": 1,
+      "lifecycle": "active",
+      "inventory": 320,
+      "segment": "premium"
+    }
+  ],
+  "facilities": [
+    {
+      "id": "hq",
+      "companyId": "player",
+      "cityId": "central",
+      "kind": "hq",
+      "name": "NOVA HQ"
+    },
+    {
+      "id": "store",
+      "companyId": "player",
+      "cityId": "central",
+      "kind": "store",
+      "name": "NOVA Flagship"
+    },
+    {
+      "id": "vectra-store",
+      "companyId": "value",
+      "cityId": "south",
+      "kind": "store",
+      "name": "Vectra Retail"
+    },
+    {
+      "id": "atlas-store",
+      "companyId": "premium",
+      "cityId": "north",
+      "kind": "store",
+      "name": "Atlas Showroom"
+    }
+  ],
+  "reports": [],
+  "policies": {
+    "player": {
+      "prices": {
+        "nova": 239
+      },
+      "production": {},
+      "marketing": 0,
+      "staff": 0
+    },
+    "value": {
+      "prices": {
+        "vectra": 179
+      },
+      "production": {},
+      "marketing": 0,
+      "staff": 0
+    },
+    "premium": {
+      "prices": {
+        "atlas": 379
+      },
+      "production": {},
+      "marketing": 0,
+      "staff": 0
+    }
+  },
+  "projects": [],
+  "commandHistory": [],
+  "stocks": [
+    {
+      "id": "opening:nova",
+      "productId": "nova",
+      "cityId": "central",
+      "quantity": 400,
+      "unitCost": 124
+    },
+    {
+      "id": "opening:vectra",
+      "productId": "vectra",
+      "cityId": "south",
+      "quantity": 800,
+      "unitCost": 100
+    },
+    {
+      "id": "opening:atlas",
+      "productId": "atlas",
+      "cityId": "north",
+      "quantity": 320,
+      "unitCost": 202
+    }
+  ],
+  "factories": [],
+  "finance": {
+    "player": {
+      "opening": {
+        "cash": 2500000,
+        "inventory": 49600,
+        "materials": 0,
+        "fixedAssets": 160000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -2709600,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 2500000,
+        "inventory": 49600,
+        "materials": 0,
+        "fixedAssets": 160000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -2709600,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    },
+    "value": {
+      "opening": {
+        "cash": 3200000,
+        "inventory": 80000,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": -200000,
+        "payable": 0,
+        "equity": -3120000,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 3200000,
+        "inventory": 80000,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": -200000,
+        "payable": 0,
+        "equity": -3120000,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    },
+    "premium": {
+      "opening": {
+        "cash": 4100000,
+        "inventory": 64640,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -4204640,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "balances": {
+        "cash": 4100000,
+        "inventory": 64640,
+        "materials": 0,
+        "fixedAssets": 40000,
+        "construction": 0,
+        "debt": 0,
+        "payable": 0,
+        "equity": -4204640,
+        "revenue": 0,
+        "cogs": 0,
+        "payroll": 0,
+        "rent": 0,
+        "marketing": 0,
+        "research": 0,
+        "freight": 0,
+        "interest": 0
+      },
+      "missedWeeks": 0,
+      "bankrupt": false
+    }
+  },
+  "ledger": []
+}
