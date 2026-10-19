@@ -139,6 +139,11 @@ try {
   const coreRun=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
   assert.equal(coreRun.absoluteWeek,16);assert.ok(coreRun.reports.length===15);
   assert.ok(coreRun.companies.every(c=>c.cash>=0));
+  assert.ok(coreRun.products.some(p=>p.parentId==='nova'&&p.revision===2));
+  assert.equal(coreRun.products.find(p=>p.id==='nova').quality,68);
+  await page.getByRole('button',{name:'Company',exact:true}).click();
+  assert.match(await page.locator('.panel').innerText(),/R2/);
+  assert.match(await page.locator('.panel').innerText(),/Performance/);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});

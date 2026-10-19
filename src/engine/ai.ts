@@ -32,8 +32,8 @@ export function planAI(observation:Observation):TurnOrders{
   for(const product of o.products){
     const observed=o.marketPrices.filter(p=>p.segment===product.segment),market=observed.length?observed.reduce((n,p)=>n+p.price,0)/observed.length:product.price;
     policy.prices[product.id]=Math.max(Math.ceil(product.cost*1.25),Math.round(product.cost*config.markup*.8+market*.2));
-    policy.production[product.id]=factory?config.target:0;
-    if(o.strategy==='premium-innovator'&&o.week%12===0&&!o.projects.some(p=>p.kind==='research'&&p.productId===product.id)&&budget>=RESEARCH_RULE.cost){projects.push({kind:'research',productId:product.id});budget-=RESEARCH_RULE.cost;}
+    policy.production[product.id]=factory&&product.lifecycle==='active'?config.target:0;
+    if(product.lifecycle==='active'&&product.quality<100&&o.strategy==='premium-innovator'&&o.week%12===0&&!o.projects.some(p=>p.kind==='research'&&p.productId===product.id)&&budget>=RESEARCH_RULE.cost){projects.push({kind:'research',productId:product.id});budget-=RESEARCH_RULE.cost;}
     for(const store of o.facilities.filter(f=>f.kind==='store')){
       if(o.stocks.some(l=>l.productId===product.id&&l.cityId===store.cityId&&l.quantity>0)||o.projects.some(p=>p.kind==='shipment'&&p.productId===product.id&&p.cityId===store.cityId))continue;
       const source=o.stocks.filter(l=>l.productId===product.id&&l.cityId!==store.cityId&&l.quantity>20).sort((a,b)=>b.quantity-a.quantity)[0];

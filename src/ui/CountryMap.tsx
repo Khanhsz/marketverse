@@ -11,9 +11,9 @@ type Layer = typeof layers[number];
 const legends: Record<Layer, string> = {
   Market: 'Population · Value / Mainstream / Premium segments',
   Competition: 'Dark green: NOVA · Slate: VECTRA · Ochre: ATLAS',
-  Operations: 'Facility labels show existing assets; production is not simulated',
+  Operations: 'Facility labels show existing assets; select for operational details',
   Logistics: 'Existing transport links · Lead times and costs not yet simulated',
-  Economy: 'Purchasing power relative to national baseline · No live sales yet',
+  Economy: 'Purchasing power relative to national baseline',
 };
 const ownerColor = (id: string) => id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
 

@@ -19,3 +19,5 @@ export const AI_RULES = {
   'regional-specialist': {markup:1.9,target:120,expansionEvery:10,reserve:120000},
   'aggressive-expander': {markup:1.65,target:170,expansionEvery:6,reserve:100000},
 } as const;
+export const DESIGN_RULES = { includedImprovement: 20, perPoint: 250, maxResearchWeeks: 12 };
+export const ATTRIBUTE_WEIGHTS = {value:{quality:.2,design:.1,performance:.2,durability:.5},mainstream:{quality:.3,design:.2,performance:.3,durability:.2},premium:{quality:.25,design:.3,performance:.3,durability:.15}} as const;

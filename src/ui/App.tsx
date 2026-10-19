@@ -64,12 +64,12 @@ export function App() {
           <p className="muted">{context.entity.kind.toUpperCase()} · {context.entity.companyId===player.id?'Player owned':'Competitor owned'}</p><hr/>
           <h3>OWNER</h3>{ownerButton(context.entity.companyId)}<h3>LOCATION</h3>{cityButton(context.entity.cityId)}
           <h3>TRANSPORT CONNECTIONS</h3>{city.links.map(cityButton)}
-          <div className="notice">Existing asset. Capacity, localized inventory and operating costs arrive in subsequent simulation sprints.</div>
+          <div className="notice">Select the company to inspect its products. Production requires workforce, component kits and cash; every shipment has an arrival week.</div>
         </>}
         {context.kind === 'company' && <>
           <p className="muted">{context.entity.control==='human'?'Player company':'AI competitor'} · {context.entity.id}</p><hr/>
           <div className="stat">CASH <b>{number(context.entity.cash)}</b></div><div className="stat">DEBT <b>{number(context.entity.debt)}</b></div>
-          <h3>FACILITIES</h3>{game.facilities.filter(f=>f.companyId===context.entity.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button>{cityButton(f.cityId)}</div>)}
+          <h3>PRODUCT PORTFOLIO</h3>{game.products.filter(p=>p.companyId===context.entity.id).map(p=><div className="productCard" key={p.id}><strong>{p.name}</strong><p>R{p.revision} · {p.lifecycle} · {p.segment}</p><p>Price {p.price} · unit cost {p.cost} · stock {p.inventory}</p><p>Quality {p.quality} · Design {p.attributes.design} · Performance {p.attributes.performance} · Durability {p.attributes.durability}</p></div>)}<h3>FACILITIES</h3>{game.facilities.filter(f=>f.companyId===context.entity.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button>{cityButton(f.cityId)}</div>)}
           {context.entity.strategy&&<p>Strategy: {context.entity.strategy}</p>}<h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
         </>}
         {game.reports.at(-1)?.demand&&<details className="demandReport" open><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
@@ -82,7 +82,7 @@ export function App() {
       </aside>
     </div>
     {(recovery || storageError) && <div className="saveWarning" role="alert"><strong>{recovery?'Saved game could not be loaded. Original data is preserved; gameplay is paused.':storageError}</strong><button onClick={exportGame}>{recovery?'Export original save':'Export save'}</button><span>Use Reset only when you are ready to discard the saved game.</span></div>}
-    <footer className="footer"><div>● {recovery || storageError?'SAVE NEEDS ATTENTION':'LOCAL SAVE'} <span>· Weekly engine active · Business simulation pending</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game? This discards the existing save.')){setGame(createInitialGame());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>RESET</button><button className="next" disabled={!!recovery} onClick={()=>setPlannerOpen(true)}>NEXT WEEK →</button></div></footer>
+    <footer className="footer"><div>● {recovery || storageError?'SAVE NEEDS ATTENTION':'LOCAL SAVE'} <span>· Weekly engine active · Orders · Inventory · Finance active</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game? This discards the existing save.')){setGame(createInitialGame());setSelection({kind:'city',id:'central'});setRecovery('');committedWeek.current=0;}}}>RESET</button><button className="next" disabled={!!recovery} onClick={()=>setPlannerOpen(true)}>NEXT WEEK →</button></div></footer>
     {plannerOpen&&<WeeklyPlanner game={game} cityId={city.id} onClose={()=>setPlannerOpen(false)} onCommit={orders=>{if(committedWeek.current===orders.expectedWeek)throw new Error('Week already committed');const next=advanceWeek(game,orders);committedWeek.current=orders.expectedWeek;setGame(next);setPlannerOpen(false);}}/>}
   </div>;
 }

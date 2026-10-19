@@ -1,3 +1,6 @@
+import { ATTRIBUTE_NAMES, defaultUpgrade } from '../engine/products';
+import type { Attributes } from '../engine/products';
+import type { Segment } from '../engine/game';
 import { useState } from 'react';
 import type { GameState, Facility } from '../engine/game';
 import { applyOrders, quoteProject } from '../engine/orders';
@@ -12,7 +15,10 @@ export function WeeklyPlanner({game,cityId,onCommit,onClose}:Props) {
   const [origin,setOrigin]=useState(cityId);
   const [kind,setKind]=useState<Facility['kind']>('store');
   const owned=game.products.filter(p=>p.companyId===game.playerId);
-  const [productId,setProductId]=useState(owned[0]?.id || '');
+  const researchable=owned.filter(p=>p.lifecycle==='active');
+  const [productId,setProductId]=useState(researchable[0]?.id || '');
+  const [attributes,setAttributes]=useState<Attributes>(()=>defaultUpgrade(researchable[0]||owned[0]));
+  const [segment,setSegment]=useState<Segment>((researchable[0]||owned[0]).segment);
   const [quantity,setQuantity]=useState(10);
   const [borrow,setBorrow]=useState(0),[repay,setRepay]=useState(0);
   const [error,setError]=useState('');
@@ -27,8 +33,8 @@ export function WeeklyPlanner({game,cityId,onCommit,onClose}:Props) {
     <h3>Product policies</h3>
     {owned.map(p=><div className="formRow" key={p.id}><strong>{p.name}</strong><label>Price ({p.id})<input type="number" min="1" step="1" value={policy.prices[p.id]??p.price} onChange={e=>setPolicy({...policy,prices:{...policy.prices,[p.id]:Number(e.target.value)}})}/></label><label>Production target ({p.id})<input type="number" min="0" step="1" value={policy.production[p.id]??0} onChange={e=>setPolicy({...policy,production:{...policy.production,[p.id]:Number(e.target.value)}})}/></label></div>)}
     <h3>Financing</h3><div className="formRow"><label>Borrow credits<input type="number" min="0" value={borrow} onChange={e=>setBorrow(Number(e.target.value))}/></label><label>Repay principal<input type="number" min="0" value={repay} onChange={e=>setRepay(Number(e.target.value))}/></label><span>Debt limit 500,000 · Weekly interest 0.1%</span></div><h3>New projects</h3><div className="formRow"><label>Destination<select aria-label="Destination" value={destination} onChange={e=>setDestination(e.target.value)}>{cityOptions}</select></label><label>Facility kind<select aria-label="Facility kind" value={kind} onChange={e=>setKind(e.target.value as Facility['kind'])}>{FACILITY_KINDS.map(k=><option key={k}>{k}</option>)}</select></label><button onClick={()=>add({kind:'construction',cityId:destination,facilityKind:kind})}>Add construction</button><span>{BUILD_RULES[kind].cost.toLocaleString()} credits · {BUILD_RULES[kind].weeks} weeks</span></div>
-    <div className="formRow"><label>Product<select aria-label="Product" value={productId} onChange={e=>setProductId(e.target.value)}>{owned.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><button onClick={()=>add({kind:'research',productId})}>Add research</button><span>{RESEARCH_RULE.cost.toLocaleString()} credits · {RESEARCH_RULE.weeks} weeks</span></div>
-    <div className="formRow"><label>Shipment origin<select aria-label="Shipment origin" value={origin} onChange={e=>setOrigin(e.target.value)}>{cityOptions}</select></label><label>Units<input type="number" min="1" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}/></label><button onClick={()=>add({kind:'shipment',productId,originId:origin,cityId:destination,quantity})}>Add shipment</button></div>
+    <div className="formRow"><label>Product<select aria-label="Product" value={productId} onChange={e=>{setProductId(e.target.value);setAttributes(defaultUpgrade(owned.find(p=>p.id===e.target.value)!));}}>{researchable.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label><button onClick={()=>add({kind:'research',productId,attributes,segment})}>Add research</button><span>{RESEARCH_RULE.cost.toLocaleString()} credits · {RESEARCH_RULE.weeks} weeks</span></div>
+    <div className="formRow">{ATTRIBUTE_NAMES.map(name=><label key={name}>Design {name}<input type="number" min="0" max="100" value={attributes[name]} onChange={e=>setAttributes({...attributes,[name]:Number(e.target.value)})}/></label>)}<label>Target segment<select aria-label="Target segment" value={segment} onChange={e=>setSegment(e.target.value as Segment)}><option>value</option><option>mainstream</option><option>premium</option></select></label></div><div className="formRow"><label>Shipment origin<select aria-label="Shipment origin" value={origin} onChange={e=>setOrigin(e.target.value)}>{cityOptions}</select></label><label>Units<input type="number" min="1" value={quantity} onChange={e=>setQuantity(Number(e.target.value))}/></label><button onClick={()=>add({kind:'shipment',productId,originId:origin,cityId:destination,quantity})}>Add shipment</button></div>
     <ul className="orderList">{projects.map((p,i)=>{let quote='';try{const q=quoteProject(game,game.playerId,p);quote=`${q.cost.toLocaleString()} credits · ${q.weeks} weeks`;}catch{}return <li key={i}>{p.kind} · {'cityId'in p?game.cities.find(c=>c.id===p.cityId)?.name:p.productId} · {quote}<button aria-label={`Remove order ${i+1}`} onClick={()=>setProjects(projects.filter((_,index)=>index!==i))}>Remove</button></li>;})}</ul>
     <p><strong>Upfront project cost: {cost.toLocaleString()} credits</strong> · Available cash: {game.companies.find(c=>c.id===game.playerId)!.cash.toLocaleString()}</p>
     {(reviewError||error)&&<p role="alert">{reviewError||error}</p>}

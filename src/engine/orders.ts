@@ -1,13 +1,16 @@
+import { quoteResearch, completeResearch, validAttributes } from './products.ts';
+import type { Attributes } from './products.ts';
+import type { Segment } from './game.ts';
 import { projectPayment, post, financing } from './finance.ts';
 import { consumeStock, receiveStock, localStock } from './operations.ts';
 import type { Cargo } from './operations.ts';
 import type { GameState, Facility } from './game.ts';
 import { placementError } from './entities.ts';
-import { BUILD_RULES, RESEARCH_RULE, SHIPPING_RULE } from '../data/rules.ts';
+import { BUILD_RULES, SHIPPING_RULE } from '../data/rules.ts';
 export type Policy = { prices: Record<string, number>; production: Record<string, number>; marketing: number; staff: number };
 export type ProjectRequest =
   | { kind: 'construction'; cityId: string; facilityKind: Facility['kind'] }
-  | { kind: 'research'; productId: string }
+  | { kind: 'research'; productId: string; attributes?:Attributes; segment?:Segment }
   | { kind: 'shipment'; productId: string; originId: string; cityId: string; quantity: number };
 export type Project = ProjectRequest & { id: string; companyId: string; cost: number; createdWeek: number; dueWeek: number; remaining: number; status: 'active' | 'completed'; cargo?:Cargo[] };
 export type TurnOrders = { id: string; expectedWeek: number; policy?: Policy; projects: ProjectRequest[]; financing?:{borrow:number;repay:number} };
@@ -36,7 +39,9 @@ export function quoteProject(state: GameState, actor: string, request: ProjectRe
   if(!product)throw new Error('Product is not owned by company');
   if(request.kind==='research') {
     if(state.projects.some(p=>p.kind==='research'&&p.productId===request.productId&&p.status==='active'))throw new Error('Research already queued');
-    return RESEARCH_RULE;
+    if(product.lifecycle!=='active')throw new Error('Research requires an active SKU');
+    if(request.segment&&!['value','mainstream','premium'].includes(request.segment))throw new Error('Invalid target segment');
+    return quoteResearch(product,request.attributes);
   }
   if(request.kind!=='shipment'||!integer(request.quantity,1))throw new Error('Invalid shipment');
   if(request.originId===request.cityId)throw new Error('Shipment needs different cities');
@@ -79,6 +84,7 @@ export function progressProjects(next: GameState, events: string[]) {
     if(project.remaining>0)continue;
     project.status='completed';
     if(project.kind==='construction'){post(next,project.companyId,'Construction commissioned',{construction:-project.cost,fixedAssets:project.cost});next.facilities.push({id:`${project.id}:asset`,companyId:project.companyId,cityId:project.cityId,kind:project.facilityKind,name:`${project.companyId.toUpperCase()} ${project.facilityKind.toUpperCase()}`});}
+    if(project.kind==='research')completeResearch(next,project.productId,project.id,project.attributes,project.segment);
     if(project.kind==='shipment')receiveStock(next,project.id,project.productId,project.cityId,project.cargo||[]);
     events.push(`${project.companyId}: ${project.kind} completed (${project.id})`);
   }
@@ -91,6 +97,7 @@ export function validateOrdersState(state: GameState) {
     if(!p.id||!state.companies.some(c=>c.id===p.companyId)||!['construction','research','shipment'].includes(p.kind)||!['active','completed'].includes(p.status)||!integer(p.remaining)||!integer(p.cost)||!integer(p.createdWeek,1)||!integer(p.dueWeek,p.createdWeek+1)||p.dueWeek-p.createdWeek>20||p.remaining!==Math.max(0,p.dueWeek-state.absoluteWeek)||(p.status==='completed')!==(p.remaining===0))throw new Error('Invalid project');
     if(p.kind==='construction'&&(!BUILD_RULES[p.facilityKind]||!state.cities.some(c=>c.id===p.cityId)))throw new Error('Invalid construction');
     if(p.kind!=='construction'&&!state.products.some(x=>x.id===p.productId&&x.companyId===p.companyId))throw new Error('Invalid project product');
+    if(p.kind==='research'&&p.attributes&&!validAttributes(p.attributes))throw new Error('Invalid pending design');
     if(p.kind==='shipment'&&(!integer(p.quantity,1)||!route(state,p.originId,p.cityId)))throw new Error('Invalid shipment route');
   }
 }
