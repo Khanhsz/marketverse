@@ -31,3 +31,9 @@ Alpha targets one fictional country, 8 cities, 4 AI competitors, one consumer pr
 
 ## Repository workflow
 Coding agents should work on feature branches from `autopilot` (or `main` when required), submit tested changes to a reviewable PR, and checkpoint in the state tracker. No secrets or OpenAI API credentials required for CI.
+
+## Simulation reference library
+
+See [MarketLab V12–V18 reference](references/marketlab-v18/README.md) for independently authored mechanics hypotheses, selected Python prototypes, historical tests, and the [weekly-to-quarterly integration guide](references/marketlab-v18/INTEGRATION_GUIDE.md).
+
+**Reference only:** this material does not change or validate the Sprint 01 weekly economy. Do not import the Python prototypes or treat synthetic formulas as verified Marketplace algorithms. Adopt individual mechanics only in later planned sprints with TypeScript invariants and tests.
