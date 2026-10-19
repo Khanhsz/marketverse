@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Application, Container, Graphics, Text } from 'pixi.js';
-import type { City, Facility } from '../engine/game';
+import type { City, Facility, Company } from '../engine/game';
 import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
+import type { Selection } from '../engine/entities';
 
-type Props = { cities: City[]; facilities: Facility[]; selectedCityId: string; onSelect: (id: string) => void };
+type Props = { cities: City[]; facilities: Facility[]; companies: Company[]; selectedCityId: string; selection: Selection; onSelect: (selection: Selection) => void };
 const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] as const;
 type Layer = typeof layers[number];
 const legends: Record<Layer, string> = {
@@ -52,7 +53,7 @@ export function CountryMap(props: Props) {
       };
       draw.current = () => {
         for (const child of world.removeChildren()) child.destroy();
-        const { cities, facilities, selectedCityId } = current.current;
+        const { cities, facilities, companies, selectedCityId, selection } = current.current;
         const active = layerRef.current;
         const territory = new Graphics();
         territory.poly([280,136,385,78,521,106,611,74,750,141,790,226,746,321,801,420,717,521,586,553,505,496,389,515,317,416,243,360,274,280,226,230].map(n => n * MAP_UNITS)).fill(0xd4ddda).stroke({ color: 0xaebeb8, width: 4 });
@@ -80,9 +81,18 @@ export function CountryMap(props: Props) {
           const assets = facilities.filter(f => f.cityId === city.id);
           assets.forEach((f, index) => {
             const fx = x - 28 + index * 32, fy = y + 52;
+            const selectedAsset = (selection.kind === 'facility' && selection.id === f.id) || (selection.kind === 'company' && selection.id === f.companyId);
+            if (selectedAsset) world.addChild(new Graphics().rect(fx - 14, fy - 14, 28, 28).stroke({color:0x24554b,width:3}));
             world.addChild(new Graphics().rect(fx - 9, fy - 9, 18, 18).fill(ownerColor(f.companyId)));
             if (active === 'Operations' || active === 'Competition') label(active === 'Operations' ? `${f.name} · ${f.kind.toUpperCase()}` : `${f.companyId === 'player' ? 'NOVA' : f.companyId.toUpperCase()} · ${f.name}`, x + 40, y + 30 + index * 26, 16, ownerColor(f.companyId));
           });
+          if(active === 'Competition') {
+            [...new Set(assets.map(f => f.companyId))].forEach((id,index) => {
+              const cx = x - 28 + index * 40, cy = y + 96;
+              world.addChild(new Graphics().poly([cx,cy-13,cx+13,cy,cx,cy+13,cx-13,cy]).fill(ownerColor(id)));
+              label(companies.find(c => c.id===id)?.name || id, x+40, y+90+index*25, 16, ownerColor(id));
+            });
+          }
         }
         applyCamera();
       };
@@ -117,7 +127,17 @@ export function CountryMap(props: Props) {
         if (clicked) {
           const w = screenToWorld(camera, view, p);
           const city = current.current.cities.find(c => Math.hypot(c.x * MAP_UNITS - w.x, c.y * MAP_UNITS - w.y) <= Math.max(20, 12 / camera.scale));
-          if (city) current.current.onSelect(city.id);
+          // Assets take priority over the wider city hit area. Positions match the rendered slots.
+          for (const c of current.current.cities) {
+            const assets = current.current.facilities.filter(f => f.cityId === c.id);
+            const facility = assets.find((_,i) => Math.abs(w.x-(c.x*MAP_UNITS-28+i*32))<=12 && Math.abs(w.y-(c.y*MAP_UNITS+52))<=12);
+            if(facility) { current.current.onSelect({kind:'facility',id:facility.id}); return; }
+            if(layerRef.current === 'Competition') {
+              const owner = [...new Set(assets.map(f=>f.companyId))].find((_,i)=>Math.hypot(w.x-(c.x*MAP_UNITS-28+i*40),w.y-(c.y*MAP_UNITS+96))<=16);
+              if(owner) { current.current.onSelect({kind:'company',id:owner}); return; }
+            }
+          }
+          if (city) current.current.onSelect({kind:'city',id:city.id});
         }
       };
       const wheel = (event: WheelEvent) => {
@@ -142,7 +162,7 @@ export function CountryMap(props: Props) {
     }).catch(error => { if (!disposed) setFailure(String(error)); });
     return () => { disposed = true; observer?.disconnect(); cleanup(); draw.current = () => {}; controls.current = () => {}; if (initialized) app.destroy(true, { children: true }); };
   }, []);
-  useEffect(() => { draw.current(); }, [props.cities, props.facilities, props.selectedCityId, layer]);
+  useEffect(() => { draw.current(); }, [props.cities, props.facilities, props.companies, props.selectedCityId, props.selection, layer]);
   return <div className="map" data-error={failure || undefined}>
     <div ref={mount} className="mapSurface" role="img" aria-label="Country strategy map with selectable cities" />
     <div className="mapLayers" role="group" aria-label="Map layers">{layers.map(name => <button key={name} aria-pressed={layer === name} onClick={() => setLayer(name)}>{name}</button>)}</div>

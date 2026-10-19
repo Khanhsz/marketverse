@@ -66,14 +66,54 @@ try {
   await page.getByRole('button',{name:'NEXT WEEK'}).click();
   await page.waitForFunction(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week===2);
   await page.reload();await ready();assert.match(await page.locator('.metrics').innerText(),/W02/);
-  await page.getByRole('button',{name:'Company',exact:true}).click();await page.locator('.floating').waitFor();
-  await page.getByRole('button',{name:'Map',exact:true}).click();assert.equal(await page.locator('.floating').count(),0);
+  await page.getByRole('button',{name:'Company',exact:true}).click();
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'),'company:player');
+  assert.equal(await page.locator('h1').innerText(),'NOVA INDUSTRIES');
+  await page.getByRole('button',{name:'Map',exact:true}).click();assert.equal(await page.locator('.panel').getAttribute('data-selection'),'city:central');
   page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'RESET',exact:true}).click();
   await page.waitForFunction(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week===1);
   assert.equal(await page.locator('h1').innerText(),'Central City');
+  // Facility and company marker interactions use real state IDs, with camera preserved.
+  await page.getByRole('button',{name:'NOVA HQ',exact:true}).click();
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'),'facility:hq');
+  await page.getByRole('button',{name:'NOVA INDUSTRIES',exact:true}).click();
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'),'company:player');
+  await page.getByRole('button',{name:'Map',exact:true}).click();
+  await page.getByRole('button',{name:'Competition',exact:true}).click();
+  const p = await screen(390-14,160+48); // company diamond: world offset (-28,+96)
+  await page.mouse.click(p.x,p.y);
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'),'company:premium');
+  await page.getByRole('button',{name:'Atlas Showroom',exact:true}).click();
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'),'facility:atlas-store');
+  assert.match(await page.locator('.panel').innerText(),/Competitor owned/);
+  await page.getByRole('button',{name:'Northport',exact:true}).click();
+  await page.getByRole('button',{name:'Central City',exact:true}).click();
+  assert.equal(await page.locator('h1').innerText(),'Central City');
+  // Test-only valid fixture exercises every facility kind without changing starter content.
+  await page.evaluate(()=>{
+    const state=JSON.parse(localStorage.getItem('marketverse:sprint01:state'));
+    for(const kind of ['factory','warehouse','rd'])state.facilities.push({id:'test-'+kind,name:'Test '+kind,cityId:'central',companyId:'player',kind});
+    localStorage.setItem('marketverse:sprint01:state',JSON.stringify(state));
+  });
+  await page.reload();await ready();
+  for(const [i,name] of ['NOVA HQ','NOVA Flagship','Test factory','Test warehouse','Test rd'].entries()){
+    const c=await camera(),b=await page.locator('canvas').boundingBox();
+    await page.mouse.click(b.x+b.width/2+(1100-28+i*32-c.x)*c.scale,b.y+b.height/2+(600+52-c.y)*c.scale);
+    assert.equal(await page.locator('h1').innerText(),name);
+  }
+  // Broken reference must not silently replace an existing save.
+  const invalid=await page.evaluate(()=>{const state=JSON.parse(localStorage.getItem('marketverse:sprint01:state'));state.facilities[0].cityId='missing';const raw=JSON.stringify(state);localStorage.setItem('marketverse:sprint01:state',raw);return raw;});
+  await page.reload();await page.getByRole('alert').waitFor();
+  assert.equal(await page.evaluate(()=>localStorage.getItem('marketverse:sprint01:state')),invalid);
+  assert.equal(await page.getByRole('button',{name:'NEXT WEEK'}).isDisabled(),true);
+  const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export original save'}).click();
+  assert.equal((await download).suggestedFilename(),'marketverse-recovery.json');
+  page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'RESET',exact:true}).click();
+  await page.waitForFunction(()=>!document.querySelector('[role=alert]'));
+  await ready();assert.equal(await page.locator('h1').innerText(),'Central City');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth<=innerWidth),true);
   assert.deepEqual(errors,[]);
   mkdirSync('.browser-artifacts',{recursive:true});
   await page.screenshot({path:'.browser-artifacts/smoke.png'});
-  console.log('PASS: real canvas cities; cursor zoom; drag without selection; zoomed selection; camera retained on selection/layer/resize; five layers; reset/zoom controls; week/save/reload/reset/tabs; laptop layout; no page errors.');
+  console.log('PASS: real canvas cities; cursor zoom; drag without selection; zoomed selection; camera retained on selection/layer/resize; five layers; reset/zoom controls; week/save/reload/reset/tabs; all facility kinds and ownership context; company marker; transport navigation; malformed-save preservation and recovery; laptop layout; no page errors.');
 } finally { await browser.close(); }

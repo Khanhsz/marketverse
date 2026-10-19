@@ -1,3 +1,4 @@
+import { placementError } from './entities.ts';
 export const SCHEMA_VERSION = 1;
 export const WEEKS_PER_YEAR = 52;
 export type Segment = 'value' | 'mainstream' | 'premium';
@@ -41,22 +42,24 @@ export function createRng(seed:number):()=>number {
   let n=seed>>>0;return ()=>{n=(n+0x6d2b79f5)>>>0;let t=n;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};
 }
 export function validateState(s:GameState):void {
+  if(!s||typeof s!=='object')throw new Error('Invalid state');
   if(s.version!==SCHEMA_VERSION)throw new Error('Invalid schema');
   if(!Number.isSafeInteger(s.seed)||!s.gameId)throw new Error('Invalid game identity');
   const c=calendarOf(s.absoluteWeek);
   if(c.year!==s.year||c.week!==s.week)throw new Error('Invalid calendar');
-  const unique=(ids:string[])=>new Set(ids).size===ids.length;
+  if(![s.cities,s.companies,s.products,s.facilities,s.reports].every(Array.isArray))throw new Error('Invalid entity collections');
+  const unique=(ids:string[])=>ids.every(id=>typeof id==='string'&&id.length>0)&&new Set(ids).size===ids.length;
   if(!unique(s.cities.map(x=>x.id))||!unique(s.companies.map(x=>x.id))||!unique(s.products.map(x=>x.id))||!unique(s.facilities.map(x=>x.id)))throw new Error('Duplicate entity');
   const cityIds=new Set(s.cities.map(x=>x.id)), companyIds=new Set(s.companies.map(x=>x.id));
-  if(!companyIds.has(s.playerId)||s.companies.filter(x=>x.control==='human').length!==1)throw new Error('Invalid player');
+  if(!companyIds.has(s.playerId)||s.companies.filter(x=>x.control==='human').length!==1||s.companies.find(x=>x.id===s.playerId)?.control!=='human')throw new Error('Invalid player');
   for(const city of s.cities) {
-    if(!(city.population>0)||!(city.power>0)||!Number.isFinite(city.x)||!Number.isFinite(city.y))throw new Error('Invalid city');
-    if(Math.abs(Object.values(city.segments).reduce((a,b)=>a+b,0)-1)>1e-6)throw new Error('Invalid segment weights');
-    if(city.links.some(id=>!cityIds.has(id)))throw new Error('Invalid transport link');
+    if(!city.name||!Number.isSafeInteger(city.population)||!(city.population>0)||!Number.isFinite(city.power)||!(city.power>0)||!Number.isFinite(city.x)||!Number.isFinite(city.y))throw new Error('Invalid city');
+    if(!city.segments||Object.keys(city.segments).length!==3||!['value','mainstream','premium'].every(k=>Object.hasOwn(city.segments,k))||Object.values(city.segments).some(v=>!Number.isFinite(v)||v<0||v>1)||Math.abs(Object.values(city.segments).reduce((a,b)=>a+b,0)-1)>1e-6)throw new Error('Invalid segment weights');
+    if(!Array.isArray(city.links)||new Set(city.links).size!==city.links.length||city.links.some(id=>id===city.id||!cityIds.has(id)||!s.cities.find(c=>c.id===id)?.links?.includes(city.id)))throw new Error('Invalid transport link');
   }
-  for(const p of s.products)if(!companyIds.has(p.companyId)||p.inventory<0||p.price<0||p.cost<0)throw new Error('Invalid product');
-  for(const f of s.facilities)if(!companyIds.has(f.companyId)||!cityIds.has(f.cityId))throw new Error('Invalid facility');
-  for(const co of s.companies)if(!Number.isFinite(co.cash)||!Number.isFinite(co.debt))throw new Error('Invalid finance');
+  for(const p of s.products)if(!p.name||!companyIds.has(p.companyId)||!Number.isSafeInteger(p.inventory)||p.inventory<0||![p.price,p.cost,p.quality].every(v=>Number.isFinite(v)&&v>=0)||p.quality>100||!['value','mainstream','premium'].includes(p.segment))throw new Error('Invalid product');
+  for(const f of s.facilities){const error=placementError(s,f,f.id);if(!f.name||error)throw new Error('Invalid facility: '+(error||'missing name'));}
+  for(const co of s.companies)if(!co.name||!['human','ai'].includes(co.control)||!Number.isFinite(co.cash)||!Number.isFinite(co.debt)||co.debt<0)throw new Error('Invalid finance');
 }
 export function advanceWeek(current:GameState):GameState {
   validateState(current);

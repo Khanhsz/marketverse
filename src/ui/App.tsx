@@ -1,30 +1,78 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CountryMap } from './CountryMap';
-import { advanceWeek,createInitialGame,deserializeGame,SAVE_KEY,serializeGame } from '../engine/game';
-import type {GameState} from '../engine/game';
-const number=(v:number)=>new Intl.NumberFormat('en-US').format(v);
-export function App(){
- const [game,setGame]=useState<GameState>(()=>{try{const raw=localStorage.getItem(SAVE_KEY);if(raw)return deserializeGame(raw);}catch{}return createInitialGame();});
- const [selected,setSelected]=useState('central');
- const [tab,setTab]=useState<'map'|'company'>('map');
- useEffect(()=>{localStorage.setItem(SAVE_KEY,serializeGame(game));},[game]);
- const city=game.cities.find(x=>x.id===selected)||game.cities[0],player=game.companies.find(x=>x.id===game.playerId)!;
- const facilities=game.facilities.filter(f=>f.cityId===city.id);
- return <div className="app">
-   <header className="header"><div className="logo">◆ MARKETVERSE <span>COUNTRY STRATEGY</span></div>
-    <div className="metrics"><div><small>PERIOD</small><b>Y{game.year.toString().padStart(2,'0')} · W{game.week.toString().padStart(2,'0')}</b></div><div><small>CASH</small><b>{number(player.cash)}</b></div><div><small>CITIES</small><b>{game.cities.length}</b></div></div>
-   </header>
-   <div className="workspace"><nav className="rail"><button aria-label="Map" aria-pressed={tab==='map'} onClick={()=>setTab('map')}>⌖</button><button aria-label="Company" aria-pressed={tab==='company'} onClick={()=>setTab('company')}>▦</button></nav>
-     <main className="mapArea"><div className="overlay">COUNTRY STRATEGY MAP <span> / {tab.toUpperCase()}</span></div><CountryMap cities={game.cities} facilities={game.facilities} selectedCityId={city.id} onSelect={id=>{setSelected(id);setTab('map');}}/>
-      {tab==='company'&&<div className="floating"><small>COMPANY REGISTER</small><h2>{player.name}</h2><p>Capital: {number(player.cash)}. Product design, market demand and AI will be added in future sprints.</p></div>}
-      <div className="mapFoot">3 CITIES · 3 COMPANIES · NO FOG · MAP-FIRST</div>
-     </main>
-     <aside className="panel"><small>CITY INTELLIGENCE</small><h1>{city.name}</h1><p className="muted">Regional economic overview</p><hr/><div className="stat">POPULATION <b>{number(city.population)}</b></div><div className="stat">PURCHASING POWER <b>{city.power.toFixed(2)}×</b></div><div className="stat">TRANSPORT LINKS <b>{city.links.length}</b></div><hr/><h3>CONSUMER SEGMENTS</h3>
-      {Object.entries(city.segments).map(([name,share])=><div className="segment" key={name}><div>{name.toUpperCase()} <b>{Math.round(share*100)}%</b></div><div className="bar"><i style={{width:(share*100)+'%'}}/></div></div>)}
-      <hr/><h3>BUSINESS PRESENCE</h3>{facilities.map(f=><div className="facility" key={f.id}>{f.name} <small>{f.kind}</small></div>)}
-      <div className="notice">Sprint 01: finances, demand, and sales are intentionally not simulated.</div>
-     </aside>
-   </div>
-   <footer className="footer"><div>● LOCAL SAVE <span>· Weekly engine active · Business simulation pending</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game?')){localStorage.removeItem(SAVE_KEY);setGame(createInitialGame());setSelected('central');}}}>RESET</button><button className="next" onClick={()=>setGame(old=>advanceWeek(old))}>NEXT WEEK →</button></div></footer>
- </div>;
+import { advanceWeek, createInitialGame, deserializeGame, SAVE_KEY, serializeGame } from '../engine/game';
+import { FACILITY_KINDS, placementError, resolveSelection } from '../engine/entities';
+import type { Selection } from '../engine/entities';
+const number = (v: number) => new Intl.NumberFormat('en-US').format(v);
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      try { return { game: deserializeGame(raw), recovery: '' }; }
+      catch { return { game: createInitialGame(), recovery: raw }; }
+    }
+  } catch { return { game: createInitialGame(), recovery: 'Storage is unavailable' }; }
+  return { game: createInitialGame(), recovery: '' };
+}
+export function App() {
+  const [loaded] = useState(loadGame);
+  const [game, setGame] = useState(loaded.game);
+  const [recovery, setRecovery] = useState(loaded.recovery);
+  const [storageError, setStorageError] = useState('');
+  const [selection, setSelection] = useState<Selection>({ kind: 'city', id: 'central' });
+  useEffect(() => {
+    if (recovery) return;
+    try { localStorage.setItem(SAVE_KEY, serializeGame(game)); setStorageError(''); }
+    catch { setStorageError('Local save failed. Export your game before closing this page.'); }
+  }, [game, recovery]);
+  const context = resolveSelection(game, selection) || resolveSelection(game, { kind: 'city', id: game.cities[0].id })!;
+  const cityId = context.kind === 'city' ? context.entity.id : context.kind === 'facility' ? context.entity.cityId : game.facilities.find(f => f.companyId === context.entity.id)?.cityId;
+  const city = game.cities.find(c => c.id === cityId) || game.cities[0];
+  const player = game.companies.find(c => c.id === game.playerId)!;
+  const choose = (value: Selection) => { if (resolveSelection(game, value)) setSelection(value); };
+  const cityButton = (id: string) => <button className="entityLink" key={id} onClick={() => choose({kind:'city',id})}>{game.cities.find(c=>c.id===id)?.name}</button>;
+  const ownerButton = (id: string) => <button className="entityLink" onClick={() => choose({kind:'company',id})}>{game.companies.find(c=>c.id===id)?.name}</button>;
+  const exportGame = () => {
+    const url=URL.createObjectURL(new Blob([recovery || serializeGame(game)],{type:'application/json'}));
+    const link=document.createElement('a');link.href=url;link.download=recovery?'marketverse-recovery.json':'marketverse-save.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  return <div className="app">
+    <header className="header"><div className="logo">◆ MARKETVERSE <span>COUNTRY STRATEGY</span></div>
+      <div className="metrics"><div><small>PERIOD</small><b>Y{game.year.toString().padStart(2,'0')} · W{game.week.toString().padStart(2,'0')}</b></div><div><small>CASH</small><b>{number(player.cash)}</b></div><div><small>CITIES</small><b>{game.cities.length}</b></div></div>
+    </header>
+    <div className="workspace"><nav className="rail"><button aria-label="Map" aria-pressed={context.kind==='city'} onClick={()=>choose({kind:'city',id:city.id})}>⌖</button><button aria-label="Company" aria-pressed={context.kind==='company'} onClick={()=>choose({kind:'company',id:player.id})}>▦</button></nav>
+      <main className="mapArea"><div className="overlay">COUNTRY STRATEGY MAP</div>
+        <CountryMap cities={game.cities} facilities={game.facilities} companies={game.companies} selectedCityId={city.id} selection={selection} onSelect={choose}/>
+        <div className="mapFoot">{game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST</div>
+      </main>
+      <aside className="panel" aria-label="Selection details" data-selection={`${context.kind}:${context.entity.id}`}>
+        <small>{context.kind.toUpperCase()} INTELLIGENCE</small><h1>{context.entity.name}</h1>
+        {context.kind === 'city' && <>
+          <p className="muted">Regional economic overview</p><hr/>
+          <div className="stat">POPULATION <b>{number(context.entity.population)}</b></div><div className="stat">PURCHASING POWER <b>{context.entity.power.toFixed(2)}×</b></div><div className="stat">TRANSPORT LINKS <b>{context.entity.links.length}</b></div>
+          <hr/><h3>CONSUMER SEGMENTS</h3>{Object.entries(context.entity.segments).map(([name,share])=><div className="segment" key={name}><div>{name.toUpperCase()} <b>{Math.round(share*100)}%</b></div><div className="bar"><i style={{width:(share*100)+'%'}}/></div></div>)}
+          <hr/><h3>TRANSPORT CONNECTIONS</h3>{context.entity.links.length ? context.entity.links.map(cityButton) : <p className="muted">No direct connections</p>}
+          <h3>BUSINESS PRESENCE</h3>{game.facilities.filter(f=>f.cityId===city.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button><small>{f.kind.toUpperCase()}</small>{ownerButton(f.companyId)}</div>)}
+          <h3>PLAYER PLACEMENT CHECK</h3><p className="muted">One facility per kind and company in each city; one HQ per company. Construction orders arrive in Sprint 04.</p>
+          {FACILITY_KINDS.map(kind=><div className="stat" key={kind}>{kind.toUpperCase()} <span>{placementError(game,{companyId:player.id,cityId:city.id,kind}) ? 'Already established' : 'Site available'}</span></div>)}
+        </>}
+        {context.kind === 'facility' && <>
+          <p className="muted">{context.entity.kind.toUpperCase()} · {context.entity.companyId===player.id?'Player owned':'Competitor owned'}</p><hr/>
+          <h3>OWNER</h3>{ownerButton(context.entity.companyId)}<h3>LOCATION</h3>{cityButton(context.entity.cityId)}
+          <h3>TRANSPORT CONNECTIONS</h3>{city.links.map(cityButton)}
+          <div className="notice">Existing asset. Construction, capacity, inventory and operating costs are introduced by later simulation sprints.</div>
+        </>}
+        {context.kind === 'company' && <>
+          <p className="muted">{context.entity.control==='human'?'Player company':'AI competitor'} · {context.entity.id}</p><hr/>
+          <div className="stat">CASH <b>{number(context.entity.cash)}</b></div><div className="stat">DEBT <b>{number(context.entity.debt)}</b></div>
+          <h3>FACILITIES</h3>{game.facilities.filter(f=>f.companyId===context.entity.id).map(f=><div className="facility" key={f.id}><button className="entityLink" onClick={()=>choose({kind:'facility',id:f.id})}>{f.name}</button>{cityButton(f.cityId)}</div>)}
+          <h3>COMPANY REGISTER</h3>{game.companies.map(c=><div key={c.id}>{ownerButton(c.id)}</div>)}
+        </>}
+        <div className="notice">Foundation: demand, production and sales are not yet simulated.</div>
+        <button className="entityLink" onClick={exportGame}>Export save</button>
+      </aside>
+    </div>
+    {(recovery || storageError) && <div className="saveWarning" role="alert"><strong>{recovery?'Saved game could not be loaded. Original data is preserved; gameplay is paused.':storageError}</strong><button onClick={exportGame}>{recovery?'Export original save':'Export save'}</button><span>Use Reset only when you are ready to discard the saved game.</span></div>}
+    <footer className="footer"><div>● {recovery || storageError?'SAVE NEEDS ATTENTION':'LOCAL SAVE'} <span>· Weekly engine active · Business simulation pending</span></div><div className="actions"><button onClick={()=>{if(window.confirm('Reset game? This discards the existing save.')){setGame(createInitialGame());setSelection({kind:'city',id:'central'});setRecovery('');}}}>RESET</button><button className="next" disabled={!!recovery} onClick={()=>setGame(old=>advanceWeek(old))}>NEXT WEEK →</button></div></footer>
+  </div>;
 }
