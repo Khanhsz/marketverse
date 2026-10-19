@@ -21,3 +21,4 @@ export const AI_RULES = {
 } as const;
 export const DESIGN_RULES = { includedImprovement: 20, perPoint: 250, maxResearchWeeks: 12 };
 export const ATTRIBUTE_WEIGHTS = {value:{quality:.2,design:.1,performance:.2,durability:.5},mainstream:{quality:.3,design:.2,performance:.3,durability:.2},premium:{quality:.25,design:.3,performance:.3,durability:.15}} as const;
+export const HR_RULES = { hiringCost:1000, hiringWeeks:2, wages:{production:300,sales:350,research:500}, unitsPerSeller:75, brandDecay:.02, brandBuild:.15, brandSpendScale:3000 };

@@ -1,10 +1,12 @@
+import { HR_RULES } from '../data/rules.ts';
+import type { Staff } from './people.ts';
 import type { GameState, City, Product, Facility } from './game.ts';
 import type { Policy, Project, TurnOrders, ProjectRequest } from './orders.ts';
 import { AI_RULES, BUILD_RULES, RESEARCH_RULE, SHIPPING_RULE } from '../data/rules.ts';
 import { route } from './orders.ts';
 export type Archetype = keyof typeof AI_RULES;
 export type Observation = {
-  companyId:string;week:number;cash:number;bankrupt:boolean;strategy:Archetype;
+  companyId:string;week:number;cash:number;staff:Staff;bankrupt:boolean;strategy:Archetype;
   cities:City[];products:Product[];facilities:Facility[];projects:Project[];policy:Policy;
   stocks:{productId:string;cityId:string;quantity:number}[];
   marketPrices:{companyId:string;segment:string;price:number}[];
@@ -12,7 +14,7 @@ export type Observation = {
 export function observeMarket(state:GameState,companyId:string):Observation{
   const company=state.companies.find(c=>c.id===companyId)!;
   const own=(id:string)=>state.products.some(p=>p.id===id&&p.companyId===companyId);
-  return structuredClone({companyId,week:state.absoluteWeek,cash:company.cash,bankrupt:state.finance[companyId].bankrupt,strategy:company.strategy||'regional-specialist',cities:state.cities,products:state.products.filter(p=>p.companyId===companyId),facilities:state.facilities.filter(f=>f.companyId===companyId),projects:state.projects.filter(p=>p.companyId===companyId&&p.status==='active'),policy:state.policies[companyId],stocks:state.stocks.filter(l=>own(l.productId)).map(l=>({productId:l.productId,cityId:l.cityId,quantity:l.quantity})),marketPrices:state.products.filter(p=>p.companyId!==companyId).map(p=>({companyId:p.companyId,segment:p.segment,price:p.price}))});
+  return structuredClone({companyId,week:state.absoluteWeek,cash:company.cash,staff:state.staff[companyId],bankrupt:state.finance[companyId].bankrupt,strategy:company.strategy||'regional-specialist',cities:state.cities,products:state.products.filter(p=>p.companyId===companyId),facilities:state.facilities.filter(f=>f.companyId===companyId),projects:state.projects.filter(p=>p.companyId===companyId&&p.status==='active'),policy:state.policies[companyId],stocks:state.stocks.filter(l=>own(l.productId)).map(l=>({productId:l.productId,cityId:l.cityId,quantity:l.quantity})),marketPrices:state.products.filter(p=>p.companyId!==companyId&&(p.lifecycle==='active'||p.inventory>0)).map(p=>({companyId:p.companyId,segment:p.segment,price:p.price}))});
 }
 export function planAI(observation:Observation):TurnOrders{
   const o=observation,id=`ai:${o.companyId}:${o.week}`;
@@ -22,6 +24,12 @@ export function planAI(observation:Observation):TurnOrders{
   const pending=(kind:string,cityId?:string)=>o.projects.some(p=>p.kind==='construction'&&p.facilityKind===kind&&(!cityId||p.cityId===cityId));
   const factory=o.facilities.find(f=>f.kind==='factory'),home=o.facilities.find(f=>f.kind==='hq'||f.kind==='store')?.cityId||o.cities[0].id;
   if(!factory&&!pending('factory')&&budget>=BUILD_RULES.factory.cost){projects.push({kind:'construction',cityId:home,facilityKind:'factory'});budget-=BUILD_RULES.factory.cost;}
+  for(const [role,target] of [['production',4],['sales',3],['research',o.strategy==='premium-innovator'?2:0]] as const){
+    const incoming=o.projects.filter(p=>p.kind==='hiring'&&p.role===role).reduce((n,p)=>n+(p.kind==='hiring'?p.quantity:0),0);
+    const quantity=Math.max(0,target-o.staff[role]-incoming),cost=quantity*HR_RULES.hiringCost;
+    if(quantity&&budget>=cost){projects.push({kind:'hiring',role,quantity});budget-=cost;}
+  }
+  policy.marketing=Math.min(o.strategy==='premium-innovator'?2000:1000,Math.floor(Math.max(0,budget)/100));
   const candidates=o.cities.filter(c=>!o.facilities.some(f=>f.cityId===c.id&&f.kind==='store')&&!pending('store',c.id));
   candidates.sort((a,b)=>{
     const origin=o.cities.find(c=>c.id===home)!;

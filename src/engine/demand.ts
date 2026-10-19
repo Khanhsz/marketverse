@@ -1,3 +1,4 @@
+import { brandKey } from './people.ts';
 import type { GameState, Product, City, Segment } from './game.ts';
 import { SEGMENT_RULES, WEEKLY_PURCHASE_RATE, ATTRIBUTE_WEIGHTS } from '../data/rules.ts';
 export type DemandCell = { cityId: string; segment: Segment; potential: number; outside: number; allocations: { productId: string; desired: number }[] };
@@ -22,7 +23,7 @@ export function calculateDemand(state: GameState): DemandCell[] {
     const potential=Math.floor(city.population*city.segments[segment]*WEEKLY_PURCHASE_RATE*city.power);
     const products=state.products.filter(p=>p.lifecycle!=='retired'&&(p.lifecycle==='active'||p.inventory>0)&&state.facilities.some(f=>f.companyId===p.companyId&&f.cityId===city.id&&f.kind==='store')).sort((a,b)=>a.id.localeCompare(b.id));
     const weights=[{id:'outside',weight:1},...products.map(p=>{
-      const utility=Math.max(-40,Math.min(40,productUtility(p,city,segment)));
+      const utility=Math.max(-40,Math.min(40,productUtility(p,city,segment,state.brand[brandKey(p.companyId,city.id,segment)]||0)));
       return {id:p.id,weight:Math.exp(utility)};
     })];
     const units=allocatePreference(potential,weights);

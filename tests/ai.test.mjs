@@ -1,3 +1,4 @@
+import {initializeStaff} from '../src/engine/people.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createInitialGame,advanceWeek,deserializeGame,serializeGame} from '../src/engine/game.ts';
@@ -5,7 +6,7 @@ import {observeMarket,planAI} from '../src/engine/ai.ts';
 import {initialPolicies} from '../src/engine/orders.ts';
 import {initializeFinance,validateFinance} from '../src/engine/finance.ts';
 import {initializeStocks} from '../src/engine/operations.ts';
-function scenario(){const s=createInitialGame();for(const [id,strategy] of [['region','regional-specialist'],['expand','aggressive-expander']]){s.companies.push({id,name:id,control:'ai',cash:2000000,debt:0,strategy});s.products.push({...s.products[0],id:'sku-'+id,companyId:id,name:id,inventory:500});s.facilities.push({id:'store-'+id,name:id,kind:'store',companyId:id,cityId:id==='region'?'central':'south'});}s.policies=initialPolicies(s);s.stocks=initializeStocks(s);s.finance=initializeFinance(s);return s;}
+function scenario(){const s=createInitialGame();for(const [id,strategy] of [['region','regional-specialist'],['expand','aggressive-expander']]){s.companies.push({id,name:id,control:'ai',cash:2000000,debt:0,strategy});s.products.push({...s.products[0],id:'sku-'+id,companyId:id,name:id,inventory:500});s.facilities.push({id:'store-'+id,name:id,kind:'store',companyId:id,cityId:id==='region'?'central':'south'});}s.policies=initialPolicies(s);s.stocks=initializeStocks(s);s.staff=initializeStaff(s);s.finance=initializeFinance(s);return s;}
 test('AI receives own resources and public prices, never private player policies or orders',()=>{
  const s=scenario(),a=observeMarket(s,'value'),before=JSON.stringify(a),plan=planAI(a);
  s.policies.player.prices.nova=9999;s.policies.player.marketing=999;s.commandHistory.push('private-plan');

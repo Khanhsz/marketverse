@@ -1,3 +1,4 @@
+import { brandKey } from '../engine/people';
 import { useState, useEffect, useRef } from 'react';
 import { localStock } from '../engine/operations';
 import { WeeklyPlanner } from './WeeklyPlanner';
@@ -75,7 +76,7 @@ export function App() {
         {game.reports.at(-1)?.demand&&<details className="demandReport" open><summary>Market demand · {city.name}</summary>{game.reports.at(-1)!.demand!.filter(d=>d.cityId===city.id).map(d=><p className="muted" key={d.segment}>{d.segment}: {d.potential} potential · {d.allocations.reduce((n,a)=>n+a.desired,0)} preferred units · {d.outside} no purchase</p>)}<p className="muted">Preferences are potential orders; realized sales require local stock.</p></details>}
         <h3>LOCAL INVENTORY · {city.name}</h3>{game.products.map(p=><p className="muted" key={p.id}>{p.name}: {localStock(game,p.id,city.id)} units</p>)}
         {game.reports.at(-1)?.financials&&<details className="financialReport" open><summary>Financial results · last week</summary>{game.reports.at(-1)!.financials!.filter(f=>f.companyId===player.id).map(f=><div key={f.companyId}><p>Revenue {number(f.revenue)} · COGS {number(f.cogs)}</p><p>Expenses {number(f.expenses)} · Profit {number(f.profit)}</p><p>Cash change {number(f.cashChange)} · Capex {number(f.capex)}</p><p>Payables {number(f.payables)} · Net worth {number(f.netWorth)}</p></div>)}</details>}
-        <h3>PROJECT QUEUE</h3>{game.projects.filter(p=>p.companyId===player.id&&p.status==='active').map(p=><p className="queueItem" key={p.id}>{p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}</p>)}
+        <details className="staffReport"><summary>People and brand</summary><p>Production {game.staff[player.id].production} · Sales {game.staff[player.id].sales} · Research {game.staff[player.id].research}</p>{(['value','mainstream','premium'] as const).map(segment=><p key={segment}>{segment} awareness in {city.name}: {Math.round((game.brand[brandKey(player.id,city.id,segment)]||0)*100)}%</p>)}</details><h3>PROJECT QUEUE</h3>{game.projects.filter(p=>p.companyId===player.id&&p.status==='active').map(p=><p className="queueItem" key={p.id}>{p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}</p>)}
         {game.reports.length>0&&<details><summary>Last weekly report</summary>{game.reports.at(-1)!.events.map((e,i)=><p className="muted" key={i}>{e}</p>)}<p>Cash change: {game.reports.at(-1)!.cashDelta[player.id]}</p></details>}
         <div className="notice">Sales use local stock; shipments require owned facilities at both ends. Production requires a factory and a persistent target.</div>
         <button className="entityLink" onClick={exportGame}>Export save</button>

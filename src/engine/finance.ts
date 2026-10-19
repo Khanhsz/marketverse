@@ -1,3 +1,5 @@
+import { marketingBudget, STAFF_ROLES } from './people.ts';
+import { HR_RULES } from '../data/rules.ts';
 import type { GameState } from './game.ts';
 import { inventoryValue } from './operations.ts';
 import { BUILD_RULES, FINANCE_RULES } from '../data/rules.ts';
@@ -29,7 +31,7 @@ export function post(state:GameState,companyId:string,memo:string,changes:Partia
   const company=state.companies.find(c=>c.id===companyId)!;company.cash=finance.balances.cash;company.debt=-finance.balances.debt||0;
 }
 export function projectPayment(state:GameState,companyId:string,kind:string,cost:number){
-  post(state,companyId,`${kind} committed`,{cash:-cost,[kind==='construction'?'construction':kind==='research'?'research':'freight']:cost});
+  post(state,companyId,`${kind} committed`,{cash:-cost,[kind==='construction'?'construction':kind==='research'?'research':kind==='hiring'?'payroll':'freight']:cost});
 }
 export function financing(state:GameState,companyId:string,borrow:number,repay:number){
   const c=state.companies.find(c=>c.id===companyId)!;
@@ -40,8 +42,8 @@ export function financing(state:GameState,companyId:string,borrow:number,repay:n
 export function settleExpenses(state:GameState,events:string[]){
   for(const company of state.companies){
     const f=state.finance[company.id];let missed=false;
-    const workers=state.factories.filter(x=>state.facilities.find(a=>a.id===x.facilityId)?.companyId===company.id).reduce((n,x)=>n+x.workers,0)+state.policies[company.id].staff;
-    const bills:{account:Account;amount:number}[]=[{account:'payroll',amount:workers*FINANCE_RULES.wage},{account:'rent',amount:state.facilities.filter(x=>x.companyId===company.id).reduce((n,x)=>n+FINANCE_RULES.rent[x.kind],0)},{account:'marketing',amount:state.policies[company.id].marketing},{account:'interest',amount:Math.ceil(company.debt*FINANCE_RULES.weeklyInterest)}];
+    const payroll=STAFF_ROLES.reduce((n,r)=>n+state.staff[company.id][r]*HR_RULES.wages[r],0);
+    const bills:{account:Account;amount:number}[]=[{account:'payroll',amount:payroll},{account:'rent',amount:state.facilities.filter(x=>x.companyId===company.id).reduce((n,x)=>n+FINANCE_RULES.rent[x.kind],0)},{account:'marketing',amount:marketingBudget(state.policies[company.id])},{account:'interest',amount:Math.ceil(company.debt*FINANCE_RULES.weeklyInterest)}];
     // Repay arrears before new bills. Expenses are recognized when incurred.
     const arrears=Math.min(company.cash,-f.balances.payable);
     post(state,company.id,'Settle arrears',{cash:-arrears,payable:arrears});

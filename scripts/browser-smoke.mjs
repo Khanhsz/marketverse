@@ -119,7 +119,9 @@ try {
   await page.getByLabel('Destination',{exact:true}).selectOption('north');
   await page.getByRole('button',{name:'Add construction',exact:true}).click();
   await page.getByRole('button',{name:'Add research',exact:true}).click();
-  assert.match(await page.getByRole('dialog').innerText(),/70,000/);
+  await page.getByLabel('Weekly media budget',{exact:true}).fill('1000');
+  await page.getByRole('button',{name:'Add hiring',exact:true}).click();
+  assert.match(await page.getByRole('dialog').innerText(),/72,000/);
   await page.getByRole('button',{name:'Commit week',exact:true}).click();
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week===2);
   await page.reload();await ready();
@@ -139,6 +141,8 @@ try {
   const coreRun=await page.evaluate(()=>JSON.parse(localStorage.getItem('marketverse:sprint01:state')));
   assert.equal(coreRun.absoluteWeek,16);assert.ok(coreRun.reports.length===15);
   assert.ok(coreRun.companies.every(c=>c.cash>=0));
+  assert.equal(coreRun.staff.player.production,2);
+  assert.ok(coreRun.brand['player|north|mainstream']>0);
   assert.ok(coreRun.products.some(p=>p.parentId==='nova'&&p.revision===2));
   assert.equal(coreRun.products.find(p=>p.id==='nova').quality,68);
   await page.getByRole('button',{name:'Company',exact:true}).click();

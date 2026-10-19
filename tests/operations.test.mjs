@@ -16,10 +16,10 @@ test('local fulfillment cannot sell absent or in-transit inventory and never mak
 });
 test('factory output obeys target, labor capacity, material spending and cash budget',()=>{
  const s=createInitialGame();s.facilities=s.facilities.filter(f=>f.kind!=='store');empty(s);s.facilities.push({id:'factory',name:'Factory',kind:'factory',companyId:'player',cityId:'central'});refreshFactories(s);
- s.policies.player.production.nova=180;
+ s.policies.player.production.nova=180;s.staff.player.production=2;
  let n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,100);assert.equal(localStock(n,'nova','central'),100);assert.equal(s.companies[0].cash-n.companies[0].cash,100*124+n.reports.at(-1).financials.find(f=>f.companyId===s.playerId).expenses);
- s.factories[0].workers=0;n=advanceWeek(s);assert.equal(n.reports.at(-1).production.length,0);
- s.factories[0].workers=4;s.companies[0].cash=500;s.finance=initializeFinance(s);n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,4);assert.ok(n.companies[0].cash>=0);
+ s.factories[0].workers=0;s.staff.player.production=0;n=advanceWeek(s);assert.equal(n.reports.at(-1).production.length,0);
+ s.factories[0].workers=4;s.staff.player.production=4;s.companies[0].cash=500;s.finance=initializeFinance(s);n=advanceWeek(s);assert.equal(n.reports.at(-1).production[0].units,4);assert.ok(n.companies[0].cash>=0);
 });
 test('sales cost basis comes from consumed lots and revenue equals fulfilled quantity times price',()=>{
  const s=createInitialGame();const n=advanceWeek(s);for(const sale of n.reports.at(-1).sales){const p=s.products.find(p=>p.id===sale.productId);assert.equal(sale.revenue,sale.units*n.products.find(x=>x.id===p.id).price);assert.equal(sale.cogs,sale.units*p.cost);assert.ok(sale.units<=sale.desired);}

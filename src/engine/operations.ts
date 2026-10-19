@@ -1,3 +1,5 @@
+import { allocateWorkers } from './people.ts';
+import { HR_RULES } from '../data/rules.ts';
 import type { GameState, Product } from './game.ts';
 import type { DemandCell } from './demand.ts';
 import { post } from './finance.ts';
@@ -23,10 +25,10 @@ export function receiveStock(state:GameState,id:string,productId:string,cityId:s
   cargo.forEach((lot,index)=>{if(lot.quantity)state.stocks.push({id:`${id}:${index}`,productId,cityId,...lot});});syncInventory(state);
 }
 export function refreshFactories(state:GameState){
-  for(const f of state.facilities.filter(f=>f.kind==='factory'))if(!state.factories.some(x=>x.facilityId===f.id))state.factories.push({facilityId:f.id,capacity:FACTORY_RULE.capacity,workers:FACTORY_RULE.starterWorkers,inputs:0});
+  for(const f of state.facilities.filter(f=>f.kind==='factory'))if(!state.factories.some(x=>x.facilityId===f.id))state.factories.push({facilityId:f.id,capacity:FACTORY_RULE.capacity,workers:0,inputs:0});
 }
 export function simulateOperations(state:GameState,demand:DemandCell[],events:string[]):{sales:Sale[];production:Production[]} {
-  refreshFactories(state);const production:Production[]=[],sales:Sale[]=[];
+  refreshFactories(state);allocateWorkers(state);const production:Production[]=[],sales:Sale[]=[];
   for(const factory of [...state.factories].sort((a,b)=>a.facilityId.localeCompare(b.facilityId))){
     const facility=state.facilities.find(f=>f.id===factory.facilityId)!;
     const company=state.companies.find(c=>c.id===facility.companyId)!;
@@ -48,10 +50,12 @@ export function simulateOperations(state:GameState,demand:DemandCell[],events:st
       production.push({facilityId:facility.id,productId:p.id,units,cost:units*unitCost,materialCost,laborCost});
     }
   }
+  const salesCapacity=Object.fromEntries(state.companies.map(c=>[c.id,state.staff[c.id].sales*HR_RULES.unitsPerSeller]));
   for(const cell of demand)for(const allocation of cell.allocations){
     const p=state.products.find(p=>p.id===allocation.productId)!;
     const accessible=state.facilities.some(f=>f.companyId===p.companyId&&f.cityId===cell.cityId&&f.kind==='store');
-    const units=accessible?Math.min(allocation.desired,localStock(state,p.id,cell.cityId)):0;
+    const units=accessible?Math.min(allocation.desired,localStock(state,p.id,cell.cityId),salesCapacity[p.companyId]):0;
+    salesCapacity[p.companyId]-=units;
     const cargo=consumeStock(state,p.id,cell.cityId,units);
     const revenue=units*p.price,cogs=cargo.reduce((n,l)=>n+l.quantity*l.unitCost,0);
     post(state,p.companyId,'Fulfilled sales',{cash:revenue,revenue:-revenue});
