@@ -15,10 +15,11 @@ type Props = {
   cityId: string;
   onCommit: (orders: TurnOrders) => void;
   onClose: () => void;
+  initialSection?: 'products' | 'marketing' | 'finance' | 'projects';
 };
-export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
+export function WeeklyPlanner({ game, cityId, onCommit, onClose, initialSection = 'products' }: Props) {
   const [section, setSection] = useState<'products' | 'marketing' | 'finance' | 'projects'>(
-    'products',
+    initialSection,
   );
   const [policy, setPolicy] = useState(() => structuredClone(game.policies[game.playerId]));
   const [projects, setProjects] = useState<ProjectRequest[]>([]);
