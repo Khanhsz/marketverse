@@ -4,7 +4,10 @@ import { launchBrowser } from './browser-runtime.mjs';
 
 const browser = await launchBrowser();
 try {
-  const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, acceptDownloads: true });
+  const page = await browser.newPage({
+    viewport: { width: 1366, height: 768 },
+    acceptDownloads: true,
+  });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(process.env.SMOKE_URL || 'http://127.0.0.1:5173/');
@@ -22,7 +25,10 @@ try {
   await ready();
   assert.equal(await page.locator('.commandVisual').count(), 1);
   assert.equal(await page.locator('.commandRail .departmentNavButton').count(), 9);
-  assert.equal(await page.locator('#selection-panel').getAttribute('data-selection'), 'city:central');
+  assert.equal(
+    await page.locator('#selection-panel').getAttribute('data-selection'),
+    'city:central',
+  );
   assert.equal(await page.locator('.commandPanelContent h1').innerText(), 'Vận hành');
   assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), 'Operations');
 
@@ -54,11 +60,17 @@ try {
     assert.equal(await page.locator('.commandPanelContent h1').innerText(), heading);
     assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), layer);
   }
-  assert.ok(await canvas.evaluate((el) => el.isConnected), 'department switches preserve Pixi canvas');
+  assert.ok(
+    await canvas.evaluate((el) => el.isConnected),
+    'department switches preserve Pixi canvas',
+  );
 
   // Retain the advanced City Intelligence inspector but not the Classic UI.
   await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
-  assert.equal(await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).count(), 0);
+  assert.equal(
+    await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).count(),
+    0,
+  );
   await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   assert.equal(await page.locator('.detailPanelContent').isVisible(), true);
   assert.equal(await page.locator('.detailPanelContent h1').innerText(), 'Central City');
@@ -119,7 +131,8 @@ try {
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Start national campaign', exact: true }).click();
   await page.waitForFunction(
-    () => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).campaign.mode === 'national',
+    () =>
+      JSON.parse(localStorage.getItem('marketverse:sprint01:state')).campaign.mode === 'national',
   );
   await ready();
   const national = await page.evaluate(() =>
