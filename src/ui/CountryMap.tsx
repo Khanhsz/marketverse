@@ -70,6 +70,7 @@ export function CountryMap(props: Props) {
         }
         app.stop(); // The map is static between interactions; render only when dirty.
         const artworkStack = await loadArtworkStack({
+          primary:'/marketverse-v6-map-clean.png',
           fallback:'/atlas-country.svg',
           layers:[
             {id:'terrain',file:'/maps/v6/layers/terrain.webp',interactive:false},
@@ -139,7 +140,7 @@ export function CountryMap(props: Props) {
           for (const child of world.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
-          // Illustrated cartography is a fixed, hand-authored SVG asset.
+          // Illustrated cartography is loaded from a clean PNG artwork.
           // All dynamic game entities and routes are rendered separately above it.
           world.addChild(artworkStack);
           const roads = new Graphics();
