@@ -85,9 +85,6 @@ try {
   );
   assert.ok(state.products.some((p) => p.parentId === 'nova'));
   assert.equal(readFileSync('.browser-artifacts/completed-save.json', 'utf8'), original);
-  const replayDownload = page.waitForEvent('download');
-  await page.getByRole('button', { name: /^Export replay from week/ }).click();
-  await (await replayDownload).saveAs('.browser-artifacts/completed-replay.json');
   await page.getByRole('button', { name: 'Báo cáo', exact: true }).click();
   await page.getByLabel('Report period', { exact: true }).selectOption('52');
   assert.match(await page.getByRole('dialog').innerText(), /52\/52 reported/);
@@ -123,6 +120,9 @@ try {
   await restore.getByRole('dialog', { name: 'Campaign complete' }).waitFor();
   await restore.getByRole('button', { name: 'Review map', exact: true }).click();
   assert.equal(await restore.evaluate((k) => localStorage.getItem(k), key), original);
+  const replayDownload = restore.waitForEvent('download');
+  await restore.getByRole('button', { name: /^Export replay from week/ }).click();
+  await (await replayDownload).saveAs('.browser-artifacts/completed-replay.json');
   await saveContext.close();
   const replayContext = await browser.newContext({
       viewport: { width: 1280, height: 800 },
