@@ -23,8 +23,19 @@ try {
   const camera = JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
   const canvas = await page.locator('canvas').boundingBox();
   // The new artwork anchor is independent of the original engine x/y values.
-  const targetX = 0.63 * 1920 + 100;
-  const targetY = 0.47 * 1280 - 92;
+  const clickWorld = async (worldX, worldY) => {
+    await page.mouse.click(
+      canvas.x + canvas.width / 2 + (worldX - camera.x) * camera.scale,
+      canvas.y + canvas.height / 2 + (worldY - camera.y) * camera.scale,
+    );
+  };
+  // First click a compact rival-city chip, then the newly compact center chip.
+  await clickWorld(0.35 * 1920 + 70, 0.275 * 1280 - 65);
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:atlas-store');
+  await clickWorld(0.565 * 1920 + 100, 0.475 * 1280 - 65);
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:store');
+  const targetX = 0.565 * 1920 + 100;
+  const targetY = 0.475 * 1280 - 92;
   await page.mouse.click(
     canvas.x + canvas.width / 2 + (targetX - camera.x) * camera.scale,
     canvas.y + canvas.height / 2 + (targetY - camera.y) * camera.scale,
