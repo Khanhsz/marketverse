@@ -436,8 +436,12 @@ export function CountryMap(props: Props) {
                   )[mainAsset.kind]
                 : 'Chưa có cơ sở';
               const expanded = layout === 'legacy' || selected;
-              const { x: cardX, y: cardY, width: cardWidth, height: cardHeight } =
-                cityCardBounds(city, layout, expanded);
+              const {
+                x: cardX,
+                y: cardY,
+                width: cardWidth,
+                height: cardHeight,
+              } = cityCardBounds(city, layout, expanded);
               const isEmpty = !mainAsset;
               const isVisual = layout === 'artwork';
               if (isVisual) {
@@ -467,15 +471,16 @@ export function CountryMap(props: Props) {
               );
               const tint = isOwned ? 0xa5dfbd : isEmpty ? 0xb1c5b9 : 0xe6be8b;
               if (!expanded && isVisual) {
-                overlays.addChild(
-                  new Graphics()
-                    .circle(cardX + 14, cardY + 16, 4.5)
-                    .fill(tint),
-                );
+                overlays.addChild(new Graphics().circle(cardX + 14, cardY + 16, 4.5).fill(tint));
                 overlays.addChild(
                   new Text({
                     text: city.name,
-                    style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 21, fontWeight: 'bold' },
+                    style: {
+                      fill: 0xffffff,
+                      fontFamily: 'Arial',
+                      fontSize: 21,
+                      fontWeight: 'bold',
+                    },
                     x: cardX + 26,
                     y: cardY + 5,
                   }),
@@ -503,7 +508,12 @@ export function CountryMap(props: Props) {
                 overlays.addChild(
                   new Text({
                     text: city.name,
-                    style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 24, fontWeight: 'bold' },
+                    style: {
+                      fill: 0xffffff,
+                      fontFamily: 'Arial',
+                      fontSize: 24,
+                      fontWeight: 'bold',
+                    },
                     x: cardX + 16,
                     y: cardY + 9,
                   }),

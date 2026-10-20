@@ -56,9 +56,13 @@ test('all city operation cards stay within the atlas and do not overlap each oth
     }
     for (let i = 0; i < cards.length; i++) {
       for (let j = i + 1; j < cards.length; j++) {
-        const a = cards[i], b = cards[j];
-        const overlap = a.x < b.x + b.width && a.x + a.width > b.x &&
-          a.y < b.y + b.height && a.y + a.height > b.y;
+        const a = cards[i],
+          b = cards[j];
+        const overlap =
+          a.x < b.x + b.width &&
+          a.x + a.width > b.x &&
+          a.y < b.y + b.height &&
+          a.y + a.height > b.y;
         assert.equal(overlap, false, selected.id + ': ' + a.id + ' overlaps ' + b.id);
       }
     }

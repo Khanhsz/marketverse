@@ -7,13 +7,13 @@ import { WORLD_SIZE } from './atlasLayers.ts';
  */
 export const CITY_ARTWORK_ANCHORS = {
   // Tied to identifiable urban / port / lake / river artwork, NOT to engine geography.
-  north: { x: 0.35, y: 0.275 },    // northwest port and docks
-  lake: { x: 0.445, y: 0.355 },    // central-north lake shore (not the mountain)
-  east: { x: 0.845, y: 0.40 },     // eastern industrial gateway
+  north: { x: 0.35, y: 0.275 }, // northwest port and docks
+  lake: { x: 0.445, y: 0.355 }, // central-north lake shore (not the mountain)
+  east: { x: 0.845, y: 0.4 }, // eastern industrial gateway
   central: { x: 0.565, y: 0.475 }, // dense central interchange
-  west: { x: 0.315, y: 0.49 },     // western developed valley
-  river: { x: 0.445, y: 0.61 },    // west bank of river bend
-  south: { x: 0.75, y: 0.69 },     // southeast urban coastal district
+  west: { x: 0.315, y: 0.49 }, // western developed valley
+  river: { x: 0.445, y: 0.61 }, // west bank of river bend
+  south: { x: 0.75, y: 0.69 }, // southeast urban coastal district
   harbor: { x: 0.685, y: 0.815 }, // southern harbor shoreline
 } as const;
 
@@ -56,11 +56,7 @@ export function cityLabelPoint(city: CityLocation, layout: Layout = 'artwork') {
  * selected city gets a detailed card. This prevents 8 big banners over the map.
  * Legacy layout keeps the original full-size cards and old hit regions.
  */
-export function cityCardBounds(
-  city: CityLocation,
-  layout: Layout = 'artwork',
-  expanded = false,
-) {
+export function cityCardBounds(city: CityLocation, layout: Layout = 'artwork', expanded = false) {
   const center = cityWorldPoint(city, layout);
   if (layout === 'legacy') {
     return { x: center.x - 16, y: center.y - 138, width: 284, height: 91 };
@@ -85,8 +81,10 @@ export function cityCardBounds(
     south: { dx: -226, dy: -84 },
     harbor: { dx: -224, dy: 16 },
   };
-  const offset = (expanded ? fullOffsets : compactOffsets)[city.id as AnchorId] ??
-    { dx: 24, dy: -95 };
+  const offset = (expanded ? fullOffsets : compactOffsets)[city.id as AnchorId] ?? {
+    dx: 24,
+    dy: -95,
+  };
   return {
     x: center.x + offset.dx,
     y: center.y + offset.dy,
