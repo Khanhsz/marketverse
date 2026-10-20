@@ -624,10 +624,8 @@ export function CountryMap(props: Props) {
             }
             const city = current.current.cities.find(
               (c) =>
-                Math.hypot(
-                  cityWorldPoint(c).x - w.x,
-                  cityWorldPoint(c).y - w.y,
-                ) <= Math.max(20, 12 / camera.scale),
+                Math.hypot(cityWorldPoint(c).x - w.x, cityWorldPoint(c).y - w.y) <=
+                Math.max(20, 12 / camera.scale),
             );
             // Assets take priority over the wider city hit area. Positions match the rendered slots.
             for (const c of current.current.cities) {
@@ -639,11 +637,8 @@ export function CountryMap(props: Props) {
               const assets = current.current.facilities.filter((f) => f.cityId === c.id);
               const facility = assets.find(
                 (_, i) =>
-                  Math.abs(
-                    w.x - (cityWorldPoint(c).x - 28 + i * 32),
-                  ) <= 12 &&
-                  Math.abs(w.y - (cityWorldPoint(c).y + 52)) <=
-                    12,
+                  Math.abs(w.x - (cityWorldPoint(c).x - 28 + i * 32)) <= 12 &&
+                  Math.abs(w.y - (cityWorldPoint(c).y + 52)) <= 12,
               );
               if (facility) {
                 current.current.onSelect({ kind: 'facility', id: facility.id });
@@ -653,8 +648,7 @@ export function CountryMap(props: Props) {
                 const owner = [...new Set(assets.map((f) => f.companyId))].find(
                   (_, i) =>
                     Math.hypot(
-                      w.x -
-                        (cityWorldPoint(c).x - 28 + i * 40),
+                      w.x - (cityWorldPoint(c).x - 28 + i * 40),
                       w.y - (cityWorldPoint(c).y + 96),
                     ) <= 16,
                 );
@@ -721,7 +715,7 @@ export function CountryMap(props: Props) {
                   ...camera,
                   ...cityWorldPoint(
                     current.current.cities.find((c) => c.id === current.current.selectedCityId) ||
-                      current.current.cities[0]
+                      current.current.cities[0],
                   ),
                 }
               : action === 'reset'

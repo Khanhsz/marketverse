@@ -101,7 +101,10 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.screenshot({ path: '.browser-artifacts/visual-command-1024.png' });
   await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
-  assert.equal(await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).count(), 0);
+  assert.equal(
+    await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).count(),
+    0,
+  );
   await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   assert.equal(await page.locator('.detailPanelContent').isVisible(), true);
   assert.equal(await page.locator('.commandVisual').count(), 1);

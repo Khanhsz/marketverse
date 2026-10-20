@@ -216,7 +216,12 @@ export function App() {
   return (
     <div className="app commandVisual">
       <header className="header">
-        <div className="logo commandLogo"><div>⬡ <strong>MARKETVERSE</strong></div><span>COUNTRY STRATEGY MAP</span></div>
+        <div className="logo commandLogo">
+          <div>
+            ⬡ <strong>MARKETVERSE</strong>
+          </div>
+          <span>COUNTRY STRATEGY MAP</span>
+        </div>
         <div className="metrics">
           <div>
             <small>THỜI GIAN</small>
@@ -235,14 +240,23 @@ export function App() {
         </div>
       </header>
       <div className={`workspace ${panelOpen ? '' : 'panelCollapsed'}`}>
-        <DepartmentRail active={department} onChange={(id) => {
-          setDepartment(id);
-          setPanelOpen(true);
-          setQuickActionsOpen(false);
-          if (id === 'reports') setReportsOpen(true);
-        }} />
+        <DepartmentRail
+          active={department}
+          onChange={(id) => {
+            setDepartment(id);
+            setPanelOpen(true);
+            setQuickActionsOpen(false);
+            if (id === 'reports') setReportsOpen(true);
+          }}
+        />
         <main className="mapArea">
-          <div className="overlay commandMapHeader">{department === 'operations' ? 'OPERATIONS · CÔNG SUẤT & TỒN KHO' : department === 'insight' ? 'CITY INTELLIGENCE' : department.toUpperCase() + ' · COUNTRY STRATEGY'}</div>
+          <div className="overlay commandMapHeader">
+            {department === 'operations'
+              ? 'OPERATIONS · CÔNG SUẤT & TỒN KHO'
+              : department === 'insight'
+                ? 'CITY INTELLIGENCE'
+                : department.toUpperCase() + ' · COUNTRY STRATEGY'}
+          </div>
           <div className="commandNational">NATIONAL</div>
           <Suspense
             fallback={
@@ -264,16 +278,16 @@ export function App() {
               playerId={game.playerId}
               activeLayer={
                 department === 'operations' || department === 'projects'
-                    ? 'Operations'
-                    : department === 'logistics'
-                      ? 'Logistics'
-                      : department === 'finance'
-                        ? 'Economy'
-                        : department === 'products' || department === 'marketing'
-                          ? 'Market'
-                          : department === 'people' || department === 'settings'
-                            ? 'Operations'
-                            : 'Competition'
+                  ? 'Operations'
+                  : department === 'logistics'
+                    ? 'Logistics'
+                    : department === 'finance'
+                      ? 'Economy'
+                      : department === 'products' || department === 'marketing'
+                        ? 'Market'
+                        : department === 'people' || department === 'settings'
+                          ? 'Operations'
+                          : 'Competition'
               }
               onSelect={choose}
             />
@@ -721,11 +735,29 @@ export function App() {
       </nav>
       <footer className="footer commandFooter">
         <div className="weeklyPlanStatus">
-          <strong>Kế hoạch tuần {String(game.week).padStart(2, '0')} · {' '}{game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length}{' '}dự án đang chạy</strong>
+          <strong>
+            Kế hoạch tuần {String(game.week).padStart(2, '0')} ·{' '}
+            {game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length}{' '}
+            dự án đang chạy
+          </strong>
           <span>Thay đổi có hiệu lực sau khi xác nhận tuần</span>
         </div>
-        <button className="roundAdvance" title="Mở kế hoạch tuần" aria-label="Mở kế hoạch tuần" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>↓</button>
-        <button className="next commandNext" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>Xem kế hoạch tuần <span>→</span></button>
+        <button
+          className="roundAdvance"
+          title="Mở kế hoạch tuần"
+          aria-label="Mở kế hoạch tuần"
+          onClick={() => planFor('projects')}
+          disabled={!!recovery || game.campaign.status !== 'active'}
+        >
+          ↓
+        </button>
+        <button
+          className="next commandNext"
+          onClick={() => planFor('projects')}
+          disabled={!!recovery || game.campaign.status !== 'active'}
+        >
+          Xem kế hoạch tuần <span>→</span>
+        </button>
       </footer>
       {resultOpen && (
         <CampaignResult game={game} onClose={() => setResultOpen(false)} onExport={exportGame} />
