@@ -94,8 +94,9 @@ export function CountryMap(props: Props) {
           element.dataset.layer = layerRef.current;
           const detail = camera.scale / fitCamera(view).scale;
           const candidates = labels.filter(item=>item.selected || item.size>=22 || detail>=2.6).map(item=>{
-            const width = item.caption.width * camera.scale;
-            const height = item.caption.height * camera.scale;
+            const targetScale=Math.max(1,(item.size>=22?12:10)/(item.size*camera.scale));
+            const width=item.caption.width*targetScale*camera.scale;
+            const height=item.caption.height*targetScale*camera.scale;
             return {id:item.id,x:view.width/2+(item.anchorX-camera.x)*camera.scale,y:view.height/2+(item.anchorY-camera.y)*camera.scale,width,height,priority:(item.selected?100:0)+(item.size>=22?20:0)};
           });
           const visibleLabels=resolveLabels(candidates,view,6);
@@ -384,6 +385,7 @@ export function CountryMap(props: Props) {
             );
             // Assets take priority over the wider city hit area. Positions match the rendered slots.
             for (const c of current.current.cities) {
+              if (camera.scale / fitCamera(view).scale < 2.6) break;
               const assets = current.current.facilities.filter((f) => f.cityId === c.id);
               const facility = assets.find(
                 (_, i) =>
