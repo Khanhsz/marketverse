@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#182c27" />
+    <title>MarketVerse — Native Polygon POC</title>
+  </head>
+  <body>
+    <div id="poc-root">
+      <div class="poc-header">
+        <a href="/" class="poc-back" title="Trở lại MarketVerse">← COUNTRY MAP</a>
+        <div class="poc-brand"><span class="poc-brand-mark">⬡</span> MARKETVERSE <span class="poc-brand-light">/ NATIVE POLYGON LAB</span></div>
+        <span class="poc-live"><i></i> PIXIJS · 100% GEOMETRY</span>
+      </div>
+      <main class="poc-layout">
+        <section id="poc-map" aria-label="Bản đồ hình học thử nghiệm">
+          <div class="poc-top-info">
+            <div class="poc-eyebrow">PROOF OF CONCEPT · V8.0</div>
+            <strong>THE POLYGON ISLAND</strong>
+            <span>Địa hình, district và tòa nhà được vẽ bằng code</span>
+          </div>
+          <div class="poc-layer-switch" role="group" aria-label="Lớp bản đồ">
+            <button data-layer="all" aria-pressed="true">Tổng quan</button>
+            <button data-layer="districts" aria-pressed="false">Districts</button>
+            <button data-layer="buildings" aria-pressed="false">Công trình</button>
+          </div>
+          <div class="poc-zoom">
+            <button id="poc-zoom-in" aria-label="Phóng to">+</button>
+            <button id="poc-zoom-out" aria-label="Thu nhỏ">−</button>
+            <button id="poc-fit" aria-label="Vừa khung">⌗</button>
+          </div>
+          <div class="poc-hint">Kéo để di chuyển · Cuộn để zoom · Chọn một polygon hoặc tòa nhà</div>
+          <div class="poc-map-status"><span id="poc-render-count">0</span> objects · <span id="poc-zoom-label">100%</span></div>
+        </section>
+        <aside class="poc-panel" aria-label="Thông tin đối tượng được chọn">
+          <div class="poc-panel-eyebrow">GEOMETRY INSPECTOR</div>
+          <div id="poc-inspector" aria-live="polite"></div>
+          <div class="poc-divider"></div>
+          <div class="poc-facts">
+            <strong>KHÔNG CÓ PNG NỀN</strong>
+            <p>Các polygon, mặt nhà 2.5D, đường giao thông và hitbox được dựng bằng PixiJS Graphics. Thử nghiệm độc lập — không ghi vào save game.</p>
+          </div>
+          <div class="poc-system-status"><span class="poc-dot"></span> SANDBOX · KHÔNG THAY ĐỔI GAMEPLAY</div>
+        </aside>
+      </main>
+      <footer class="poc-footer"><span>MARKETVERSE ENGINEERING LAB · NATIVE GEOMETRY</span><span>Concept data only · Country Map unchanged</span></footer>
+    </div>
+    <script type="module" src="/src/poc/main.ts"></script>
+  </body>
+</html>
