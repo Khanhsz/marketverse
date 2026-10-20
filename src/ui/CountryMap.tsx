@@ -69,17 +69,7 @@ export function CountryMap(props: Props) {
           return;
         }
         app.stop(); // The map is static between interactions; render only when dirty.
-        const artworkStack = await loadArtworkStack({
-          primary:'/marketverse-v6-map-clean.png',
-          fallback:'/atlas-country.svg',
-          layers:[
-            {id:'terrain',file:'/maps/v6/layers/terrain.webp',interactive:false},
-            {id:'geography',file:'/maps/v6/layers/geography.webp',interactive:false},
-            {id:'roads',file:'/maps/v6/layers/roads.webp',interactive:false},
-            {id:'urban',file:'/maps/v6/layers/urban.webp',interactive:false},
-            {id:'landmarks',file:'/maps/v6/layers/landmarks.webp',interactive:false},
-          ],
-        });
+        const artworkStack = await loadArtworkStack();
         if (disposed) { app.destroy(true, { children: true }); return; }
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
