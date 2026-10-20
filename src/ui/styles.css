@@ -1384,3 +1384,489 @@ canvas:focus-visible {
     max-width: 190px;
   }
 }
+
+
+/* MarketVerse Visual Command Center — operations-first, laptop-first.
+   Design tokens centralize the visual skin without changing simulation styles. */
+.commandVisual {
+  --mv-bg: #1a2d23;
+  --mv-surface: #1d3026;
+  --mv-surface-2: #253b2e;
+  --mv-stroke: #3a5343;
+  --mv-ink: #f0f8f0;
+  --mv-muted: #abcbb6;
+  --mv-accent: #a5d9be;
+  --mv-alert: #f6ab69;
+  --mv-radius: 9px;
+  --mv-space: 12px;
+  min-width: 850px;
+  grid-template-rows: 64px minmax(0,1fr) 62px;
+  background: var(--mv-bg);
+  color: var(--mv-ink);
+}
+.commandVisual .header {
+  padding: 0 24px;
+  background: #1a2d23;
+  border-bottom: 1px solid var(--mv-stroke);
+  color: var(--mv-ink);
+}
+.commandVisual .commandLogo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: .45px;
+  color: #e7f6eb;
+  font-weight: 750;
+}
+.commandVisual .commandLogo div { white-space: nowrap; }
+.commandVisual .commandLogo strong { margin-left: 6px; }
+.commandVisual .commandLogo span {
+  display: block;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 500;
+  color: #abd4b7;
+  letter-spacing: .75px;
+}
+.commandVisual .metrics { gap: 28px; }
+.commandVisual .metrics div { gap: 5px; }
+.commandVisual .metrics small {
+  color: #b0d8c1;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+.commandVisual .metrics b { font-size: 13px; color: white; }
+.commandVisual .workspace {
+  grid-template-columns: 70px minmax(0, 1fr) 320px;
+  min-height: 0;
+  border-bottom: 1px solid var(--mv-stroke);
+}
+.commandVisual .workspace.panelCollapsed { grid-template-columns: 70px minmax(0,1fr); }
+.commandVisual .commandRail {
+  min-width: 0;
+  background: var(--mv-surface);
+  border-right: 1px solid var(--mv-stroke);
+  gap: 2px;
+  padding: 9px 6px;
+  justify-content: space-between;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.commandVisual .commandRail .departmentNavButton {
+  width: 100%;
+  min-height: 51px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 6px 1px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #afd0bd;
+  background: transparent;
+  font-weight: 500;
+  transform: none;
+}
+.commandVisual .departmentNavButton svg { display: block; }
+.commandVisual .departmentNavButton span {
+  font-size: 10px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+.commandVisual .commandRail .departmentNavButton:hover,
+.commandVisual .commandRail .departmentNavButton:focus-visible {
+  background: #304c3d;
+  color: white;
+}
+.commandVisual .commandRail .departmentNavButton[aria-pressed="true"] {
+  background: var(--mv-accent);
+  color: #19382d;
+  box-shadow: none;
+  font-weight: 750;
+}
+.commandVisual .mapArea {
+  min-width: 0;
+  background: #80c6d9;
+}
+.commandVisual .mapSurface { background: #70b8cf; }
+.commandVisual .overlay.commandMapHeader,
+.commandVisual .commandNational {
+  position: absolute;
+  z-index: 4;
+  top: 13px;
+  margin: 0;
+  border-radius: 6px;
+  background: #182e27f5;
+  color: #fff;
+  box-shadow: 0 4px 14px #10301e42;
+  padding: 9px 12px;
+  line-height: 1.2;
+  letter-spacing: .15px;
+  font-size: 11px;
+  font-weight: 750;
+}
+.commandVisual .overlay.commandMapHeader { left: 14px; max-width: calc(100% - 110px); }
+.commandVisual .commandNational { right: 14px; pointer-events: none; }
+.commandVisual .mapFoot.commandMapHint {
+  left: 14px;
+  bottom: 14px;
+  z-index: 3;
+  padding: 8px 12px;
+  font-size: 10px;
+  border: 1px solid #2d4a3b;
+  border-radius: 6px;
+  background: #193226f0;
+  color: #f2f9f3;
+  pointer-events: none;
+  letter-spacing: .1px;
+  box-shadow: 0 3px 10px #15372435;
+}
+.commandVisual .mapLayers,
+.commandVisual .mobileLayerToggle,
+.commandVisual .atlasLegend,
+.commandVisual .mapZoomBadge,
+.commandVisual .cityPicker,
+.commandVisual .mapLegend { display: none; }
+.commandVisual .mapControls {
+  width: auto;
+  grid-template-columns: repeat(2, 30px);
+  right: 12px;
+  bottom: 14px;
+  gap: 3px;
+  padding: 4px;
+  background: #1c342be8;
+  border: 1px solid #456453;
+  box-shadow: 0 2px 12px #0d312441;
+}
+.commandVisual .mapControls button {
+  min-height: 29px;
+  padding: 3px;
+  color: white;
+  border: 0;
+  background: #355545;
+  font-size: 13px;
+}
+.commandVisual .mapControls button:hover { background: #486a57; }
+.commandVisual .mapControls .wide { display: none; }
+.commandVisual .panel {
+  padding: 0;
+  overflow-x: hidden;
+  color: var(--mv-ink);
+  background: var(--mv-surface);
+  border-left: 1px solid var(--mv-stroke);
+}
+.commandVisual .panel h1,
+.commandVisual .panel h3 { color: var(--mv-ink); }
+.commandVisual .panel[hidden], .commandVisual .legacyPanelContent[hidden] { display: none; }
+.commandPanelContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 100%;
+  padding: 18px 16px 16px;
+  font-size: 12px;
+}
+.commandEyebrow {
+  color: #abd4b7;
+  font-size: 10px;
+  letter-spacing: .75px;
+  line-height: 1.35;
+}
+.commandPanelTitle { display: flex; align-items: center; justify-content: space-between; }
+.commandVisual .commandPanelTitle h1 {
+  margin: 2px 0 1px;
+  font-size: 21px;
+  font-weight: 780;
+  letter-spacing: -.4px;
+  line-height: 1.3;
+  color: white;
+}
+.commandPanelTitle button {
+  border: 0;
+  background: transparent;
+  color: #b5d5c2;
+  padding: 5px;
+  font-size: 18px;
+}
+.commandVisual .commandLocation {
+  margin: 2px 0 14px;
+  color: var(--mv-accent);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.operationsFlow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0 0 16px;
+}
+.operationsFlow div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+  padding: 11px 8px;
+  border-radius: 7px;
+  background: #293f32;
+}
+.operationsFlow div span { color: white; font-size: 10px; font-weight: 650; white-space: nowrap; }
+.operationsFlow svg { color: #b3d4bc; }
+.operationsFlow b { color: #b7d9bd; font-size: 12px; }
+.commandSection { margin: 0 0 15px; }
+.commandVisual .commandSection h3 {
+  margin: 0 0 9px;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 720;
+}
+.commandStat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 7px 0;
+  color: #afcdb9;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.commandStat strong {
+  color: #f6f9f4;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.commandProgress {
+  height: 7px;
+  overflow: hidden;
+  margin-top: 6px;
+  border-radius: 8px;
+  background: #334b3c;
+}
+.commandProgress i {
+  display: block;
+  height: 100%;
+  background: #a4d8b6;
+  border-radius: inherit;
+  transition: width .2s ease;
+}
+.commandVisual .commandSupporting,
+.commandVisual .commandPositive {
+  margin: 9px 0 2px;
+  color: #afd9b5;
+  line-height: 1.55;
+  font-size: 11px;
+}
+.commandStockCard,
+.commandListCard {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border: 1px solid #476651;
+  border-radius: var(--mv-radius);
+  background: #17281f;
+  color: white;
+}
+.commandStockCard {
+  margin: 1px 0 12px;
+  min-height: 66px;
+  font-size: 12px;
+}
+.commandStockCard > span { display: inline-block; max-width: 65%; }
+.commandStockCard strong {
+  float: right;
+  font-size: 12px;
+  color: white;
+  white-space: nowrap;
+}
+.commandStockCard small {
+  display: block;
+  margin-top: 9px;
+  color: #a8d0b4;
+  font-size: 10px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+.commandVisual .commandAlert {
+  margin: 0 0 11px;
+  padding: 11px 12px;
+  border-radius: 7px;
+  background: #4c382a;
+  color: var(--mv-alert);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.commandVisual .commandPositive {
+  margin: 0 0 12px;
+  background: #294333;
+  padding: 9px 10px;
+  border-radius: 7px;
+}
+.commandPrimary, .commandSecondary, .commandDanger {
+  width: 100%;
+  min-height: 37px;
+  margin: 0 0 10px;
+  padding: 9px 12px;
+  text-align: center;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 740;
+}
+.commandPrimary {
+  border: 1px solid #9bceb1;
+  background: #a5d9be;
+  color: #163a2a;
+}
+.commandPrimary:hover { background: #c3ebd2; }
+.commandSecondary {
+  border: 1px solid #496854;
+  background: transparent;
+  color: #e0f3e7;
+}
+.commandSecondary:hover { background: #304c3a; }
+.commandDanger { border: 1px solid #8a5650; color: #f4b5aa; background: transparent; }
+.commandTextAction {
+  border: 0;
+  background: transparent;
+  color: #b4d9bf;
+  font-size: 11px;
+  text-align: center;
+  padding: 6px 10px 10px;
+}
+.commandTextAction:hover { text-decoration: underline; }
+.commandListCard {
+  margin: 0 0 8px;
+  padding: 11px;
+  line-height: 1.5;
+}
+button.commandListCard:hover { border-color: #a4daba; }
+.commandListCard > strong { display: block; font-size: 12px; }
+.commandListCard > small { display: block; margin: 4px 0 6px; color: #b4cdbc; font-size: 10px; }
+.commandListCard .commandStat { margin-bottom: 0; }
+.commandMeasure { margin: 10px 0; }
+.commandPanelBottom {
+  margin-top: auto;
+  padding-top: 20px;
+  color: #85b39a;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: .6px;
+}
+.commandVisual .legacyPanelContent {
+  padding: 22px 18px 30px;
+  color: #e7f3e9;
+}
+.commandVisual .legacyPanelContent .muted,
+.commandVisual .legacyPanelContent .stat,
+.commandVisual .legacyPanelContent small,
+.commandVisual .legacyPanelContent .entityLink { color: #bcdbca; }
+.commandVisual .legacyPanelContent .productCard,
+.commandVisual .legacyPanelContent .notice,
+.commandVisual .legacyPanelContent .queueItem,
+.commandVisual .legacyPanelContent .reportTotals { background: #233c30; color: #e1f3e7; border-color: #45634e; }
+.commandVisual .legacyPanelContent .stat b { color: #e9f6eb; }
+.commandVisual .legacyPanelContent h3 { color: #d2e9d9; }
+.commandVisual .legacyPanelContent hr { border-color: #365a44; }
+.commandVisual .footer.commandFooter {
+  justify-content: space-between;
+  background: #1b3026;
+  border-top: 0;
+  color: white;
+  padding: 0 22px;
+}
+.weeklyPlanStatus { display: flex; flex-direction: column; gap: 4px; }
+.weeklyPlanStatus strong { font-size: 12px; color: #f1f9f4; }
+.commandVisual .weeklyPlanStatus span {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 450;
+  color: #a6cbb2;
+}
+.commandVisual .roundAdvance {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  color: white;
+  background: #08130e;
+  border: 1px solid #647c6a;
+  border-radius: 50%;
+  font-size: 19px;
+}
+.commandVisual .commandNext {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 6px;
+  color: #193d2e;
+  background: var(--mv-accent);
+  font-weight: 750;
+  font-size: 12px;
+}
+.commandVisual .commandNext span { margin: 0; font-size: 20px; color: #1c4a33; }
+.commandVisual .commandNext:hover { background: #c4edd2; }
+.commandVisual button:focus-visible,
+.commandVisual canvas:focus-visible { outline: 2px solid #d4eed9; outline-offset: 2px; }
+@media(max-width: 1100px) {
+  .commandVisual .workspace { grid-template-columns: 64px minmax(0,1fr) 290px; }
+  .commandVisual .commandRail .departmentNavButton { min-height: 46px; }
+  .commandVisual .commandRail .departmentNavButton span { font-size: 9px; }
+  .commandPanelContent { padding: 14px 12px; }
+  .commandVisual .overlay.commandMapHeader { font-size: 10px; }
+}
+@media(max-height: 720px) and (min-width:850px) {
+  .commandVisual .commandRail .departmentNavButton { min-height: 44px; padding: 3px 1px; }
+  .commandVisual .commandRail { gap: 0; }
+  .commandVisual .commandPanelContent { padding-top: 12px; }
+  .commandVisual .operationsFlow { margin-bottom: 10px; }
+  .commandVisual .commandSection { margin-bottom: 10px; }
+}
+@media(max-width: 849px) {
+  .commandVisual {
+    min-width: 0;
+    grid-template-rows: 58px minmax(0,1fr) 58px calc(58px + env(safe-area-inset-bottom));
+  }
+  .commandVisual .workspace,
+  .commandVisual .workspace.panelCollapsed { display: block; }
+  .commandVisual .commandRail { display: none; }
+  .commandVisual .header { padding: 0 10px; }
+  .commandVisual .metrics { gap: 10px; }
+  .commandVisual .metrics b { font-size: 11px; }
+  .commandVisual .commandLogo strong { font-size: 11px; }
+  .commandVisual .commandLogo span { font-size: 8px; display: block; }
+  .commandVisual .commandNational { top: 48px; right: 10px; font-size: 9px; }
+  .commandVisual .overlay.commandMapHeader { left: 10px; top: 48px; padding: 8px; max-width: calc(100% - 95px); }
+  .commandVisual .panel { background: var(--mv-surface); border-color: var(--mv-stroke); }
+  .commandVisual .mobilePanelClose { background: #2f4d3c; color: white; }
+  .commandVisual .mobileNav { background: #1b3026; border-color: var(--mv-stroke); }
+  .commandVisual .mobileNav button, .commandVisual .mobileNav button span { color: #e1f4e7; }
+  .commandVisual .mobileNav button[aria-pressed="true"] { background: #345441; }
+  .commandVisual .footer.commandFooter { padding: 0 10px; }
+  .commandVisual .roundAdvance { display: none; }
+  .commandVisual .weeklyPlanStatus span { display: none; }
+  .commandVisual .weeklyPlanStatus strong { font-size: 10px; }
+  .commandVisual .commandNext { font-size: 10px; padding: 6px; }
+  .commandVisual .mapFoot.commandMapHint { bottom: 10px; left: 10px; font-size: 9px; max-width: 55%; }
+  .commandVisual .mapControls { right: 10px; bottom: 10px; width: auto; }
+  .commandVisual .mapQuickCard { background: #223b2deb; color: white; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .commandVisual *, .commandVisual *::before, .commandVisual *::after { transition-duration: 0s !important; }
+}
