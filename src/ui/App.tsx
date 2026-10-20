@@ -328,6 +328,7 @@ export function App() {
               stocks={game.stocks}
               factories={game.factories}
               playerId={game.playerId}
+              layout={visualMode ? 'artwork' : 'legacy'}
               activeLayer={
                 !visualMode
                   ? 'Market'
