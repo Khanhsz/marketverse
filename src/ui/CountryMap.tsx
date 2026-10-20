@@ -1,6 +1,8 @@
 import type { CityMetrics } from '../engine/analytics';
 import { useEffect, useRef, useState } from 'react';
-import { Application, Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
+import { Application, Container, Graphics, Text } from 'pixi.js';
+import { loadArtworkStack } from '../map/artworkLoader';
+import { MAP_MODES } from '../map/atlasLayers';
 import type { City, Facility, Company } from '../engine/game';
 import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
@@ -25,7 +27,7 @@ const legends: Record<Layer, string> = {
   Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
-const layerColors: Record<Layer, number> = { Market:0x3d8068, Competition:0x5576a0, Operations:0x647d8b, Logistics:0x3c8391, Economy:0x98834d };
+const layerColors: Record<Layer, number> = Object.fromEntries(Object.entries(MAP_MODES).map(([name,mode])=>[name,mode.color])) as Record<Layer,number>;
 const layerNames: Record<Layer, string> = { Market:'Demand intensity', Competition:'Company presence / market share', Operations:'Operating facilities', Logistics:'Incoming cargo & routes', Economy:'Purchasing power' };
 const ownerColor = (id: string) =>
   id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
@@ -67,10 +69,16 @@ export function CountryMap(props: Props) {
           return;
         }
         app.stop(); // The map is static between interactions; render only when dirty.
-        // Asset contract: public/marketverse-v6-map.png is the approved hand-drawn B-style artwork.
-        // Until the binary is committed, preserve the existing illustrated atlas.
-        const artwork = await fetch('/marketverse-v6-map.png', {method:'HEAD'}).then(r=>r.ok).catch(()=>false);
-        const atlasTexture = await Assets.load(artwork ? '/marketverse-v6-map.png' : '/atlas-country.svg');
+        const artworkStack = await loadArtworkStack({
+          fallback:'/atlas-country.svg',
+          layers:[
+            {id:'terrain',file:'/maps/v6/layers/terrain.webp',interactive:false},
+            {id:'geography',file:'/maps/v6/layers/geography.webp',interactive:false},
+            {id:'roads',file:'/maps/v6/layers/roads.webp',interactive:false},
+            {id:'urban',file:'/maps/v6/layers/urban.webp',interactive:false},
+            {id:'landmarks',file:'/maps/v6/layers/landmarks.webp',interactive:false},
+          ],
+        });
         if (disposed) { app.destroy(true, { children: true }); return; }
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
@@ -133,10 +141,7 @@ export function CountryMap(props: Props) {
           const active = layerRef.current;
           // Illustrated cartography is a fixed, hand-authored SVG asset.
           // All dynamic game entities and routes are rendered separately above it.
-          const atlas = new Sprite(atlasTexture);
-          atlas.width = 1920;
-          atlas.height = 1280;
-          world.addChild(atlas);
+          world.addChild(artworkStack);
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
