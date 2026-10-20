@@ -13,6 +13,8 @@ try {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url);
   await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.camera);
+  await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
+  await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   page.once('dialog', (d) => d.accept());
   await page
     .getByLabel('Import save or replay', { exact: true })
@@ -28,8 +30,9 @@ try {
   const timings = [];
   for (let week = 1; week <= 104; week++) {
     const started = performance.now();
-    await page.getByRole('button', { name: 'NEXT WEEK' }).click();
+    await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).click();
     if (week === 1) {
+      await page.getByRole('button', { name: 'Products', exact: true }).click();
       await page.getByLabel('Production target (nova)', { exact: true }).fill('180');
       await page.getByRole('button', { name: 'Projects & review', exact: true }).click();
       await page.getByLabel('Destination', { exact: true }).selectOption('north');
@@ -67,7 +70,7 @@ try {
   await page.getByRole('button', { name: 'Export completed campaign', exact: true }).click();
   await (await completeDownload).saveAs('.browser-artifacts/completed-save.json');
   await page.getByRole('button', { name: 'Review map', exact: true }).click();
-  assert.equal(await page.getByRole('button', { name: 'NEXT WEEK' }).isDisabled(), true);
+  assert.equal(await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).isDisabled(), true);
   const original = await page.evaluate((k) => localStorage.getItem(k), key),
     state = JSON.parse(original);
   assert.equal(state.campaign.status, 'completed');
@@ -85,10 +88,12 @@ try {
   const replayDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: /^Export replay from week/ }).click();
   await (await replayDownload).saveAs('.browser-artifacts/completed-replay.json');
-  await page.getByLabel('Reports', { exact: true }).click();
+  await page.getByRole('button', { name: 'Báo cáo', exact: true }).click();
   await page.getByLabel('Report period', { exact: true }).selectOption('52');
   assert.match(await page.getByRole('dialog').innerText(), /52\/52 reported/);
   await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
+  await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   // Invalid imports preserve the exact current save; no confirmation is requested.
   await page
     .getByLabel('Import save or replay', { exact: true })
@@ -109,6 +114,8 @@ try {
   restore.on('pageerror', (e) => errors.push(e.message));
   await restore.goto(url);
   await restore.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.camera);
+  await restore.getByRole('button', { name: 'Cài đặt', exact: true }).click();
+  await restore.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   restore.once('dialog', (d) => d.accept());
   await restore
     .getByLabel('Import save or replay', { exact: true })
@@ -125,6 +132,8 @@ try {
   replayPage.on('pageerror', (e) => errors.push(e.message));
   await replayPage.goto(url);
   await replayPage.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.camera);
+  await replayPage.getByRole('button', { name: 'Cài đặt', exact: true }).click();
+  await replayPage.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   replayPage.once('dialog', (d) => d.accept());
   await replayPage
     .getByLabel('Import save or replay', { exact: true })
