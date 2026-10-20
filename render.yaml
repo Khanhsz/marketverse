@@ -1,0 +1,18 @@
+# MarketVerse — static Vite frontend hosted on Render
+# Requires GitHub authorization for this private repository.
+services:
+  - type: web
+    name: marketverse
+    runtime: static
+    repo: https://github.com/Khanhsz/marketverse
+    branch: main
+    buildCommand: npm install --no-audit --no-fund && npm run build
+    staticPublishPath: ./dist
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
