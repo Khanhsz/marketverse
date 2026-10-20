@@ -14,6 +14,8 @@ try {
   );
   assert.equal(await page.locator('.commandVisual').count(), 1);
   assert.equal(await page.locator('.commandRail .departmentNavButton').count(), 9);
+  assert.equal(await page.locator('.metrics').innerText().then((text) => /8/.test(text)), true);
+  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).cities.length), 8);
   assert.equal(await page.locator('.panel h1').first().innerText(), 'Vận hành');
   assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), 'Operations');
   assert.match(await page.locator('.commandStockCard').innerText(), /400 SP/);
@@ -31,9 +33,9 @@ try {
   };
   // First click a compact rival-city chip, then the newly compact center chip.
   await clickWorld(0.35 * 1920 + 70, 0.275 * 1280 - 65);
-  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:atlas-store');
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:premium-factory');
   await clickWorld(0.565 * 1920 + 100, 0.475 * 1280 - 65);
-  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:store');
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:player-factory');
   const targetX = 0.565 * 1920 + 100;
   const targetY = 0.475 * 1280 - 92;
   await page.mouse.click(
