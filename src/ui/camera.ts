@@ -3,7 +3,6 @@ export type Viewport = { width: number; height: number };
 export const WORLD = { width: 1920, height: 1280 };
 export const MIN_SCALE = 0.15;
 export const MAX_SCALE = 2;
-export const MAP_UNITS = 2;
 const clampScale = (scale: number) => Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale));
 export function fitCamera(view: Viewport): Camera {
   return {

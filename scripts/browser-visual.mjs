@@ -101,17 +101,14 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.screenshot({ path: '.browser-artifacts/visual-command-1024.png' });
   await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
-  assert.match(
-    await page.locator('.commandPanelContent').innerText(),
-    /Chuyển sang giao diện chi tiết/,
-  );
-  await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).click();
-  await page.waitForURL(/view=classic/);
-  assert.equal(await page.locator('.commandVisual').count(), 0);
-  assert.equal(await page.locator('.panel h1').innerText(), 'Central City');
+  assert.equal(await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).count(), 0);
+  await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
+  assert.equal(await page.locator('.detailPanelContent').isVisible(), true);
+  assert.equal(await page.locator('.commandVisual').count(), 1);
+  assert.equal(await page.evaluate(() => location.search), '');
   assert.deepEqual(errors, []);
   console.log(
-    'PASS: visual operations panel, Pixi facility cards, 9 department views, deep-linked weekly planner, save/reload, laptop breakpoints and accessible classic fallback',
+    'PASS: visual operations panel, Pixi facility cards, 9 department views, deep-linked weekly planner, save/reload, laptop breakpoints and unified intelligence details',
   );
 } finally {
   await browser.close();

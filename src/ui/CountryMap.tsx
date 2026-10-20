@@ -23,7 +23,6 @@ type Props = {
   factories: Factory[];
   playerId: string;
   activeLayer: Layer;
-  layout?: 'artwork' | 'legacy';
   onSelect: (selection: Selection) => void;
 };
 const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] as const;
@@ -205,7 +204,6 @@ export function CountryMap(props: Props) {
           for (const child of overlays.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
-          const layout = current.current.layout ?? 'artwork';
           // Illustrated cartography is loaded from a clean PNG artwork.
           // All dynamic game entities and routes are rendered separately above it.
           // Keep the decoded artwork mounted while only the data overlays are rebuilt.
@@ -214,8 +212,8 @@ export function CountryMap(props: Props) {
             for (const id of city.links) {
               const other = cities.find((c) => c.id === id);
               if (!other || city.id >= id) continue;
-              const from = cityWorldPoint(city, layout);
-              const to = cityWorldPoint(other, layout);
+              const from = cityWorldPoint(city);
+              const to = cityWorldPoint(other);
               roads.moveTo(from.x, from.y).lineTo(to.x, to.y);
               if (active === 'Logistics')
                 label('TRANSPORT LINK', (from.x + to.x) / 2 + 20, (from.y + to.y) / 2, 16);
@@ -228,14 +226,14 @@ export function CountryMap(props: Props) {
           } else roads.destroy();
           // Draw selected card last so its details remain on top of compact chips.
           const drawCities =
-            active === 'Operations' && layout === 'artwork'
+            active === 'Operations'
               ? [...cities].sort(
                   (a, b) => Number(a.id === selectedCityId) - Number(b.id === selectedCityId),
                 )
               : cities;
           for (const city of drawCities) {
-            const { x, y } = cityWorldPoint(city, layout);
-            const { x: labelX, y: labelY } = cityLabelPoint(city, layout);
+            const { x, y } = cityWorldPoint(city);
+            const { x: labelX, y: labelY } = cityLabelPoint(city);
             selectedLabel = city.id === selectedCityId;
             const selected = city.id === selectedCityId,
               metric = current.current.metrics.find((m) => m.cityId === city.id);
@@ -301,14 +299,13 @@ export function CountryMap(props: Props) {
               overlays.addChild(presence);
             }
             if (active === 'Operations') {
-              const count = facilities.filter((f) => f.cityId === city.id).length;
-              const radius = layout === 'artwork' ? 22 : 28;
+              const radius = 22;
               overlays.addChild(
                 new Graphics()
                   .roundRect(x - radius, y - radius, radius * 2, radius * 2, 8)
                   .fill({
                     color: layerColors.Operations,
-                    alpha: layout === 'artwork' ? 0.15 : Math.min(0.65, 0.13 + count * 0.09),
+                    alpha: 0.15,
                   })
                   .stroke({ color: layerColors.Operations, alpha: 0.6, width: 2 }),
               );
@@ -435,16 +432,15 @@ export function CountryMap(props: Props) {
                     } as const
                   )[mainAsset.kind]
                 : 'Chưa có cơ sở';
-              const expanded = layout === 'legacy' || selected;
+              const expanded = selected;
               const {
                 x: cardX,
                 y: cardY,
                 width: cardWidth,
                 height: cardHeight,
-              } = cityCardBounds(city, layout, expanded);
+              } = cityCardBounds(city, expanded);
               const isEmpty = !mainAsset;
-              const isVisual = layout === 'artwork';
-              if (isVisual) {
+                            {
                 // Short location tether keeps the chip associated with its city,
                 // even when the chip is deliberately nudged off the road/shore.
                 const connectorX = Math.max(cardX + 15, Math.min(x, cardX + cardWidth - 15));
@@ -470,7 +466,7 @@ export function CountryMap(props: Props) {
                   }),
               );
               const tint = isOwned ? 0xa5dfbd : isEmpty ? 0xb1c5b9 : 0xe6be8b;
-              if (!expanded && isVisual) {
+              if (!expanded) {
                 overlays.addChild(new Graphics().circle(cardX + 14, cardY + 16, 4.5).fill(tint));
                 overlays.addChild(
                   new Text({
@@ -603,8 +599,7 @@ export function CountryMap(props: Props) {
             if (layerRef.current === 'Operations') {
               for (const c of current.current.cities) {
                 const card = cityCardBounds(
-                  c,
-                  current.current.layout ?? 'artwork',
+                  c
                   c.id === current.current.selectedCityId,
                 );
                 if (
@@ -633,8 +628,8 @@ export function CountryMap(props: Props) {
             const city = current.current.cities.find(
               (c) =>
                 Math.hypot(
-                  cityWorldPoint(c, current.current.layout ?? 'artwork').x - w.x,
-                  cityWorldPoint(c, current.current.layout ?? 'artwork').y - w.y,
+                  cityWorldPoint(c).x - w.x,
+                  cityWorldPoint(c).y - w.y,
                 ) <= Math.max(20, 12 / camera.scale),
             );
             // Assets take priority over the wider city hit area. Positions match the rendered slots.
@@ -648,9 +643,9 @@ export function CountryMap(props: Props) {
               const facility = assets.find(
                 (_, i) =>
                   Math.abs(
-                    w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 32),
+                    w.x - (cityWorldPoint(c).x - 28 + i * 32),
                   ) <= 12 &&
-                  Math.abs(w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 52)) <=
+                  Math.abs(w.y - (cityWorldPoint(c).y + 52)) <=
                     12,
               );
               if (facility) {
@@ -662,8 +657,8 @@ export function CountryMap(props: Props) {
                   (_, i) =>
                     Math.hypot(
                       w.x -
-                        (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 40),
-                      w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 96),
+                        (cityWorldPoint(c).x - 28 + i * 40),
+                      w.y - (cityWorldPoint(c).y + 96),
                     ) <= 16,
                 );
                 if (owner) {
@@ -729,8 +724,7 @@ export function CountryMap(props: Props) {
                   ...camera,
                   ...cityWorldPoint(
                     current.current.cities.find((c) => c.id === current.current.selectedCityId) ||
-                      current.current.cities[0],
-                    current.current.layout ?? 'artwork',
+                      current.current.cities[0]
                   ),
                 }
               : action === 'reset'
@@ -810,7 +804,6 @@ export function CountryMap(props: Props) {
     props.products,
     props.factories,
     props.playerId,
-    props.layout,
     layer,
   ]);
   return (
