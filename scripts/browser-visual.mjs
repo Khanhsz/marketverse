@@ -51,6 +51,21 @@ try {
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
+  // Media and hiring are one compact planner view, with no invented team capacity.
+  await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).click();
+  await page.getByRole('button', { name: 'Marketing & staff', exact: true }).click();
+  assert.equal(await page.locator('.teamHireRow').count(), 3);
+  assert.equal(await page.getByRole('button', { name: 'Hire role' }).count(), 0);
+  assert.equal(await page.getByLabel('Media budget slider').getAttribute('min'), '0');
+  assert.equal(await page.getByLabel('Media budget slider').getAttribute('max'), '2500000');
+  await page.getByRole('button', { name: 'Increase Production hires' }).click();
+  assert.equal(await page.locator('.teamHireRow').first().locator('output').innerText(), '+1');
+  await page.getByRole('button', { name: 'Decrease Production hires' }).click();
+  assert.equal(await page.locator('.teamHireRow').first().locator('output').innerText(), '+0');
+  await page.getByLabel('Weekly media budget', { exact: true }).fill('500');
+  assert.equal(await page.getByLabel('Media budget slider').inputValue(), '500');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
   // The country map is the sole map view; no V7 preview or switch remains.
   assert.equal(await page.locator('[data-view="city-v7"]').count(), 0);
   assert.equal(await page.getByRole('button', { name: 'Central City · V7' }).count(), 0);

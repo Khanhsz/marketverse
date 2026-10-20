@@ -39,8 +39,7 @@ try {
       await page.getByRole('button', { name: 'Add construction', exact: true }).click();
       await page.getByRole('button', { name: 'Add research', exact: true }).click();
       await page.getByRole('button', { name: 'Marketing & staff', exact: true }).click();
-      await page.getByLabel('Hire count', { exact: true }).fill('1');
-      await page.getByRole('button', { name: 'Add hiring', exact: true }).click();
+      await page.getByRole('button', { name: 'Increase Production hires', exact: true }).click();
       await page.getByLabel('Weekly media budget', { exact: true }).fill('500');
     }
     if (week === 5) {
