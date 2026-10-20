@@ -778,3 +778,20 @@ canvas:focus-visible {
 .atlasScale-Logistics{background:linear-gradient(90deg,#dfecef,#3c8391)}
 .atlasScale-Economy{background:linear-gradient(90deg,#eee9d9,#98834d)}
 @media(max-width:849px){.atlasLegend{left:10px;bottom:117px;width:205px;padding:7px 9px}.atlasLegendContent small{font-size:9px}.atlasLegend>button{font-size:10px}.mapQuickCard{z-index:6}}
+
+
+/* V6 illustrated atlas: overlay controls stay legible on the colorful artwork. */
+.mapArea{background:#8ebed0}
+.mapLayers{background:#ffffffed;box-shadow:0 8px 24px #234e5b24;border:1px solid #d5e5e5}
+.mapLayers button[aria-pressed=true]{background:#284d56;color:#fff}
+.atlasLegend{background:#fffffff2;border-color:#d6e2e1;color:#284650;backdrop-filter:blur(10px)}
+.cityPicker{background:#fffffff0;backdrop-filter:blur(8px)}
+.mapZoomBadge{background:#fffffff0;color:#284650}
+.mapControls{background:#fffffff0;backdrop-filter:blur(8px)}
+@media(max-width:849px){
+ .mapArea{background:#8ebed0}
+ .mapLayers.mobileLayersOpen{background:#fffffff7}
+ .mapFoot{display:none}
+ .mapLegend{max-width:calc(100% - 20px);font-size:10px}
+ .atlasLegend{bottom:106px;max-width:190px}
+}
