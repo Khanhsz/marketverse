@@ -23,7 +23,7 @@
     16
   ],
   "status": "alpha_candidate",
-  "nextAction": "Human gameplay review of Alpha 0.1.0-alpha.1 using docs/ALPHA_REVIEW.md and known issues. Observe remote CI and review the branch before any merge/public release; do not automatically add further features.",
+  "nextAction": "Finish the authorized P0 map-stability repair and deployed verification. Then proceed to P1 first-twelve-weeks onboarding from docs/PRODUCT_REVIEW_PLAN.md. Human playtesting and public-release acceptance remain separate.",
   "evidence": {
     "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
     "lastPassedCITests": 10,
@@ -46,18 +46,37 @@
     "scheduledWorkTask": "unconfigured",
     "requiresOpenAIApiKey": false,
     "autoAdvancePolicy": "advance_on_quality_gate",
-    "schedulingBlocker": "No Work/Codex scheduling tool is exposed in this authorized session.",
+    "schedulingBlocker": "No unattended Work/Codex coding runner is configured. A scheduled notification is not a coding agent.",
     "workingBranch": "codex/marketverse-sprint-continuation"
   },
   "deployment": {
     "provider": "render",
     "type": "static_site",
-    "status": "configuration_prepared_not_deployed",
+    "status": "repair_pending_deploy",
+    "serviceId": "srv-dbbfrqbbc2fs73b2cocg",
+    "workspaceName": "Khánh's workspace",
+    "url": "https://marketverse-alpha.onrender.com",
     "blueprint": "render.yaml",
     "branch": "codex/marketverse-sprint-continuation",
-    "autoDeploy": false,
-    "localValidation": "npm run verify: 53 tests and build passed; npm run test:browser passed",
-    "blocker": "No Render connector or authenticated Render session is available. Owner must connect the private GitHub repository and create the Static Site. No live URL exists yet."
+    "autoDeploy": true,
+    "lastObservedLiveCommit": "993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d",
+    "localValidation": "56 behavioral tests, artwork integrity, formatting, TypeScript/build, browser regression, production map, 104-week production campaign and exact Node/Chromium replay passed.",
+    "blocker": "The existing live commit contains the two-byte invalid PNG. Fixed source must be deployed and verified."
   },
-  "updatedOn": "2026-10-20"
+  "updatedOn": "2026-10-20",
+  "productReview": {
+    "plan": "docs/PRODUCT_REVIEW_PLAN.md",
+    "activeStep": "P0 map stability",
+    "status": "local_validation_passed_pending_deploy",
+    "nextStep": "P1 first twelve weeks",
+    "evidence": "docs/validation/P0_MAP_STABILITY.md",
+    "localEvidence": {
+      "node": "v24.19.0",
+      "chromium": "153.0.8010.0",
+      "tests": 56,
+      "campaignWeeks": 104,
+      "canonicalStateSha256": "17ba2b19b3e4003899d707db013e11906cdb0344e001ff45e48eb3b0ebb9d059",
+      "baseCommit": "993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d"
+    }
+  }
 }

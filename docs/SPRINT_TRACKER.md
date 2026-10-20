@@ -21,7 +21,7 @@
 
 ## Integration principles
 
-Render playtest follow-up: `render.yaml` and `docs/RENDER.md` prepare a manually deployed Static Site from the Alpha branch. Local `npm run verify` (53 tests/build), browser smoke and state validation pass. No Render service has been created; account connection/site creation remains an owner action. All 16 sprint acceptances remain unchanged.
+The existing Alpha review site is https://marketverse-alpha.onrender.com and automatically deploys the Alpha branch. Historical Sprint 16 evidence remains tied to its recorded source. The product review follow-up is tracked separately in `PRODUCT_REVIEW_PLAN.md`; P0 map stability is being validated in `validation/P0_MAP_STABILITY.md`.
 
 - This project is not complete at Sprint 01; CI passing is necessary but not sufficient.
 - Every Sprint brief and acceptance checklist is under `docs/sprints/`.

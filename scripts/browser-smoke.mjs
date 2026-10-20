@@ -15,6 +15,18 @@ try {
   };
   const camera = async () =>
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
+  const dismissMapActions = async () => {
+    const close = page.getByRole('button', { name: 'Dismiss map actions', exact: true });
+    if (await close.isVisible()) await close.click();
+  };
+  const focusBusiness = async (cityId) => {
+    await page.getByLabel('Select city', { exact: true }).selectOption(cityId);
+    await dismissMapActions();
+    await page.getByRole('button', { name: 'Reset view', exact: true }).click();
+    await page.getByRole('button', { name: 'Center selection', exact: true }).click();
+    for (let zoom = 0; zoom < 5; zoom++)
+      await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+  };
   const screen = async (x, y) => {
     const box = await page.locator('canvas').boundingBox(),
       c = await camera();
@@ -30,6 +42,7 @@ try {
     await page.waitForFunction((n) => document.querySelector('h1').textContent === n, name);
     assert.deepEqual(await camera(), before, 'selection preserves camera');
     await ready();
+    await dismissMapActions();
   };
   await ready();
   const canvas = await page.locator('canvas').elementHandle();
@@ -120,6 +133,7 @@ try {
   assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'company:player');
   await page.getByRole('button', { name: 'Map', exact: true }).click();
   await page.getByRole('button', { name: 'Competition', exact: true }).click();
+  await focusBusiness('north');
   const p = await screen(390 - 14, 160 + 48); // company diamond: world offset (-28,+96)
   await page.mouse.click(p.x, p.y);
   assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'company:premium');
@@ -152,6 +166,11 @@ try {
     'Test warehouse',
     'Test rd',
   ].entries()) {
+    if (i === 0) {
+      await page.getByRole('button', { name: 'Operations', exact: true }).click();
+      await focusBusiness('central');
+    }
+    await dismissMapActions();
     const c = await camera(),
       b = await page.locator('canvas').boundingBox();
     await page.mouse.click(
@@ -186,11 +205,14 @@ try {
   await page.getByRole('button', { name: 'NEXT WEEK' }).click();
   await page.getByLabel('Price (nova)', { exact: true }).fill('270');
   await page.getByLabel('Production target (nova)', { exact: true }).fill('80');
+  await page.getByRole('button', { name: 'Projects & review', exact: true }).click();
   await page.getByLabel('Destination', { exact: true }).selectOption('north');
   await page.getByRole('button', { name: 'Add construction', exact: true }).click();
   await page.getByRole('button', { name: 'Add research', exact: true }).click();
+  await page.getByRole('button', { name: 'Marketing & staff', exact: true }).click();
   await page.getByLabel('Weekly media budget', { exact: true }).fill('1000');
   await page.getByRole('button', { name: 'Add hiring', exact: true }).click();
+  await page.getByRole('button', { name: 'Projects & review', exact: true }).click();
   assert.match(await page.getByRole('dialog').innerText(), /72,000/);
   await page.getByRole('button', { name: 'Commit week', exact: true }).click();
   await page.waitForFunction(
@@ -243,7 +265,7 @@ try {
   await page.getByRole('button', { name: 'Company', exact: true }).click();
   assert.match(await page.locator('.panel').innerText(), /R2/);
   assert.match(await page.locator('.panel').innerText(), /Performance/);
-  await page.getByRole('button', { name: 'Reports', exact: true }).click();
+  await page.getByLabel('Reports', { exact: true }).click();
   assert.match(await page.getByRole('dialog').innerText(), /Recognized profit components/);
   assert.equal(
     await page.getByRole('img', { name: 'Profit over the last thirteen completed weeks' }).count(),

@@ -1,45 +1,22 @@
 {
-  "version": "6.1",
+  "version": "6.2",
   "style": "minimalist-transport-atlas",
   "world": {
     "width": 1920,
     "height": 1280
   },
   "original": {
-    "file": "/marketverse-v6-map.png",
+    "file": "/marketverse-v6-map-clean.png",
     "width": 1536,
     "height": 1024,
-    "status": "awaiting-clean-layered-artwork"
+    "sizeBytes": 2262971,
+    "sha256": "14d4428c1744fefe322b7c760faa9a38e5bc4ab75da1dfb8a5a5e6d6c5e7f71a",
+    "status": "verified-clean-artwork"
   },
-  "fallback": "/atlas-country.svg",
   "layers": [
     {
-      "id": "terrain",
-      "file": "/maps/v6/layers/terrain.webp",
-      "kind": "raster",
-      "interactive": false
-    },
-    {
-      "id": "geography",
-      "file": "/maps/v6/layers/geography.webp",
-      "kind": "raster",
-      "interactive": false
-    },
-    {
-      "id": "roads",
-      "file": "/maps/v6/layers/roads.webp",
-      "kind": "raster",
-      "interactive": false
-    },
-    {
-      "id": "urban",
-      "file": "/maps/v6/layers/urban.webp",
-      "kind": "raster",
-      "interactive": false
-    },
-    {
-      "id": "landmarks",
-      "file": "/maps/v6/layers/landmarks.webp",
+      "id": "country-artwork",
+      "file": "/marketverse-v6-map-clean.png",
       "kind": "raster",
       "interactive": false
     }
@@ -57,5 +34,5 @@
     "selectionSource": "simulation-state",
     "anchors": "resolve-from-engine-city-coordinates"
   },
-  "notes": "Raster layers must be clean alpha-transparent exports. Do not include UI, company markers or game labels in artwork."
+  "notes": "Approved UI-free country PNG. Dynamic labels, cities, facilities, thematic data and logistics routes render separately in world coordinates above the persistent artwork."
 }

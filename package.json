@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run check:map && tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "verify": "npm run format:check && npm run test && npm run build",
@@ -17,9 +17,11 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"scripts/*.mjs\" \"tests/*.mjs\"",
     "preview": "vite preview --host 0.0.0.0",
     "test:campaign:prod": "BROWSER_PRODUCTION=1 BROWSER_SUITE=./browser-campaign.mjs node scripts/run-browser-smoke.mjs",
-    "verify:alpha": "npm run verify && npm run test:browser && npm run test:campaign:prod && npm run test:replay:cross && npm run test:profile && BALANCE_OUTPUT=docs/validation/BALANCE_16.json npm run test:balance && node scripts/check-sprint-state.mjs",
+    "verify:alpha": "npm run verify && npm run test:browser && npm run test:map:prod && npm run test:campaign:prod && npm run test:replay:cross && npm run test:profile && BALANCE_OUTPUT=docs/validation/BALANCE_16.json npm run test:balance && node scripts/check-sprint-state.mjs",
     "package:alpha": "node scripts/package-alpha.mjs",
-    "test:replay:cross": "node --experimental-strip-types scripts/check-browser-replay.mjs"
+    "test:replay:cross": "node --experimental-strip-types scripts/check-browser-replay.mjs",
+    "check:map": "node scripts/check-map-assets.mjs",
+    "test:map:prod": "BROWSER_PRODUCTION=1 BROWSER_SUITE=./browser-map.mjs node scripts/run-browser-smoke.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.9.0",

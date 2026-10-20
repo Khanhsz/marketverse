@@ -2,7 +2,7 @@
 
 A map-first, weekly business strategy simulator for laptops and desktops. Build a consumer electronics/appliances company across a fictional country, compete against four budget-bound rivals, and complete a 104-week campaign.
 
-**All 16 roadmap sprints are accepted at Alpha candidate `0.1.0-alpha.1`.** Accepted sprint evidence and the live checkpoint are in [the tracker](docs/SPRINT_TRACKER.md), [state](docs/AUTOPILOT_STATE.json) and [validation records](docs/validation/). No public deployment or unattended coding schedule is configured.
+**All 16 roadmap sprints have historical acceptance evidence at Alpha candidate `0.1.0-alpha.1`.** Later map changes require their own validation. Follow [the product review plan](docs/PRODUCT_REVIEW_PLAN.md), [tracker](docs/SPRINT_TRACKER.md), [state](docs/AUTOPILOT_STATE.json) and [validation records](docs/validation/) for the current checkpoint. Human gameplay review remains pending; no unattended coding schedule is configured.
 
 ## Play and develop
 
@@ -15,7 +15,7 @@ npm run dev
 
 Open **How to play** in the app. **Start national campaign** prepares eight distinct connected cities, four AI archetypes, factories and staff. The original three-city foundation sandbox remains available through Reset.
 
-- Pan/zoom the vector map and inspect Market, Competition, Operations, Logistics and Economy layers.
+- Pan/zoom the illustrated country map and inspect Market, Competition, Operations, Logistics and Economy overlays.
 - Review persistent prices, production and media budgets before committing each business week.
 - Hire staff; build stores, warehouses, factories and labs; research versioned products and ship physical stock.
 - Follow realized sales, cost-basis inventory, double-entry finances, loans and cash flow.
@@ -27,6 +27,8 @@ Open **How to play** in the app. **Start national campaign** prepares eight dist
 | Command | What it checks |
 |---|---|
 | `npm run verify` | Formatting, deterministic behavioral tests, TypeScript and production build |
+| `npm run check:map` | Actual PNG structure, pixels, dimensions and approved artwork checksum; also runs before every build |
+| `npm run test:map:prod` | Production map redraw/zoom/selection, save/reload and corrupt-image retry regression |
 | `npm run test:browser` | Camera/layers, entity context, save recovery, orders, R&D/HR/marketing, reports and keyboard workflows |
 | `npm run test:campaign:prod` | Full 104-week UI campaign against the current production build, save import/export and worker replay |
 | `npm run test:replay:cross` | Exact canonical state equality between the preceding production Chromium run and Node |
@@ -39,7 +41,7 @@ Browser runners own and stop their temporary servers. Install the managed browse
 
 Use `npm run preview` to inspect the production build. No publishing or deployment is performed by these commands.
 
-To host a playable Alpha on Render, use the checked-in [Static Site Blueprint and deployment instructions](docs/RENDER.md). No backend or API key is needed. The Blueprint is prepared; no live site has been created by this repository configuration.
+The Alpha review build is hosted at [marketverse-alpha.onrender.com](https://marketverse-alpha.onrender.com), from `codex/marketverse-sprint-continuation`. The existing Render Static Site automatically builds branch updates. No backend or API key is needed. See [deployment instructions](docs/RENDER.md); a successful deployment must still pass the browser journey.
 
 ## Canonical project records
 

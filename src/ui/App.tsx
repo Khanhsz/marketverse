@@ -267,23 +267,75 @@ export function App() {
               onSelect={choose}
             />
           </Suspense>
-          {quickActionsOpen && <section className="mapQuickCard" aria-label="Map quick actions">
-            <button className="quickClose" aria-label="Dismiss map actions" onClick={() => setQuickActionsOpen(false)}>×</button>
-            <small>{context.kind.toUpperCase()} · SELECTED</small>
-            <h2>{context.entity.name}</h2>
-            <p>{city.name} · {number(city.population)} residents · {game.facilities.filter(f => f.cityId === city.id).length} facilities</p>
-            <div className="quickActions">
-              <button onClick={() => { setPanelOpen(true); setQuickActionsOpen(false); }}>Inspect</button>
-              <button onClick={() => { setPlannerOpen(true); setQuickActionsOpen(false); }}>Plan actions</button>
-              <button onClick={() => { setReportsOpen(true); setQuickActionsOpen(false); }}>Reports</button>
-            </div>
-          </section>}
-          {weeklyChangesOpen && game.reports.length > 0 && <section className="weeklyChanges" aria-label="Latest weekly events">
-            <button className="quickClose" aria-label="Dismiss weekly events" onClick={() => setWeeklyChangesOpen(false)}>×</button>
-            <strong>Week {game.absoluteWeek} · Economy update</strong>
-            {game.reports.at(-1)!.events.slice(0,3).map((event,i) => <p key={i}>{event}</p>)}
-            <button onClick={() => {setReportsOpen(true);setWeeklyChangesOpen(false);}}>Full report →</button>
-          </section>}
+          {quickActionsOpen && (
+            <section className="mapQuickCard" aria-label="Map quick actions">
+              <button
+                className="quickClose"
+                aria-label="Dismiss map actions"
+                onClick={() => setQuickActionsOpen(false)}
+              >
+                ×
+              </button>
+              <small>{context.kind.toUpperCase()} · SELECTED</small>
+              <h2>{context.entity.name}</h2>
+              <p>
+                {city.name} · {number(city.population)} residents ·{' '}
+                {game.facilities.filter((f) => f.cityId === city.id).length} facilities
+              </p>
+              <div className="quickActions">
+                <button
+                  onClick={() => {
+                    setPanelOpen(true);
+                    setQuickActionsOpen(false);
+                  }}
+                >
+                  Inspect
+                </button>
+                <button
+                  onClick={() => {
+                    setPlannerOpen(true);
+                    setQuickActionsOpen(false);
+                  }}
+                >
+                  Plan actions
+                </button>
+                <button
+                  onClick={() => {
+                    setReportsOpen(true);
+                    setQuickActionsOpen(false);
+                  }}
+                >
+                  Reports
+                </button>
+              </div>
+            </section>
+          )}
+          {weeklyChangesOpen && game.reports.length > 0 && (
+            <section className="weeklyChanges" aria-label="Latest weekly events">
+              <button
+                className="quickClose"
+                aria-label="Dismiss weekly events"
+                onClick={() => setWeeklyChangesOpen(false)}
+              >
+                ×
+              </button>
+              <strong>Week {game.absoluteWeek} · Economy update</strong>
+              {game.reports
+                .at(-1)!
+                .events.slice(0, 3)
+                .map((event, i) => (
+                  <p key={i}>{event}</p>
+                ))}
+              <button
+                onClick={() => {
+                  setReportsOpen(true);
+                  setWeeklyChangesOpen(false);
+                }}
+              >
+                Full report →
+              </button>
+            </section>
+          )}
           <div className="mapFoot">
             {game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST
           </div>
@@ -296,7 +348,13 @@ export function App() {
           aria-label="Selection details"
           data-selection={`${context.kind}:${context.entity.id}`}
         >
-          <button className="mobilePanelClose" aria-label="Close details" onClick={() => setPanelOpen(false)}>×</button>
+          <button
+            className="mobilePanelClose"
+            aria-label="Close details"
+            onClick={() => setPanelOpen(false)}
+          >
+            ×
+          </button>
           <small>{context.kind.toUpperCase()} INTELLIGENCE</small>
           <h1>{context.entity.name}</h1>
           {context.kind === 'city' && (
@@ -608,12 +666,32 @@ export function App() {
           <span>Use Reset only when you are ready to discard the saved game.</span>
         </div>
       )}
-      <button className="mobilePlanFab" onClick={() => setPlannerOpen(true)} disabled={!!recovery || game.campaign.status !== 'active'} aria-label="Open weekly planner">Plan week →</button>
+      <button
+        className="mobilePlanFab"
+        onClick={() => setPlannerOpen(true)}
+        disabled={!!recovery || game.campaign.status !== 'active'}
+        aria-label="Open weekly planner"
+      >
+        Plan week →
+      </button>
       <nav className="mobileNav" aria-label="Mobile game navigation">
-        <button onClick={() => { setSelection({kind:'city',id:city.id}); setPanelOpen(false); }}>⌖ <span>Map</span></button>
-        <button onClick={() => choose({kind:'company',id:player.id})}>▦ <span>Company</span></button>
-        <button onClick={() => setReportsOpen(true)}>≋ <span>Reports</span></button>
-        <button onClick={() => setPanelOpen(v => !v)}>☷ <span>Details</span></button>
+        <button
+          onClick={() => {
+            setSelection({ kind: 'city', id: city.id });
+            setPanelOpen(false);
+          }}
+        >
+          ⌖ <span>Map</span>
+        </button>
+        <button onClick={() => choose({ kind: 'company', id: player.id })}>
+          ▦ <span>Company</span>
+        </button>
+        <button onClick={() => setReportsOpen(true)}>
+          ≋ <span>Reports</span>
+        </button>
+        <button onClick={() => setPanelOpen((v) => !v)}>
+          ☷ <span>Details</span>
+        </button>
       </nav>
       <footer className="footer">
         <div>

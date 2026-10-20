@@ -1,5 +1,13 @@
 # MarketVerse Changelog
 
+## 2026-10-20 — P0 map stability follow-up
+- Restored the approved clean PNG, replacing the two-byte invalid upload; retained interactive gameplay overlays above a persistent artwork container.
+- Fixed business-zoom redraws, hidden facility hit targets and failed-image retry without losing the current save.
+- Added a real PNG/checksum gate to every build and a production map regression to CI/Alpha verification.
+- Updated existing browser journeys for planner tabs and zoom visibility; formatted pre-existing UI/map edits so the required formatting gate passes.
+- Local validation: 56 behavior tests and build, map production regression, general browser regression, 104-week production campaign and exact Node/Chromium replay pass. Existing simulation result is unchanged. See `docs/validation/P0_MAP_STABILITY.md` for deployed acceptance and remaining human review.
+- Updated the actual Render connection state and recorded the authorized step-by-step product backlog. No gameplay economy, industry, API key or hosting resource changes.
+
 ## Render playtest deployment preparation
 - Added `render.yaml` for a Node 22.23.3 production build published as a Render Static Site from the completed Alpha branch, with automatic deployments disabled.
 - Added `docs/RENDER.md` with private-repository connection, manual setup, playtest and browser-local save instructions. No Render service or public URL has been created; account connection and site creation require the owner's Render session.

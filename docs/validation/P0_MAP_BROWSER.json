@@ -1,0 +1,14 @@
+{
+  "production": true,
+  "target": "http://127.0.0.1:5174/",
+  "browser": "153.0.8010.0",
+  "artworkBytes": 2262971,
+  "layerSwitches": 15,
+  "cities": 8,
+  "weeksCommitted": 3,
+  "zoomRebuild": true,
+  "hiddenHitTargetsRejected": true,
+  "saveReloadExact": true,
+  "corruptArtworkRetry": true,
+  "uncaughtErrors": []
+}

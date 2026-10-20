@@ -31,14 +31,17 @@ try {
     await page.getByRole('button', { name: 'NEXT WEEK' }).click();
     if (week === 1) {
       await page.getByLabel('Production target (nova)', { exact: true }).fill('180');
+      await page.getByRole('button', { name: 'Projects & review', exact: true }).click();
       await page.getByLabel('Destination', { exact: true }).selectOption('north');
       await page.getByRole('button', { name: 'Add construction', exact: true }).click();
       await page.getByRole('button', { name: 'Add research', exact: true }).click();
+      await page.getByRole('button', { name: 'Marketing & staff', exact: true }).click();
       await page.getByLabel('Hire count', { exact: true }).fill('1');
       await page.getByRole('button', { name: 'Add hiring', exact: true }).click();
       await page.getByLabel('Weekly media budget', { exact: true }).fill('500');
     }
     if (week === 5) {
+      await page.getByRole('button', { name: 'Projects & review', exact: true }).click();
       await page.getByLabel('Destination', { exact: true }).selectOption('north');
       await page.getByLabel('Shipment origin', { exact: true }).selectOption('central');
       await page.getByLabel('Units', { exact: true }).fill('80');
@@ -82,7 +85,7 @@ try {
   const replayDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: /^Export replay from week/ }).click();
   await (await replayDownload).saveAs('.browser-artifacts/completed-replay.json');
-  await page.getByRole('button', { name: 'Reports', exact: true }).click();
+  await page.getByLabel('Reports', { exact: true }).click();
   await page.getByLabel('Report period', { exact: true }).selectOption('52');
   assert.match(await page.getByRole('dialog').innerText(), /52\/52 reported/);
   await page.keyboard.press('Escape');

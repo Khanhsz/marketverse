@@ -33,7 +33,7 @@
 - Prioritize laptop layout; do not replace the map with a dashboard.
 
 ## Quality gate
-For each sprint: typecheck/build PASS, relevant behavioral tests PASS, no serious regression, browser smoke on affected UI, docs updated, commit saved. `npm run verify` currently checks Node tests and Vite build. There are currently 53 behavioral tests, historical save fixtures, a repeatable `npm run test:browser` gate and `npm run verify:alpha` for production 104-week UI, exact cross-runtime replay, laptop profiles and multi-seed balance. Accepted evidence is in `docs/validation/`. Remote CI must be reported separately from local results.
+For each sprint: typecheck/build PASS, relevant behavioral tests PASS, no serious regression, browser smoke on affected UI, docs updated, commit saved. `npm run verify` checks formatting, 56 behavioral tests, artwork integrity, TypeScript and Vite build. Run `npm run test:map:prod` for map/artwork changes and `npm run test:browser` for UI regression. Historical save fixtures and `npm run verify:alpha` additionally cover production 104-week UI, exact cross-runtime replay, laptop profiles and multi-seed balance. Accepted evidence is in `docs/validation/`. Remote CI must be reported separately from local results; never reuse historical acceptance as validation for later source changes.
 
 ## Autonomy, permissions and cost
 - User preference: ChatGPT Work / Codex through ChatGPT subscription; **NO OpenAI API key or separate API charge**.

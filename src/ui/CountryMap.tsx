@@ -27,8 +27,16 @@ const legends: Record<Layer, string> = {
   Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
-const layerColors: Record<Layer, number> = Object.fromEntries(Object.entries(MAP_MODES).map(([name,mode])=>[name,mode.color])) as Record<Layer,number>;
-const layerNames: Record<Layer, string> = { Market:'Demand intensity', Competition:'Company presence / market share', Operations:'Operating facilities', Logistics:'Incoming cargo & routes', Economy:'Purchasing power' };
+const layerColors: Record<Layer, number> = Object.fromEntries(
+  Object.entries(MAP_MODES).map(([name, mode]) => [name, mode.color]),
+) as Record<Layer, number>;
+const layerNames: Record<Layer, string> = {
+  Market: 'Demand intensity',
+  Competition: 'Company presence / market share',
+  Operations: 'Operating facilities',
+  Logistics: 'Incoming cargo & routes',
+  Economy: 'Purchasing power',
+};
 const ownerColor = (id: string) =>
   id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
 
@@ -44,13 +52,27 @@ export function CountryMap(props: Props) {
   const draw = useRef<() => void>(() => {});
   const controls = useRef<(action: 'in' | 'out' | 'reset' | 'focus') => void>(() => {});
   const [failure, setFailure] = useState('');
+  const [attempt, setAttempt] = useState(0);
   const [selectedLegend, setSelectedLegend] = useState(true);
 
   useEffect(() => {
     const element = mount.current;
     if (!element) return;
+    setFailure('');
+    delete element.dataset.camera;
+    delete element.dataset.artwork;
     let disposed = false;
     let initialized = false;
+    let destroyed = false;
+    let artwork: Container | undefined;
+    const destroyApplication = () => {
+      artwork?.destroy({ children: true, texture: true, textureSource: true });
+      artwork = undefined;
+      if (initialized && !destroyed) {
+        destroyed = true;
+        app.destroy(true, { children: true });
+      }
+    };
     let renderFrame = 0;
     let observer: ResizeObserver | undefined;
     let cleanup = () => {};
@@ -65,12 +87,17 @@ export function CountryMap(props: Props) {
       .then(async () => {
         initialized = true;
         if (disposed) {
-          app.destroy(true, { children: true });
+          destroyApplication();
           return;
         }
         app.stop(); // The map is static between interactions; render only when dirty.
         const artworkStack = await loadArtworkStack();
-        if (disposed) { app.destroy(true, { children: true }); return; }
+        artwork = artworkStack;
+        if (disposed) {
+          destroyApplication();
+          return;
+        }
+        element.dataset.artwork = 'ready';
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
         app.canvas.setAttribute('role', 'application');
@@ -78,16 +105,31 @@ export function CountryMap(props: Props) {
           'aria-label',
           'Country map: arrow keys pan, plus or minus zoom, Home fits view',
         );
-        const labels: { caption: Text; size: number; selected: boolean; id:string; anchorX:number; anchorY:number }[] = [];
+        const labels: {
+          caption: Text;
+          size: number;
+          selected: boolean;
+          id: string;
+          anchorX: number;
+          anchorY: number;
+        }[] = [];
         let selectedLabel = false;
         const world = new Container();
+        const overlays = new Container();
+        world.addChild(artworkStack, overlays);
         app.stage.addChild(world);
+        let renderedDetailBand = -1;
         let view: Viewport = { width: element.clientWidth, height: element.clientHeight };
         let camera: Camera = fitCamera(view);
         const applyCamera = () => {
           const relative = camera.scale / fitCamera(view).scale;
+          const detailBand = relative >= 3 ? 2 : relative >= 2.6 ? 1 : 0;
+          if (renderedDetailBand >= 0 && renderedDetailBand !== detailBand) {
+            draw.current();
+            return;
+          }
           const nextLevel = relative < 1.55 ? 'National' : relative < 3 ? 'Regional' : 'Business';
-          setZoomLevel(old => old === nextLevel ? old : nextLevel);
+          setZoomLevel((old) => (old === nextLevel ? old : nextLevel));
           world.scale.set(camera.scale);
           world.position.set(
             view.width / 2 - camera.x * camera.scale,
@@ -96,13 +138,25 @@ export function CountryMap(props: Props) {
           element.dataset.camera = JSON.stringify(camera);
           element.dataset.layer = layerRef.current;
           const detail = camera.scale / fitCamera(view).scale;
-          const candidates = labels.filter(item=>item.selected || item.size>=22 || detail>=2.6).map(item=>{
-            const targetScale=Math.max(1,(item.size>=22?12:10)/(item.size*camera.scale));
-            const width=item.caption.width*targetScale*camera.scale;
-            const height=item.caption.height*targetScale*camera.scale;
-            return {id:item.id,x:view.width/2+(item.anchorX-camera.x)*camera.scale,y:view.height/2+(item.anchorY-camera.y)*camera.scale,width,height,priority:(item.selected?100:0)+(item.size>=22?20:0)};
-          });
-          const visibleLabels=resolveLabels(candidates,view,6);
+          const candidates = labels
+            .filter((item) => item.selected || item.size >= 22 || detail >= 2.6)
+            .map((item) => {
+              const targetScale = Math.max(
+                1,
+                (item.size >= 22 ? 12 : 10) / (item.size * camera.scale),
+              );
+              const width = item.caption.width * targetScale * camera.scale;
+              const height = item.caption.height * targetScale * camera.scale;
+              return {
+                id: item.id,
+                x: view.width / 2 + (item.anchorX - camera.x) * camera.scale,
+                y: view.height / 2 + (item.anchorY - camera.y) * camera.scale,
+                width,
+                height,
+                priority: (item.selected ? 100 : 0) + (item.size >= 22 ? 20 : 0),
+              };
+            });
+          const visibleLabels = resolveLabels(candidates, view, 6);
           for (const item of labels) {
             item.caption.visible = visibleLabels.has(item.id);
             item.caption.scale.set(
@@ -121,18 +175,28 @@ export function CountryMap(props: Props) {
             style: { fill: color, fontSize: size, fontFamily: 'Arial', fontWeight: 'bold' },
           });
           caption.position.set(x, y);
-          world.addChild(caption);
-          labels.push({ caption, size, selected: selectedLabel, id:`label-${labels.length}`,anchorX:x,anchorY:y });
+          overlays.addChild(caption);
+          labels.push({
+            caption,
+            size,
+            selected: selectedLabel,
+            id: `label-${labels.length}`,
+            anchorX: x,
+            anchorY: y,
+          });
         };
         draw.current = () => {
           labels.length = 0;
           selectedLabel = false;
-          for (const child of world.removeChildren()) child.destroy();
+          const detail = camera.scale / fitCamera(view).scale;
+          renderedDetailBand = detail >= 3 ? 2 : detail >= 2.6 ? 1 : 0;
+          element.dataset.detailBand = String(renderedDetailBand);
+          for (const child of overlays.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
           // Illustrated cartography is loaded from a clean PNG artwork.
           // All dynamic game entities and routes are rendered separately above it.
-          world.addChild(artworkStack);
+          // Keep the decoded artwork mounted while only the data overlays are rebuilt.
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
@@ -152,8 +216,8 @@ export function CountryMap(props: Props) {
           // The illustrated map already contains its own permanent roads.
           // Show simulation connectivity only in the logistics layer.
           if (active === 'Logistics') {
-            roads.stroke({color:0x167f96,width:8,alpha:.82});
-            world.addChild(roads);
+            roads.stroke({ color: 0x167f96, width: 8, alpha: 0.82 });
+            overlays.addChild(roads);
           } else roads.destroy();
           for (const city of cities) {
             const x = city.x * MAP_UNITS,
@@ -161,47 +225,88 @@ export function CountryMap(props: Props) {
             selectedLabel = city.id === selectedCityId;
             const selected = city.id === selectedCityId,
               metric = current.current.metrics.find((m) => m.cityId === city.id);
-            if (active === 'Market' || active === 'Economy' || active === 'Competition' || active === 'Logistics') {
-              const measured = active === 'Market'
-                ? (metric?.potential ?? city.population / 100)
-                : active === 'Competition' ? (metric?.playerShare ?? 0)
-                : active === 'Logistics' ? (metric?.incoming ?? 0)
-                : city.power;
-              const intensity = active === 'Competition'
-                ? Math.max(0,Math.min(1,measured))
-                : active === 'Economy' ? Math.max(0,Math.min(1,measured/2))
-                : active === 'Logistics' ? Math.min(1,Math.log1p(measured)/8)
-                : Math.min(1,Math.log1p(measured)/13);
+            if (
+              active === 'Market' ||
+              active === 'Economy' ||
+              active === 'Competition' ||
+              active === 'Logistics'
+            ) {
+              const measured =
+                active === 'Market'
+                  ? (metric?.potential ?? city.population / 100)
+                  : active === 'Competition'
+                    ? (metric?.playerShare ?? 0)
+                    : active === 'Logistics'
+                      ? (metric?.incoming ?? 0)
+                      : city.power;
+              const intensity =
+                active === 'Competition'
+                  ? Math.max(0, Math.min(1, measured))
+                  : active === 'Economy'
+                    ? Math.max(0, Math.min(1, measured / 2))
+                    : active === 'Logistics'
+                      ? Math.min(1, Math.log1p(measured) / 8)
+                      : Math.min(1, Math.log1p(measured) / 13);
               const halo = new Graphics()
-                .circle(x,y,active === 'Market' ? 60+intensity*65 : active === 'Economy' ? 65+intensity*40 : 48+intensity*50)
-                .fill({ color:layerColors[active], alpha:0.10+intensity*.29 })
-                .stroke({color:layerColors[active],alpha:.18+intensity*.3,width:2});
-              world.addChild(halo);
+                .circle(
+                  x,
+                  y,
+                  active === 'Market'
+                    ? 60 + intensity * 65
+                    : active === 'Economy'
+                      ? 65 + intensity * 40
+                      : 48 + intensity * 50,
+                )
+                .fill({ color: layerColors[active], alpha: 0.1 + intensity * 0.29 })
+                .stroke({ color: layerColors[active], alpha: 0.18 + intensity * 0.3, width: 2 });
+              overlays.addChild(halo);
             }
             if (active === 'Competition' && metric?.playerShare != null) {
-              const share=Math.max(0,Math.min(1,metric.playerShare));
-              world.addChild(new Graphics().circle(x,y,31).stroke({color:0xcdd9d5,width:9}));
-              if(share>0) world.addChild(new Graphics().arc(x,y,31,-Math.PI/2,-Math.PI/2+share*Math.PI*2).stroke({color:layerColors.Competition,width:9}));
+              const share = Math.max(0, Math.min(1, metric.playerShare));
+              overlays.addChild(
+                new Graphics().circle(x, y, 31).stroke({ color: 0xcdd9d5, width: 9 }),
+              );
+              if (share > 0)
+                overlays.addChild(
+                  new Graphics()
+                    .arc(x, y, 31, -Math.PI / 2, -Math.PI / 2 + share * Math.PI * 2)
+                    .stroke({ color: layerColors.Competition, width: 9 }),
+                );
             }
             if (active === 'Competition' && metric?.playerShare == null) {
-              const owners=[...new Set(facilities.filter(f=>f.cityId===city.id).map(f=>f.companyId))];
+              const owners = [
+                ...new Set(facilities.filter((f) => f.cityId === city.id).map((f) => f.companyId)),
+              ];
               const presence = new Graphics();
-              owners.forEach((owner,i)=>{
-                presence.circle(x-18+i*17,y+36,7).fill(ownerColor(owner)).stroke({color:0xffffff,width:2});
+              owners.forEach((owner, i) => {
+                presence
+                  .circle(x - 18 + i * 17, y + 36, 7)
+                  .fill(ownerColor(owner))
+                  .stroke({ color: 0xffffff, width: 2 });
               });
-              world.addChild(presence);
+              overlays.addChild(presence);
             }
             if (active === 'Operations') {
-              const count=facilities.filter(f=>f.cityId===city.id).length;
-              world.addChild(new Graphics().roundRect(x-28,y-28,56,56,8)
-                .fill({color:layerColors.Operations,alpha:Math.min(.65,.13+count*.09)})
-                .stroke({color:layerColors.Operations,alpha:.6,width:2}));
+              const count = facilities.filter((f) => f.cityId === city.id).length;
+              overlays.addChild(
+                new Graphics()
+                  .roundRect(x - 28, y - 28, 56, 56, 8)
+                  .fill({
+                    color: layerColors.Operations,
+                    alpha: Math.min(0.65, 0.13 + count * 0.09),
+                  })
+                  .stroke({ color: layerColors.Operations, alpha: 0.6, width: 2 }),
+              );
             }
             if (selected) {
-              world.addChild(new Graphics().circle(x, y, 44).fill({ color: 0x24554b, alpha: 0.09 }));
-              world.addChild(new Graphics().circle(x, y, 36).stroke({ color: 0x24554b, width: 3 }));
+              overlays.addChild(
+                new Graphics().circle(x, y, 44).fill({ color: 0x24554b, alpha: 0.09 }),
+              );
+              overlays.addChild(
+                new Graphics().circle(x, y, 36).stroke({ color: 0x24554b, width: 3 }),
+              );
             }
-            world.addChild(
+            overlays.addChild(
               new Graphics()
                 .roundRect(x - 15, y - 15, 30, 30, 6)
                 .fill(selected ? 0x24554b : 0x6d8880),
@@ -228,30 +333,43 @@ export function CountryMap(props: Props) {
             if (active === 'Competition')
               label(
                 metric?.playerShare == null
-                  ? `${new Set(facilities.filter(f=>f.cityId===city.id).map(f=>f.companyId)).size} COMPANIES PRESENT`
+                  ? `${new Set(facilities.filter((f) => f.cityId === city.id).map((f) => f.companyId)).size} COMPANIES PRESENT`
                   : `PLAYER SHARE ${((metric.playerShare || 0) * 100).toFixed(1)}%`,
-                x + 40, y + 12, 16,
+                x + 40,
+                y + 12,
+                16,
               );
             const assets = facilities.filter((f) => f.cityId === city.id);
-            if (active === 'Operations' && assets.length > 0 && camera.scale / fitCamera(view).scale >= 2.6)
-              label(`${assets.length} FACILITIES`,x+40,y+12,16);
+            if (
+              active === 'Operations' &&
+              assets.length > 0 &&
+              camera.scale / fitCamera(view).scale >= 2.6
+            )
+              label(`${assets.length} FACILITIES`, x + 40, y + 12, 16);
             assets.forEach((f, index) => {
-              if(camera.scale / fitCamera(view).scale < 2.6 || (active !== 'Operations' && active !== 'Competition')) return;
+              if (
+                camera.scale / fitCamera(view).scale < 2.6 ||
+                (active !== 'Operations' && active !== 'Competition')
+              )
+                return;
               const fx = x - 28 + index * 32,
                 fy = y + 52;
               const selectedAsset =
                 (selection.kind === 'facility' && selection.id === f.id) ||
                 (selection.kind === 'company' && selection.id === f.companyId);
               if (selectedAsset)
-                world.addChild(
+                overlays.addChild(
                   new Graphics()
                     .rect(fx - 14, fy - 14, 28, 28)
                     .stroke({ color: 0x24554b, width: 3 }),
                 );
-              world.addChild(
+              overlays.addChild(
                 new Graphics().rect(fx - 9, fy - 9, 18, 18).fill(ownerColor(f.companyId)),
               );
-              if ((active === 'Operations' || active === 'Competition') && camera.scale / fitCamera(view).scale >= 3)
+              if (
+                (active === 'Operations' || active === 'Competition') &&
+                camera.scale / fitCamera(view).scale >= 3
+              )
                 label(
                   active === 'Operations'
                     ? `${f.name} · ${f.kind.toUpperCase()}`
@@ -266,7 +384,7 @@ export function CountryMap(props: Props) {
               [...new Set(assets.map((f) => f.companyId))].forEach((id, index) => {
                 const cx = x - 28 + index * 40,
                   cy = y + 96;
-                world.addChild(
+                overlays.addChild(
                   new Graphics()
                     .poly([cx, cy - 13, cx + 13, cy, cx, cy + 13, cx - 13, cy])
                     .fill(ownerColor(id)),
@@ -351,7 +469,11 @@ export function CountryMap(props: Props) {
             );
             // Assets take priority over the wider city hit area. Positions match the rendered slots.
             for (const c of current.current.cities) {
-              if (camera.scale / fitCamera(view).scale < 2.6) break;
+              if (
+                camera.scale / fitCamera(view).scale < 2.6 ||
+                (layerRef.current !== 'Operations' && layerRef.current !== 'Competition')
+              )
+                break;
               const assets = current.current.facilities.filter((f) => f.cityId === c.id);
               const facility = assets.find(
                 (_, i) =>
@@ -385,8 +507,11 @@ export function CountryMap(props: Props) {
           if (event.pointerType !== 'touch') return;
           touches.set(event.pointerId, point(event));
           if (touches.size === 2) {
-            const [a,b] = [...touches.values()];
-            touchPinch = { distance: Math.hypot(a.x-b.x,a.y-b.y), center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2} };
+            const [a, b] = [...touches.values()];
+            touchPinch = {
+              distance: Math.hypot(a.x - b.x, a.y - b.y),
+              center: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+            };
             gesture = undefined;
           }
         };
@@ -394,12 +519,17 @@ export function CountryMap(props: Props) {
           if (!touches.has(event.pointerId)) return;
           touches.set(event.pointerId, point(event));
           if (touches.size !== 2 || !touchPinch) return;
-          const [a,b] = [...touches.values()];
-          const center = {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
-          const distance = Math.hypot(a.x-b.x,a.y-b.y);
-          if (touchPinch.distance > 0) camera = zoomCamera(camera,view,center,distance/touchPinch.distance);
-          camera = panCamera(camera,center.x-touchPinch.center.x,center.y-touchPinch.center.y);
-          touchPinch = {distance,center};
+          const [a, b] = [...touches.values()];
+          const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+          const distance = Math.hypot(a.x - b.x, a.y - b.y);
+          if (touchPinch.distance > 0)
+            camera = zoomCamera(camera, view, center, distance / touchPinch.distance);
+          camera = panCamera(
+            camera,
+            center.x - touchPinch.center.x,
+            center.y - touchPinch.center.y,
+          );
+          touchPinch = { distance, center };
           applyCamera();
         };
         const touchEnd = (event: PointerEvent) => {
@@ -481,7 +611,8 @@ export function CountryMap(props: Props) {
         };
       })
       .catch((error) => {
-        if (!disposed) setFailure(String(error));
+        destroyApplication();
+        if (!disposed) setFailure(error instanceof Error ? error.message : String(error));
       });
     return () => {
       disposed = true;
@@ -490,9 +621,9 @@ export function CountryMap(props: Props) {
       cleanup();
       draw.current = () => {};
       controls.current = () => {};
-      if (initialized) app.destroy(true, { children: true });
+      destroyApplication();
     };
-  }, []);
+  }, [attempt]);
   useEffect(() => {
     draw.current();
   }, [
@@ -521,10 +652,27 @@ export function CountryMap(props: Props) {
           ))}
         </select>
       </label>
-      <button className="mobileLayerToggle" aria-expanded={layerMenuOpen} onClick={() => setLayerMenuOpen(v => !v)}>Layers · {layer} ▾</button>
-      <div className={`mapLayers ${layerMenuOpen ? 'mobileLayersOpen' : ''}`} role="group" aria-label="Map layers">
+      <button
+        className="mobileLayerToggle"
+        aria-expanded={layerMenuOpen}
+        onClick={() => setLayerMenuOpen((v) => !v)}
+      >
+        Layers · {layer} ▾
+      </button>
+      <div
+        className={`mapLayers ${layerMenuOpen ? 'mobileLayersOpen' : ''}`}
+        role="group"
+        aria-label="Map layers"
+      >
         {layers.map((name) => (
-          <button key={name} aria-pressed={layer === name} onClick={() => { setLayer(name); setLayerMenuOpen(false); }}>
+          <button
+            key={name}
+            aria-pressed={layer === name}
+            onClick={() => {
+              setLayer(name);
+              setLayerMenuOpen(false);
+            }}
+          >
             {name}
           </button>
         ))}
@@ -543,13 +691,35 @@ export function CountryMap(props: Props) {
           Center selection
         </button>
       </div>
-      <div className="mapZoomBadge" aria-live="polite">{zoomLevel} view</div>
+      <div className="mapZoomBadge" aria-live="polite">
+        {zoomLevel} view
+      </div>
       <div className="atlasLegend" aria-label={layerNames[layer]}>
-        <button aria-expanded={selectedLegend} onClick={()=>setSelectedLegend(v=>!v)}>{layerNames[layer]} {selectedLegend?'−':'+'}</button>
-        {selectedLegend && <div className="atlasLegendContent"><span>Low</span><div className={`atlasScale atlasScale-${layer}`}/><span>High</span><small>{layer==='Competition'?'Company presence before first sales; measured share afterward':layer==='Market'?'Potential buyers after week resolution; population proxy before first week':layer==='Logistics'?'Incoming units and transport connections':layer==='Operations'?'Facility counts and owners': 'Relative city purchasing power'}</small></div>}
+        <button aria-expanded={selectedLegend} onClick={() => setSelectedLegend((v) => !v)}>
+          {layerNames[layer]} {selectedLegend ? '−' : '+'}
+        </button>
+        {selectedLegend && (
+          <div className="atlasLegendContent">
+            <span>Low</span>
+            <div className={`atlasScale atlasScale-${layer}`} />
+            <span>High</span>
+            <small>
+              {layer === 'Competition'
+                ? 'Company presence before first sales; measured share afterward'
+                : layer === 'Market'
+                  ? 'Potential buyers after week resolution; population proxy before first week'
+                  : layer === 'Logistics'
+                    ? 'Incoming units and transport connections'
+                    : layer === 'Operations'
+                      ? 'Facility counts and owners'
+                      : 'Relative city purchasing power'}
+            </small>
+          </div>
+        )}
       </div>
       <p className="mapLegend" aria-live="polite">
         {failure ? `Map unavailable: ${failure}` : legends[layer]}
+        {failure && <button onClick={() => setAttempt((value) => value + 1)}>Retry map</button>}
         <span>Drag to pan · Scroll to zoom · Select a city</span>
       </p>
     </div>
