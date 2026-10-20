@@ -265,32 +265,32 @@ export function App() {
               </p>
             }
           >
-              <CountryMap
-                cities={game.cities}
-                facilities={game.facilities}
-                companies={game.companies}
-                selectedCityId={city.id}
-                selection={selection}
-                metrics={metrics}
-                products={game.products}
-                stocks={game.stocks}
-                factories={game.factories}
-                playerId={game.playerId}
-                activeLayer={
-                  department === 'operations' || department === 'projects'
-                    ? 'Operations'
-                    : department === 'logistics'
-                      ? 'Logistics'
-                      : department === 'finance'
-                        ? 'Economy'
-                        : department === 'products' || department === 'marketing'
-                          ? 'Market'
-                          : department === 'people' || department === 'settings'
-                            ? 'Operations'
-                            : 'Competition'
-                }
-                onSelect={choose}
-              />
+            <CountryMap
+              cities={game.cities}
+              facilities={game.facilities}
+              companies={game.companies}
+              selectedCityId={city.id}
+              selection={selection}
+              metrics={metrics}
+              products={game.products}
+              stocks={game.stocks}
+              factories={game.factories}
+              playerId={game.playerId}
+              activeLayer={
+                department === 'operations' || department === 'projects'
+                  ? 'Operations'
+                  : department === 'logistics'
+                    ? 'Logistics'
+                    : department === 'finance'
+                      ? 'Economy'
+                      : department === 'products' || department === 'marketing'
+                        ? 'Market'
+                        : department === 'people' || department === 'settings'
+                          ? 'Operations'
+                          : 'Competition'
+              }
+              onSelect={choose}
+            />
           </Suspense>
           {quickActionsOpen && (
             <section className="mapQuickCard" aria-label="Map quick actions">
