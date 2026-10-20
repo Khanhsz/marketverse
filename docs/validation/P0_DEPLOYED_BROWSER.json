@@ -1,0 +1,20 @@
+{
+  "production": true,
+  "target": "https://marketverse-alpha.onrender.com",
+  "browser": "153.0.8010.0",
+  "sourceArtworkBytes": 2262971,
+  "artworkBytes": 2046226,
+  "deliveredArtworkSha256": "bef4569219f7a9144299b168f4bdeea89d7a997ab3062dfbf458d4ae21ec4c04",
+  "layerSwitches": 15,
+  "cities": 8,
+  "weeksCommitted": 3,
+  "zoomRebuild": true,
+  "hiddenHitTargetsRejected": true,
+  "saveReloadExact": true,
+  "corruptArtworkRetry": true,
+  "uncaughtErrors": [],
+  "deployedCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
+  "deployId": "dep-dbbl7bhsrm7s738bovt0",
+  "testHarnessSha256": "5bfe849ae3342ec245d4fe3d989581450cde8e7ad8bd1568bb558c17f34c136f",
+  "verifiedAt": "2026-10-20T11:50:31.918610+00:00"
+}

@@ -1,6 +1,6 @@
 # P0 — map stability — 2026-10-20
 
-Base source: `993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d`. Fixed source is locally validated; deployment acceptance is pending below. This is post-Alpha maintenance, not a new claim that all historical release gates were rerun.
+Base source: `993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d`. Fixed runtime source: `4574ab478b7962edac5f2ff0168f286b9a308db4`, tree `bd7b603432574ec703aec6fec33080645b7e5354`. Local, CI and deployed acceptance passed below. This is post-Alpha maintenance, not a new claim that all historical release gates were rerun.
 
 ## Root causes and repairs
 
@@ -27,7 +27,15 @@ Runtime: Node `v24.19.0`, Chromium `153.0.8010.0` on the container. The normal m
 
 Existing service: `marketverse-alpha`, Static Site, https://marketverse-alpha.onrender.com. Connected branch automatically deploys commits.
 
-Pending: record the fixed source commit, the corresponding Render deploy ID/status, served asset checksum and the same map browser journey against the deployed URL. A successful build or a queued deployment is not acceptance of the live game.
+Accepted runtime commit: `4574ab478b7962edac5f2ff0168f286b9a308db4`. Render deploy `dep-dbbl7bhsrm7s738bovt0` reached **live** on 2026-10-20 at 11:43:05 UTC.
+
+- HTTPS image request returned 200 and the original 2,262,971-byte PNG with its approved SHA-256.
+- The browser delivery path used Cloudflare Polish (`cf-polished: ok, orig_size=2262971`), returning a 2,046,226-byte lossless PNG. Both images decode to the identical RGBA SHA-256 `fd86169056ca67547054bd9d45b74f3041aed2bdb98ba8929c2f85ff8350f62b`. See `P0_ASSET_DELIVERY.json`.
+- The browser test now verifies delivered-image decoding/dimensions rather than assuming a CDN preserves PNG compression bytes. Source checksum remains enforced by every build.
+- The same 15-layer-switch/eight-city/zoom/selection/three-turn/save/reload/corrupt-image-retry journey passed against https://marketverse-alpha.onrender.com with zero uncaught errors. See `P0_DEPLOYED_BROWSER.json`, including its test harness checksum. The live map screenshot was visually inspected.
+- [GitHub CI run 39416889137](https://github.com/Khanhsz/marketverse/actions/runs/39416889137) completed successfully for the deployed runtime commit, including 56 behavior tests, browser/map gates, 104-week campaign, exact replay and the balance sweep.
+
+The follow-up changes to this evidence and the CDN-safe browser assertion do not change application source. Its commit skips Render deployment; the verified runtime remains the commit recorded above.
 
 ## Limits and next product step
 

@@ -21,7 +21,7 @@
 
 ## Integration principles
 
-The existing Alpha review site is https://marketverse-alpha.onrender.com and automatically deploys the Alpha branch. Historical Sprint 16 evidence remains tied to its recorded source. The product review follow-up is tracked separately in `PRODUCT_REVIEW_PLAN.md`; P0 map stability is being validated in `validation/P0_MAP_STABILITY.md`.
+The existing Alpha review site is https://marketverse-alpha.onrender.com and automatically deploys the Alpha branch. Historical Sprint 16 evidence remains tied to its recorded source. The product review follow-up is tracked separately in `PRODUCT_REVIEW_PLAN.md`; P0 map stability is complete on runtime commit `4574ab4`, with local, GitHub CI and deployed acceptance in `validation/P0_MAP_STABILITY.md`. P1 first-twelve-weeks onboarding is queued.
 
 - This project is not complete at Sprint 01; CI passing is necessary but not sufficient.
 - Every Sprint brief and acceptance checklist is under `docs/sprints/`.

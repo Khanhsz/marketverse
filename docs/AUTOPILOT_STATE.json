@@ -23,14 +23,14 @@
     16
   ],
   "status": "alpha_candidate",
-  "nextAction": "Finish the authorized P0 map-stability repair and deployed verification. Then proceed to P1 first-twelve-weeks onboarding from docs/PRODUCT_REVIEW_PLAN.md. Human playtesting and public-release acceptance remain separate.",
+  "nextAction": "P0 map stability is complete on the verified Render build. Next authorized step: implement P1 first-twelve-weeks onboarding from docs/PRODUCT_REVIEW_PLAN.md; human playtests remain required for product acceptance.",
   "evidence": {
-    "lastPassedCICommit": "7606717e0ae54b196b46b3a857318e5d2e6cf10a",
-    "lastPassedCITests": 10,
-    "browserSmoke": "passed: production 104-week UI campaign, save import/export, local worker replay, keyboard/map regression and laptop DPR matrix",
-    "lastValidatedCommit": "b020d4d973ae142e966f5017cca77792150caf5d",
-    "lastLocalTests": 53,
-    "remoteCI": "not observed: previous GitHub API requests were proxy-denied; native Git push succeeds",
+    "lastPassedCICommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
+    "lastPassedCITests": 56,
+    "browserSmoke": "passed: P0 production map locally and on Render, general UI regression, 104-week production campaign and exact Node/Chromium replay",
+    "lastValidatedCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
+    "lastLocalTests": 56,
+    "remoteCI": "success: https://github.com/Khanhsz/marketverse/actions/runs/39416889137 at 4574ab478b7962edac5f2ff0168f286b9a308db4",
     "alphaVersion": "0.1.0-alpha.1",
     "alphaArtifactSha256": "2aefde66830b8d3340dc2424efdb392803a8453e7beb185f9458623cbd35351e",
     "alphaManifest": "docs/validation/ALPHA_CANDIDATE.json",
@@ -38,7 +38,8 @@
     "nodeChromiumReplayExact": true,
     "balanceCampaigns": 20,
     "balanceCompleted": 20,
-    "balanceProfitable": 14
+    "balanceProfitable": 14,
+    "alphaArtifactStatus": "historical Sprint 16 package; not rebuilt for this P0 follow-up"
   },
   "automation": {
     "requested": true,
@@ -52,22 +53,25 @@
   "deployment": {
     "provider": "render",
     "type": "static_site",
-    "status": "repair_pending_deploy",
+    "status": "live_verified",
     "serviceId": "srv-dbbfrqbbc2fs73b2cocg",
     "workspaceName": "Khánh's workspace",
     "url": "https://marketverse-alpha.onrender.com",
     "blueprint": "render.yaml",
     "branch": "codex/marketverse-sprint-continuation",
     "autoDeploy": true,
-    "lastObservedLiveCommit": "993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d",
+    "lastObservedLiveCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
     "localValidation": "56 behavioral tests, artwork integrity, formatting, TypeScript/build, browser regression, production map, 104-week production campaign and exact Node/Chromium replay passed.",
-    "blocker": "The existing live commit contains the two-byte invalid PNG. Fixed source must be deployed and verified."
+    "blocker": null,
+    "deployId": "dep-dbbl7bhsrm7s738bovt0",
+    "verifiedAt": "2026-10-20T11:50:31.918610+00:00",
+    "deployedBrowserEvidence": "docs/validation/P0_DEPLOYED_BROWSER.json"
   },
   "updatedOn": "2026-10-20",
   "productReview": {
     "plan": "docs/PRODUCT_REVIEW_PLAN.md",
-    "activeStep": "P0 map stability",
-    "status": "local_validation_passed_pending_deploy",
+    "activeStep": "P1 first twelve weeks",
+    "status": "queued",
     "nextStep": "P1 first twelve weeks",
     "evidence": "docs/validation/P0_MAP_STABILITY.md",
     "localEvidence": {
@@ -77,6 +81,10 @@
       "campaignWeeks": 104,
       "canonicalStateSha256": "17ba2b19b3e4003899d707db013e11906cdb0344e001ff45e48eb3b0ebb9d059",
       "baseCommit": "993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d"
-    }
+    },
+    "completedSteps": [
+      "P0 map stability"
+    ],
+    "lastValidatedRuntimeCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4"
   }
 }

@@ -1,6 +1,6 @@
 # Alpha candidate known issues and scope
 
-Historical Sprint 16 evidence belongs to its recorded commit. A later map update introduced an invalid two-byte PNG; the P0 repair now passes local asset, map, UI, 104-week production-browser and exact replay checks. Deployed acceptance is tracked separately in `validation/P0_MAP_STABILITY.md`. This does not claim that every strategy, browser or edge case has been exhaustively verified.
+Historical Sprint 16 evidence belongs to its recorded commit. A later map update introduced an invalid two-byte PNG; the P0 repair now passes local asset, map, UI, 104-week production-browser and exact replay checks, GitHub CI and the deployed map journey. Deployed acceptance is recorded separately in `validation/P0_MAP_STABILITY.md`. This does not claim that every strategy, browser or edge case has been exhaustively verified.
 
 - Human gameplay review is still required before formal release. The working branch has not been merged into `main`; an Alpha review deployment exists at https://marketverse-alpha.onrender.com. There is no formal GitHub Release.
 - Automated browser evidence covers Chromium at laptop/desktop sizes and pixel densities 1×/2×. Firefox, Safari, mobile/touch and assistive-technology user testing have not been completed.

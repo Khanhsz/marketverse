@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-20T11:50:31.918610+00:00",
+  "deployedCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
+  "url": "https://marketverse-alpha.onrender.com/marketverse-v6-map-clean.png",
+  "status": 200,
+  "source": {
+    "bytes": 2262971,
+    "sha256": "14d4428c1744fefe322b7c760faa9a38e5bc4ab75da1dfb8a5a5e6d6c5e7f71a",
+    "width": 1536,
+    "height": 1024,
+    "rgbaSha256": "fd86169056ca67547054bd9d45b74f3041aed2bdb98ba8929c2f85ff8350f62b"
+  },
+  "browserDelivery": {
+    "bytes": 2046226,
+    "sha256": "bef4569219f7a9144299b168f4bdeea89d7a997ab3062dfbf458d4ae21ec4c04",
+    "width": 1536,
+    "height": 1024,
+    "rgbaSha256": "fd86169056ca67547054bd9d45b74f3041aed2bdb98ba8929c2f85ff8350f62b"
+  },
+  "cdnHeader": "cf-polished: ok, orig_size=2262971",
+  "decodedPixelsIdentical": true
+}

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { launchBrowser } from './browser-runtime.mjs';
 
@@ -23,7 +24,18 @@ try {
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
   const asset = await page.request.get(new URL('/marketverse-v6-map-clean.png', page.url()).href);
   assert.equal(asset.status(), 200);
-  assert.equal((await asset.body()).length, 2262971);
+  const artworkBytes = await asset.body();
+  // A CDN can losslessly recompress the response; the build gate pins the source bytes.
+  const imageSize = await page.evaluate(
+    async ({ data, type }) => {
+      const image = new Image();
+      image.src = `data:${type};base64,${data}`;
+      await image.decode();
+      return { width: image.naturalWidth, height: image.naturalHeight };
+    },
+    { data: artworkBytes.toString('base64'), type: asset.headers()['content-type'] },
+  );
+  assert.deepEqual(imageSize, { width: 1536, height: 1024 });
   await ready();
   for (let cycle = 0; cycle < 3; cycle++) {
     for (const layer of ['Market', 'Competition', 'Operations', 'Logistics', 'Economy']) {
@@ -100,7 +112,9 @@ try {
     production: process.env.BROWSER_PRODUCTION === '1',
     target: process.env.SMOKE_URL,
     browser: await browser.version(),
-    artworkBytes: 2262971,
+    sourceArtworkBytes: 2262971,
+    artworkBytes: artworkBytes.length,
+    deliveredArtworkSha256: createHash('sha256').update(artworkBytes).digest('hex'),
     layerSwitches: 15,
     cities: 8,
     weeksCommitted: 3,

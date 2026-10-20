@@ -4,7 +4,7 @@ Authorized on 2026-10-20: work through the Senior PO priorities one step at a ti
 
 ## P0 — restore a reliable playable build
 
-Status: implementation and local verification in progress. Deployment is not accepted until the fixed commit is live and its behavior is checked.
+Status: **completed** on runtime commit `4574ab4`. Local checks, GitHub CI and deployed browser verification passed; see `validation/P0_MAP_STABILITY.md`. P1 remains queued.
 
 - Restore the approved 1536×1024 country PNG, keeping game UI and interactive entities separate.
 - Keep artwork mounted through selection, layer changes and weekly state updates.
