@@ -1,12 +1,11 @@
 import type { CityMetrics } from '../engine/analytics';
 import { useEffect, useRef, useState } from 'react';
-import { Application, Container, Graphics, Text } from 'pixi.js';
+import { Application, Assets, Container, Graphics, Sprite, Text } from 'pixi.js';
 import type { City, Facility, Company } from '../engine/game';
 import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
-import { countryOutline, terrainContours } from '../map/geography';
 
 type Props = {
   cities: City[];
@@ -61,13 +60,15 @@ export function CountryMap(props: Props) {
         resolution: window.devicePixelRatio || 1,
         autoDensity: true,
       })
-      .then(() => {
+      .then(async () => {
         initialized = true;
         if (disposed) {
           app.destroy(true, { children: true });
           return;
         }
         app.stop(); // The map is static between interactions; render only when dirty.
+        const atlasTexture = await Assets.load('/atlas-country.svg');
+        if (disposed) { app.destroy(true, { children: true }); return; }
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
         app.canvas.setAttribute('role', 'application');
@@ -127,53 +128,12 @@ export function CountryMap(props: Props) {
           for (const child of world.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
-          const territory = new Graphics();
-          territory
-            .poly(
-              countryOutline.map((n) => n * MAP_UNITS),
-            )
-            .fill(0xd4ddda)
-            .stroke({ color: 0xaebeb8, width: 4 });
-          world.addChild(territory);
-          const contours=new Graphics();
-          for(const line of terrainContours){
-            contours.moveTo(line[0]*MAP_UNITS,line[1]*MAP_UNITS);
-            for(let i=2;i<line.length;i+=2)contours.lineTo(line[i]*MAP_UNITS,line[i+1]*MAP_UNITS);
-          }
-          contours.stroke({color:0xb0c0b4,alpha:.32,width:2});
-          world.addChild(contours);
-          // Strategic Atlas: subtle coordinate grid and district geometry are decorative only.
-          const atlasGrid = new Graphics();
-          for (let gx = 160; gx <= 1760; gx += 160)
-            atlasGrid.moveTo(gx, 80).lineTo(gx, 1200);
-          for (let gy = 160; gy <= 1120; gy += 160)
-            atlasGrid.moveTo(100, gy).lineTo(1820, gy);
-          atlasGrid.stroke({ color: 0xc9d7cf, alpha: 0.34, width: 1 });
-          world.addChildAt(atlasGrid, 0);
-          const districts = new Graphics();
-          for (const city of cities) {
-            const x = city.x * MAP_UNITS, y = city.y * MAP_UNITS;
-            districts.roundRect(x - 46, y - 34, 92, 68, 14)
-              .fill({ color: 0xf6f9f6, alpha: 0.42 })
-              .stroke({ color: 0x9fb7a9, alpha: 0.42, width: 1.5 });
-          }
-          world.addChild(districts);
-          // V3 cartography: muted water and urban footprints, anchored to actual city positions.
-          const geography = new Graphics();
-          geography.moveTo(240, 780).bezierCurveTo(430, 710, 650, 840, 830, 735)
-            .bezierCurveTo(1050, 610, 1290, 740, 1520, 585)
-            .stroke({color:0x95c0c5,width:18,alpha:.35});
-          world.addChild(geography);
-          const urban = new Graphics();
-          for (const city of cities) {
-            const x=city.x*MAP_UNITS,y=city.y*MAP_UNITS;
-            for(let i=0;i<9;i++){
-              const col=i%3,row=Math.floor(i/3);
-              urban.roundRect(x-52+col*27,y-52+row*25,18+(i%2)*5,13,2)
-                .fill({color:0x9cafaa,alpha:.2});
-            }
-          }
-          world.addChild(urban);
+          // Illustrated cartography is a fixed, hand-authored SVG asset.
+          // All dynamic game entities and routes are rendered separately above it.
+          const atlas = new Sprite(atlasTexture);
+          atlas.width = 1920;
+          atlas.height = 1280;
+          world.addChild(atlas);
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
@@ -194,7 +154,7 @@ export function CountryMap(props: Props) {
             color: active === 'Logistics' ? 0x618c80 : 0xf8faf8,
             width: active === 'Logistics' ? 10 : 7,
           });
-          world.addChildAt(roads, 1);
+          world.addChild(roads);
           for (const city of cities) {
             const x = city.x * MAP_UNITS,
               y = city.y * MAP_UNITS;
