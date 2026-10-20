@@ -2090,3 +2090,278 @@ button.commandListCard:hover {
   border: 0;
   border-radius: 6px;
 }
+
+/* Compact decision planner: live media + uncapped team rows. */
+.planner.plannerWide {
+  max-width: 1140px;
+}
+.mediaPeopleGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.plannerControlCard {
+  min-width: 0;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #d9e5de;
+  border-radius: 12px;
+}
+.plannerCardTitle {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8eeea;
+}
+.plannerCardTitle h3 {
+  margin: 0 0 6px;
+  font-size: 19px;
+  color: #213d34;
+}
+.plannerCardTitle p {
+  margin: 0;
+  font-size: 12px;
+  color: #61756b;
+  line-height: 1.5;
+}
+.planner .mediaCityControl {
+  display: grid;
+  flex: 0 0 170px;
+  gap: 5px;
+  color: #5d7067;
+  font-size: 11px;
+}
+.planner .mediaCityControl select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #cadbd0;
+  border-radius: 7px;
+  padding: 8px;
+  background: #f9fcfa;
+  color: #1c483b;
+}
+.mediaCurrentStrip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 16px 0;
+  padding: 14px 16px;
+  gap: 16px;
+  background: #f3f7f4;
+  border-radius: 9px;
+}
+.mediaCurrentStrip div {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.mediaCurrentStrip div + div {
+  border-left: 1px solid #dbe6df;
+  padding-left: 16px;
+}
+.mediaCurrentStrip span,
+.teamHireTotals span {
+  color: #63766c;
+  font-size: 11px;
+}
+.mediaCurrentStrip strong {
+  color: #214c3f;
+  font-size: 13px;
+  text-transform: capitalize;
+  overflow-wrap: anywhere;
+}
+.mediaSegmentPicker {
+  border: 0;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.mediaSegmentPicker legend {
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 12px;
+}
+.planner .mediaSegmentPicker button {
+  flex: 1;
+  border: 1px solid #c8d9d0;
+  border-radius: 7px;
+  background: #fff;
+  padding: 10px 8px;
+  font-weight: 600;
+}
+.planner .mediaSegmentPicker button[aria-pressed='true'] {
+  background: #e7f2eb;
+  border-color: #3a8067;
+  color: #175542;
+}
+.mediaBudgetHead,
+.mediaBudgetScale {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.mediaBudgetHead {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.mediaBudgetHead strong {
+  font-size: 18px;
+  color: #194e40;
+  font-variant-numeric: tabular-nums;
+}
+.planner input.mediaBudgetSlider {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 9px;
+  margin: 18px 0 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  background: linear-gradient(to right, #216451 var(--media-progress), #e2e9e5 var(--media-progress));
+}
+.planner input.mediaBudgetSlider::-webkit-slider-thumb {
+  appearance: none;
+  background: #216451;
+  border: 3px solid #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: 0 2px 7px #244a3e33;
+}
+.planner input.mediaBudgetSlider::-moz-range-thumb {
+  background: #216451;
+  border: 3px solid #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 2px 7px #244a3e33;
+}
+.mediaBudgetScale {
+  color: #687e71;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.planner .mediaExactBudget {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  color: #566b5f;
+  font-size: 12px;
+}
+.planner .mediaExactBudget input {
+  width: 155px;
+  max-width: 65%;
+  padding: 9px 10px;
+  border: 1px solid #c6dacf;
+  border-radius: 7px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.teamHireList {
+  display: grid;
+  gap: 0;
+  margin-top: 9px;
+}
+.teamHireRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e8eeea;
+}
+.teamRole {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.teamRole strong {
+  font-size: 14px;
+  color: #294d3c;
+}
+.teamRole span {
+  font-size: 12px;
+  color: #6e8277;
+}
+.teamHireStepper {
+  flex-shrink: 0;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.planner .teamHireStepper button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  font-size: 20px;
+  background: #eaf3ed;
+  color: #205845;
+  border: 1px solid #bbd4c3;
+  border-radius: 7px;
+}
+.teamHireStepper output {
+  font-size: 15px;
+  font-weight: 750;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #183b2f;
+  min-width: 36px;
+}
+.teamHireTotals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 17px;
+  padding: 16px 12px;
+  gap: 10px;
+  background: #f2f8f4;
+  border-radius: 9px;
+}
+.teamHireTotals div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.teamHireTotals strong {
+  color: #174e3c;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.plannerInfoLine {
+  color: #587465;
+  line-height: 1.55;
+  font-size: 11px;
+  margin: 18px 0 0;
+}
+@media (max-width: 800px) {
+  .mediaPeopleGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .plannerControlCard {
+    padding: 16px;
+  }
+  .planner .mediaCityControl {
+    flex-basis: 145px;
+  }
+}
+@media (max-width: 450px) {
+  .plannerCardTitle {
+    flex-wrap: wrap;
+  }
+  .planner .mediaCityControl {
+    flex-basis: 100%;
+  }
+  .teamHireTotals {
+    grid-template-columns: 1fr 1fr;
+  }
+}

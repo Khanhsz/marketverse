@@ -86,7 +86,7 @@ export function validatePeople(state: GameState) {
     const staff = state.staff[company.id];
     if (
       !staff ||
-      STAFF_ROLES.some((r) => !Number.isSafeInteger(staff[r]) || staff[r] < 0 || staff[r] > 1000)
+      STAFF_ROLES.some((r) => !Number.isSafeInteger(staff[r]) || staff[r] < 0)
     )
       throw new Error('Invalid staffing');
   }

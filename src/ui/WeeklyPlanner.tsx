@@ -1,5 +1,7 @@
 import { Modal } from './Modal';
 import { STAFF_ROLES } from '../engine/people';
+import { HR_RULES } from '../data/rules';
+import { adjustHiringPlan, plannedHires, mediaBudgetLimit } from './plannerModel';
 import type { StaffRole } from '../engine/people';
 import { ATTRIBUTE_NAMES, defaultUpgrade } from '../engine/products';
 import type { Attributes } from '../engine/products';
@@ -40,9 +42,8 @@ export function WeeklyPlanner({
   );
   const [segment, setSegment] = useState<Segment>((researchable[0] || owned[0]).segment);
   const [quantity, setQuantity] = useState(10);
-  const [role, setRole] = useState<StaffRole>('production'),
-    [hires, setHires] = useState(2),
-    [mediaSegment, setMediaSegment] = useState<Segment>('mainstream');
+  const [mediaSegment, setMediaSegment] = useState<Segment>('mainstream');
+  const [mediaCity, setMediaCity] = useState(cityId);
   const [borrow, setBorrow] = useState(0),
     [repay, setRepay] = useState(0);
   const [error, setError] = useState('');
@@ -73,8 +74,46 @@ export function WeeklyPlanner({
       {c.name}
     </option>
   ));
+  const player = game.companies.find((c) => c.id === game.playerId)!;
+  const activeMedia = game.policies[game.playerId].media?.[mediaCity] ?? {};
+  const runningMedia = Object.values(activeMedia).reduce((sum, value) => sum + (value || 0), 0);
+  const mediaSpend = policy.media?.[mediaCity]?.[mediaSegment] ?? 0;
+  const affordableMedia = mediaBudgetLimit(player.cash - cost, policy, mediaCity, mediaSegment);
+  const pendingHires = (role: StaffRole) =>
+    game.projects
+      .filter(
+        (p) =>
+          p.companyId === game.playerId &&
+          p.kind === 'hiring' &&
+          p.status === 'active' &&
+          p.role === role,
+      )
+      .reduce((sum, p) => sum + (p.kind === 'hiring' ? p.quantity : 0), 0);
+  const hireCount = STAFF_ROLES.reduce((sum, role) => sum + plannedHires(projects, role), 0);
+  const hireSalary = STAFF_ROLES.reduce(
+    (sum, role) => sum + plannedHires(projects, role) * HR_RULES.wages[role],
+    0,
+  );
+  const setMediaSpend = (amount: number) => {
+    const next = Number.isFinite(amount) ? Math.max(0, Math.min(affordableMedia, Math.floor(amount))) : 0;
+    setPolicy((previous) => ({
+      ...previous,
+      media: {
+        ...previous.media,
+        [mediaCity]: {
+          ...previous.media?.[mediaCity],
+          [mediaSegment]: next,
+        },
+      },
+    }));
+  };
+  const adjustHires = (role: StaffRole, delta: -1 | 1) => {
+    setError('');
+    setProjects((previous) => adjustHiringPlan(previous, role, delta));
+  };
+  const formatCredits = (value: number) => value.toLocaleString('en-US') + ' CR';
   return (
-    <Modal titleId="planner-title" onClose={onClose}>
+    <Modal titleId="planner-title" onClose={onClose} className={section === 'marketing' ? 'plannerWide' : ''}>
       <div className="plannerHead">
         <h2 id="planner-title">Review week {game.absoluteWeek}</h2>
         <button onClick={onClose} autoFocus>
@@ -137,68 +176,135 @@ export function WeeklyPlanner({
           </div>
         ))}
       </div>
-      <div className={section === 'marketing' ? '' : 'plannerSectionInactive'}>
-        <h3>Marketing and people</h3>
-        <div className="formRow">
-          <label>
-            Media segment
-            <select
-              aria-label="Media segment"
-              value={mediaSegment}
-              onChange={(e) => setMediaSegment(e.target.value as Segment)}
-            >
-              <option>value</option>
-              <option>mainstream</option>
-              <option>premium</option>
-            </select>
-          </label>
-          <label>
-            Weekly media budget
-            <input
-              type="number"
-              min="0"
-              value={policy.media?.[destination]?.[mediaSegment] || 0}
-              onChange={(e) =>
-                setPolicy({
-                  ...policy,
-                  media: {
-                    ...policy.media,
-                    [destination]: {
-                      ...policy.media?.[destination],
-                      [mediaSegment]: Number(e.target.value),
-                    },
-                  },
-                })
-              }
-            />
-          </label>
-          <span>Applied in the selected destination city; persists each week.</span>
-        </div>
-        <div className="formRow">
-          <label>
-            Hire role
-            <select
-              aria-label="Hire role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as StaffRole)}
-            >
-              {STAFF_ROLES.map((r) => (
-                <option key={r}>{r}</option>
+      <div className={section === 'marketing' ? 'mediaPeopleSection' : 'plannerSectionInactive'}>
+        <div className="mediaPeopleGrid">
+          <section className="plannerControlCard" aria-labelledby="media-panel-title">
+            <div className="plannerCardTitle">
+              <div>
+                <h3 id="media-panel-title">Media</h3>
+                <p>Adjust your weekly media investment in the selected city.</p>
+              </div>
+              <label className="mediaCityControl">
+                City
+                <select aria-label="Media city" value={mediaCity} onChange={(e) => setMediaCity(e.target.value)}>
+                  {cityOptions}
+                </select>
+              </label>
+            </div>
+            <div className="mediaCurrentStrip">
+              <div>
+                <span>Current weekly spend</span>
+                <strong>{formatCredits(runningMedia)}</strong>
+              </div>
+              <div>
+                <span>Current segment</span>
+                <strong>{mediaSegment} · {formatCredits(activeMedia[mediaSegment] ?? 0)}</strong>
+              </div>
+            </div>
+            <fieldset className="mediaSegmentPicker">
+              <legend>Audience segment</legend>
+              {(['value', 'mainstream', 'premium'] as const).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  aria-pressed={item === mediaSegment}
+                  onClick={() => setMediaSegment(item)}
+                >
+                  {item === 'value' ? 'Value' : item === 'mainstream' ? 'Mainstream' : 'Premium'}
+                </button>
               ))}
-            </select>
-          </label>
-          <label>
-            Hire count
+            </fieldset>
+            <div className="mediaBudgetHead">
+              <label htmlFor="media-budget-slider">Weekly media budget</label>
+              <strong>{formatCredits(mediaSpend)}</strong>
+            </div>
             <input
-              type="number"
-              min="1"
-              value={hires}
-              onChange={(e) => setHires(Number(e.target.value))}
+              id="media-budget-slider"
+              className="mediaBudgetSlider"
+              type="range"
+              aria-label="Media budget slider"
+              min={0}
+              max={affordableMedia}
+              step={1}
+              value={Math.min(mediaSpend, affordableMedia)}
+              disabled={affordableMedia === 0}
+              onChange={(e) => setMediaSpend(Number(e.target.value))}
+              style={{ '--media-progress': affordableMedia > 0 ? (Math.min(mediaSpend, affordableMedia) / affordableMedia) * 100 + '%' : '0%' } as React.CSSProperties}
             />
-          </label>
-          <button onClick={() => add({ kind: 'hiring', role, quantity: hires })}>Add hiring</button>
-          <span>1,000 per hire · 2 weeks · weekly salary after arrival</span>
+            <div className="mediaBudgetScale">
+              <span>0 CR</span>
+              <span>Available budget: {formatCredits(affordableMedia)}</span>
+            </div>
+            <label className="mediaExactBudget">
+              Precise amount
+              <input
+                type="number"
+                aria-label="Weekly media budget"
+                min={0}
+                max={affordableMedia}
+                step={1}
+                value={mediaSpend}
+                onChange={(e) => setMediaSpend(Number(e.target.value))}
+              />
+            </label>
+            {mediaSpend > affordableMedia && (
+              <p role="alert">This allocation exceeds available cash. Reduce it to continue.</p>
+            )}
+            <p className="plannerInfoLine">
+              Changes take effect on the next committed week and persist until changed.
+            </p>
+          </section>
+          <section className="plannerControlCard" aria-labelledby="team-panel-title">
+            <div className="plannerCardTitle">
+              <div>
+                <h3 id="team-panel-title">Team</h3>
+                <p>Current staff and new hires. No fixed team-size slots.</p>
+              </div>
+            </div>
+            <div className="teamHireList">
+              {STAFF_ROLES.map((staffRole) => {
+                const name = staffRole === 'production' ? 'Production' : staffRole === 'sales' ? 'Sales' : 'R&D';
+                const pending = pendingHires(staffRole);
+                const added = plannedHires(projects, staffRole);
+                return (
+                  <div className="teamHireRow" key={staffRole}>
+                    <div className="teamRole">
+                      <strong>{name}</strong>
+                      <span>Current {game.staff[game.playerId][staffRole]}{pending ? ' · ' + pending + ' incoming' : ''}</span>
+                    </div>
+                    <div className="teamHireStepper" aria-label={name + ' hiring plan'}>
+                      <button
+                        type="button"
+                        aria-label={'Decrease ' + name + ' hires'}
+                        disabled={added === 0}
+                        onClick={() => adjustHires(staffRole, -1)}
+                      >
+                        −
+                      </button>
+                      <output aria-label={name + ' planned hires'}>+{added}</output>
+                      <button
+                        type="button"
+                        aria-label={'Increase ' + name + ' hires'}
+                        onClick={() => adjustHires(staffRole, 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="teamHireTotals">
+              <div><span>Planned hires</span><strong>+{hireCount}</strong></div>
+              <div><span>Upfront recruitment</span><strong>{formatCredits(hireCount * HR_RULES.hiringCost)}</strong></div>
+              <div><span>Added weekly payroll</span><strong>{formatCredits(hireSalary)}</strong></div>
+            </div>
+            <p className="plannerInfoLine">
+              New hires arrive in {HR_RULES.hiringWeeks} weeks. Minus removes only planned hires, not existing employees.
+            </p>
+          </section>
         </div>
+        {(reviewError || error) && <p className="plannerReviewError" role="alert">{reviewError || error}</p>}
       </div>
       <div className={section === 'finance' ? '' : 'plannerSectionInactive'}>
         <h3>Financing</h3>

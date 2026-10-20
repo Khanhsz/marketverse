@@ -87,8 +87,7 @@ export function quoteProject(
   if (request.kind === 'hiring') {
     if (
       !STAFF_ROLES.includes(request.role) ||
-      !integer(request.quantity, 1, 100) ||
-      nextStaffTotal(state, actor, request.role) + request.quantity > 1000
+      !integer(request.quantity, 1, 100)
     )
       throw new Error('Invalid hiring');
     return { cost: request.quantity * HR_RULES.hiringCost, weeks: HR_RULES.hiringWeeks };
@@ -164,7 +163,7 @@ export function validatePolicy(state: GameState, actor: string, policy: Policy) 
       ([id, segments]) =>
         !state.cities.some((c) => c.id === id) ||
         Object.entries(segments).some(
-          ([s, v]) => !['value', 'mainstream', 'premium'].includes(s) || !integer(v!, 0, 100000),
+          ([s, v]) => !['value', 'mainstream', 'premium'].includes(s) || !integer(v!, 0, Number.MAX_SAFE_INTEGER),
         ),
     )
   )
@@ -320,10 +319,6 @@ export function validateOrdersState(state: GameState) {
     if (error) throw new Error('Invalid pending construction: ' + error);
     virtual.push(proposal);
   }
-  for (const company of state.companies)
-    for (const role of STAFF_ROLES)
-      if (nextStaffTotal(state, company.id, role) > 1000)
-        throw new Error('Invalid pending staffing');
 }
 
 function nextStaffTotal(state: GameState, actor: string, role: StaffRole) {
