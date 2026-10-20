@@ -43,18 +43,24 @@ test('city art anchors do not modify saved simulation coordinates or legacy hit 
 
 test('all city operation cards stay within the atlas and do not overlap each other', () => {
   const cities = nationalCities();
-  const cards = cities.map((city) => ({ id: city.id, ...cityCardBounds(city) }));
-  for (const card of cards) {
-    assert.ok(card.x >= 0 && card.x + card.width <= 1920, card.id);
-    assert.ok(card.y >= 0 && card.y + card.height <= 1280, card.id);
-  }
-  for (let i = 0; i < cards.length; i++) {
-    for (let j = i + 1; j < cards.length; j++) {
-      const a = cards[i],
-        b = cards[j];
-      const overlap =
-        a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
-      assert.equal(overlap, false, a.id + ' overlaps ' + b.id);
+  // Every selection state uses one expanded card and seven compact chips.
+  // Test real rendered geometry, not eight hypothetical expanded cards.
+  for (const selected of cities) {
+    const cards = cities.map((city) => ({
+      id: city.id,
+      ...cityCardBounds(city, 'artwork', city.id === selected.id),
+    }));
+    for (const card of cards) {
+      assert.ok(card.x >= 0 && card.x + card.width <= 1920, selected.id + ': ' + card.id);
+      assert.ok(card.y >= 0 && card.y + card.height <= 1280, selected.id + ': ' + card.id);
+    }
+    for (let i = 0; i < cards.length; i++) {
+      for (let j = i + 1; j < cards.length; j++) {
+        const a = cards[i], b = cards[j];
+        const overlap = a.x < b.x + b.width && a.x + a.width > b.x &&
+          a.y < b.y + b.height && a.y + a.height > b.y;
+        assert.equal(overlap, false, selected.id + ': ' + a.id + ' overlaps ' + b.id);
+      }
     }
   }
   for (const city of cities) {
