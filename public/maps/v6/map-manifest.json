@@ -1,0 +1,61 @@
+{
+  "version": "6.1",
+  "style": "minimalist-transport-atlas",
+  "world": {
+    "width": 1920,
+    "height": 1280
+  },
+  "original": {
+    "file": "/marketverse-v6-map.png",
+    "width": 1536,
+    "height": 1024,
+    "status": "awaiting-clean-layered-artwork"
+  },
+  "fallback": "/atlas-country.svg",
+  "layers": [
+    {
+      "id": "terrain",
+      "file": "/maps/v6/layers/terrain.webp",
+      "kind": "raster",
+      "interactive": false
+    },
+    {
+      "id": "geography",
+      "file": "/maps/v6/layers/geography.webp",
+      "kind": "raster",
+      "interactive": false
+    },
+    {
+      "id": "roads",
+      "file": "/maps/v6/layers/roads.webp",
+      "kind": "raster",
+      "interactive": false
+    },
+    {
+      "id": "urban",
+      "file": "/maps/v6/layers/urban.webp",
+      "kind": "raster",
+      "interactive": false
+    },
+    {
+      "id": "landmarks",
+      "file": "/maps/v6/layers/landmarks.webp",
+      "kind": "raster",
+      "interactive": false
+    }
+  ],
+  "overlays": [
+    "economic-regions",
+    "thematic",
+    "city-markers",
+    "facility-markers",
+    "selection"
+  ],
+  "interaction": {
+    "coordinateSystem": "world",
+    "camera": "shared",
+    "selectionSource": "simulation-state",
+    "anchors": "resolve-from-engine-city-coordinates"
+  },
+  "notes": "Raster layers must be clean alpha-transparent exports. Do not include UI, company markers or game labels in artwork."
+}
