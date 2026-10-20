@@ -24,7 +24,10 @@ test('batches are a request-size safeguard, not an artificial 6-person team cap'
   let queue = [];
   for (let i = 0; i < 105; i++) queue = adjustHiringPlan(queue, 'research', 1);
   assert.equal(plannedHires(queue, 'research'), 105);
-  assert.deepEqual(queue.filter((p) => p.kind === 'hiring').map((p) => p.quantity), [100, 5]);
+  assert.deepEqual(
+    queue.filter((p) => p.kind === 'hiring').map((p) => p.quantity),
+    [100, 5],
+  );
   assert.equal(plannedHires(adjustHiringPlan(queue, 'research', -1), 'research'), 104);
 });
 

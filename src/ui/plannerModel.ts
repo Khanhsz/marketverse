@@ -39,8 +39,7 @@ export function mediaBudgetLimit(
     (total, [id, segments]) =>
       total +
       Object.entries(segments).reduce(
-        (sum, [name, spend]) =>
-          sum + (id === cityId && name === segment ? 0 : spend ?? 0),
+        (sum, [name, spend]) => sum + (id === cityId && name === segment ? 0 : (spend ?? 0)),
         0,
       ),
     0,

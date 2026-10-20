@@ -2225,7 +2225,11 @@ button.commandListCard:hover {
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  background: linear-gradient(to right, #216451 var(--media-progress), #e2e9e5 var(--media-progress));
+  background: linear-gradient(
+    to right,
+    #216451 var(--media-progress),
+    #e2e9e5 var(--media-progress)
+  );
 }
 .planner input.mediaBudgetSlider::-webkit-slider-thumb {
   appearance: none;

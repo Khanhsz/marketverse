@@ -84,10 +84,7 @@ export function validatePeople(state: GameState) {
   if (!state.staff || !state.brand) throw new Error('Invalid workforce or brand state');
   for (const company of state.companies) {
     const staff = state.staff[company.id];
-    if (
-      !staff ||
-      STAFF_ROLES.some((r) => !Number.isSafeInteger(staff[r]) || staff[r] < 0)
-    )
+    if (!staff || STAFF_ROLES.some((r) => !Number.isSafeInteger(staff[r]) || staff[r] < 0))
       throw new Error('Invalid staffing');
   }
   const valid = new Set(

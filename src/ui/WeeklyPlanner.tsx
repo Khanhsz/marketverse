@@ -95,7 +95,9 @@ export function WeeklyPlanner({
     0,
   );
   const setMediaSpend = (amount: number) => {
-    const next = Number.isFinite(amount) ? Math.max(0, Math.min(affordableMedia, Math.floor(amount))) : 0;
+    const next = Number.isFinite(amount)
+      ? Math.max(0, Math.min(affordableMedia, Math.floor(amount)))
+      : 0;
     setPolicy((previous) => ({
       ...previous,
       media: {
@@ -113,7 +115,11 @@ export function WeeklyPlanner({
   };
   const formatCredits = (value: number) => value.toLocaleString('en-US') + ' CR';
   return (
-    <Modal titleId="planner-title" onClose={onClose} className={section === 'marketing' ? 'plannerWide' : ''}>
+    <Modal
+      titleId="planner-title"
+      onClose={onClose}
+      className={section === 'marketing' ? 'plannerWide' : ''}
+    >
       <div className="plannerHead">
         <h2 id="planner-title">Review week {game.absoluteWeek}</h2>
         <button onClick={onClose} autoFocus>
@@ -186,7 +192,11 @@ export function WeeklyPlanner({
               </div>
               <label className="mediaCityControl">
                 City
-                <select aria-label="Media city" value={mediaCity} onChange={(e) => setMediaCity(e.target.value)}>
+                <select
+                  aria-label="Media city"
+                  value={mediaCity}
+                  onChange={(e) => setMediaCity(e.target.value)}
+                >
                   {cityOptions}
                 </select>
               </label>
@@ -198,7 +208,9 @@ export function WeeklyPlanner({
               </div>
               <div>
                 <span>Current segment</span>
-                <strong>{mediaSegment} · {formatCredits(activeMedia[mediaSegment] ?? 0)}</strong>
+                <strong>
+                  {mediaSegment} · {formatCredits(activeMedia[mediaSegment] ?? 0)}
+                </strong>
               </div>
             </div>
             <fieldset className="mediaSegmentPicker">
@@ -229,7 +241,14 @@ export function WeeklyPlanner({
               value={Math.min(mediaSpend, affordableMedia)}
               disabled={affordableMedia === 0}
               onChange={(e) => setMediaSpend(Number(e.target.value))}
-              style={{ '--media-progress': affordableMedia > 0 ? (Math.min(mediaSpend, affordableMedia) / affordableMedia) * 100 + '%' : '0%' } as React.CSSProperties}
+              style={
+                {
+                  '--media-progress':
+                    affordableMedia > 0
+                      ? (Math.min(mediaSpend, affordableMedia) / affordableMedia) * 100 + '%'
+                      : '0%',
+                } as React.CSSProperties
+              }
             />
             <div className="mediaBudgetScale">
               <span>0 CR</span>
@@ -263,14 +282,22 @@ export function WeeklyPlanner({
             </div>
             <div className="teamHireList">
               {STAFF_ROLES.map((staffRole) => {
-                const name = staffRole === 'production' ? 'Production' : staffRole === 'sales' ? 'Sales' : 'R&D';
+                const name =
+                  staffRole === 'production'
+                    ? 'Production'
+                    : staffRole === 'sales'
+                      ? 'Sales'
+                      : 'R&D';
                 const pending = pendingHires(staffRole);
                 const added = plannedHires(projects, staffRole);
                 return (
                   <div className="teamHireRow" key={staffRole}>
                     <div className="teamRole">
                       <strong>{name}</strong>
-                      <span>Current {game.staff[game.playerId][staffRole]}{pending ? ' · ' + pending + ' incoming' : ''}</span>
+                      <span>
+                        Current {game.staff[game.playerId][staffRole]}
+                        {pending ? ' · ' + pending + ' incoming' : ''}
+                      </span>
                     </div>
                     <div className="teamHireStepper" aria-label={name + ' hiring plan'}>
                       <button
@@ -295,16 +322,30 @@ export function WeeklyPlanner({
               })}
             </div>
             <div className="teamHireTotals">
-              <div><span>Planned hires</span><strong>+{hireCount}</strong></div>
-              <div><span>Upfront recruitment</span><strong>{formatCredits(hireCount * HR_RULES.hiringCost)}</strong></div>
-              <div><span>Added weekly payroll</span><strong>{formatCredits(hireSalary)}</strong></div>
+              <div>
+                <span>Planned hires</span>
+                <strong>+{hireCount}</strong>
+              </div>
+              <div>
+                <span>Upfront recruitment</span>
+                <strong>{formatCredits(hireCount * HR_RULES.hiringCost)}</strong>
+              </div>
+              <div>
+                <span>Added weekly payroll</span>
+                <strong>{formatCredits(hireSalary)}</strong>
+              </div>
             </div>
             <p className="plannerInfoLine">
-              New hires arrive in {HR_RULES.hiringWeeks} weeks. Minus removes only planned hires, not existing employees.
+              New hires arrive in {HR_RULES.hiringWeeks} weeks. Minus removes only planned hires,
+              not existing employees.
             </p>
           </section>
         </div>
-        {(reviewError || error) && <p className="plannerReviewError" role="alert">{reviewError || error}</p>}
+        {(reviewError || error) && (
+          <p className="plannerReviewError" role="alert">
+            {reviewError || error}
+          </p>
+        )}
       </div>
       <div className={section === 'finance' ? '' : 'plannerSectionInactive'}>
         <h3>Financing</h3>
