@@ -585,6 +585,12 @@ export function App() {
           <span>Use Reset only when you are ready to discard the saved game.</span>
         </div>
       )}
+      <nav className="mobileNav" aria-label="Mobile game navigation">
+        <button onClick={() => { setSelection({kind:'city',id:city.id}); setPanelOpen(false); }}>⌖ <span>Map</span></button>
+        <button onClick={() => choose({kind:'company',id:player.id})}>▦ <span>Company</span></button>
+        <button onClick={() => setReportsOpen(true)}>≋ <span>Reports</span></button>
+        <button onClick={() => setPanelOpen(v => !v)}>☷ <span>Details</span></button>
+      </nav>
       <footer className="footer">
         <div>
           ● {recovery || storageError ? 'SAVE NEEDS ATTENTION' : 'LOCAL SAVE'}{' '}
