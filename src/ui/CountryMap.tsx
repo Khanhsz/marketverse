@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Application, Container, Graphics, Text } from 'pixi.js';
 import { loadArtworkStack } from '../map/artworkLoader';
 import { MAP_MODES } from '../map/atlasLayers';
-import type { City, Facility, Company } from '../engine/game';
+import type { City, Facility, Company, Product } from '../engine/game';
+import type { Factory, StockLot } from '../engine/operations';
 import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
@@ -16,6 +17,11 @@ type Props = {
   selectedCityId: string;
   selection: Selection;
   metrics: CityMetrics[];
+  products: Product[];
+  stocks: StockLot[];
+  factories: Factory[];
+  playerId: string;
+  activeLayer: Layer;
   onSelect: (selection: Selection) => void;
 };
 const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] as const;
@@ -44,7 +50,8 @@ export function CountryMap(props: Props) {
   const mount = useRef<HTMLDivElement>(null);
   const current = useRef(props);
   current.current = props;
-  const [layer, setLayer] = useState<Layer>('Market');
+  const [layer, setLayer] = useState<Layer>(props.activeLayer);
+  useEffect(() => { setLayer(props.activeLayer); }, [props.activeLayer]);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<'National' | 'Regional' | 'Business'>('National');
   const layerRef = useRef<Layer>(layer);
@@ -311,7 +318,7 @@ export function CountryMap(props: Props) {
                 .roundRect(x - 15, y - 15, 30, 30, 6)
                 .fill(selected ? 0x24554b : 0x6d8880),
             );
-            label(city.name.toUpperCase(), x + 40, y - 18);
+            if (active !== 'Operations') label(city.name.toUpperCase(), x + 40, y - 18);
             if (active === 'Market')
               label(
                 `${(city.population / 1000000).toFixed(2)}M · ${metric?.potential == null ? 'DEMAND AFTER FIRST WEEK' : metric.potential + ' potential buyers'}`,
@@ -321,13 +328,7 @@ export function CountryMap(props: Props) {
               );
             if (active === 'Economy')
               label(`PURCHASING POWER ${city.power.toFixed(2)}×`, x + 40, y + 12, 16);
-            if (active === 'Operations')
-              label(
-                `PLAYER STOCK ${metric?.stock || 0} · MADE ${metric?.produced || 0}`,
-                x + 40,
-                y + 12,
-                16,
-              );
+
             if (active === 'Logistics')
               label(`INCOMING ${metric?.incoming || 0} UNITS`, x + 40, y + 12, 16);
             if (active === 'Competition')
@@ -340,12 +341,7 @@ export function CountryMap(props: Props) {
                 16,
               );
             const assets = facilities.filter((f) => f.cityId === city.id);
-            if (
-              active === 'Operations' &&
-              assets.length > 0 &&
-              camera.scale / fitCamera(view).scale >= 2.6
-            )
-              label(`${assets.length} FACILITIES`, x + 40, y + 12, 16);
+
             assets.forEach((f, index) => {
               if (
                 camera.scale / fitCamera(view).scale < 2.6 ||
@@ -397,6 +393,69 @@ export function CountryMap(props: Props) {
                   ownerColor(id),
                 );
               });
+            }
+            if (active === 'Operations') {
+              const prioritized = [...assets].sort((a, b) =>
+                Number(b.companyId === current.current.playerId) -
+                  Number(a.companyId === current.current.playerId),
+              );
+              const mainAsset = prioritized.find((f) => f.kind === 'factory') ||
+                prioritized.find((f) => f.kind === 'warehouse') ||
+                prioritized.find((f) => f.kind === 'store') ||
+                prioritized[0];
+              const isOwned = mainAsset?.companyId === current.current.playerId;
+              const locationStock = current.current.stocks
+                .filter((lot) =>
+                  lot.cityId === city.id &&
+                  current.current.products.some(
+                    (product) =>
+                      product.id === lot.productId &&
+                      product.companyId === current.current.playerId,
+                  ),
+                )
+                .reduce((sum, lot) => sum + lot.quantity, 0);
+              const facilityName = mainAsset
+                ? ({ factory: 'NHÀ MÁY', warehouse: 'KHO HÀNG', store: 'CỬA HÀNG', hq: 'TRỤ SỞ', rd: 'R&D' } as const)[mainAsset.kind]
+                : 'CHƯA CÓ CƠ SỞ';
+              const factory = mainAsset?.kind === 'factory'
+                ? current.current.factories.find((f) => f.facilityId === mainAsset.id)
+                : undefined;
+              const subtitle = mainAsset?.kind === 'factory'
+                ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
+                : 'Tồn kho của bạn: ' + locationStock + ' SP';
+              const cardY = y - 138;
+              const cardX = x - 16;
+              const cardWidth = 284;
+              const cardHeight = 91;
+              overlays.addChild(
+                new Graphics()
+                  .roundRect(cardX, cardY, cardWidth, cardHeight, 13)
+                  .fill({ color: selected ? 0x122820 : 0x1b3329, alpha: 0.98 })
+                  .stroke({ color: selected ? 0xa9dac2 : 0x4d6e60, width: selected ? 3 : 2 }),
+              );
+              overlays.addChild(
+                new Text({
+                  text: city.name + ' · ' + facilityName,
+                  style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 21, fontWeight: 'bold' },
+                  x: cardX + 15,
+                  y: cardY + 11,
+                }),
+              );
+              overlays.addChild(
+                new Text({
+                  text: subtitle,
+                  style: { fill: locationStock ? 0xa3d8b7 : 0xf0ba87, fontFamily: 'Arial', fontSize: 16 },
+                  x: cardX + 15,
+                  y: cardY + 52,
+                }),
+              );
+              if (isOwned) {
+                overlays.addChild(
+                  new Graphics()
+                    .circle(cardX + cardWidth - 17, cardY + 18, 6)
+                    .fill(0x9ddac0),
+                );
+              }
             }
           }
           applyCamera();
@@ -462,6 +521,25 @@ export function CountryMap(props: Props) {
           app.canvas.style.cursor = 'grab';
           if (clicked) {
             const w = screenToWorld(camera, view, p);
+            if (layerRef.current === 'Operations') {
+              for (const c of current.current.cities) {
+                const x = c.x * MAP_UNITS;
+                const y = c.y * MAP_UNITS;
+                if (w.x >= x - 16 && w.x <= x + 268 && w.y >= y - 138 && w.y <= y - 47) {
+                  const assets = current.current.facilities.filter((f) => f.cityId === c.id);
+                  const prioritized = [...assets].sort((a, b) =>
+                    Number(b.companyId === current.current.playerId) -
+                    Number(a.companyId === current.current.playerId));
+                  const mainAsset = prioritized.find((f) => f.kind === 'factory') ||
+                    prioritized.find((f) => f.kind === 'warehouse') ||
+                    prioritized.find((f) => f.kind === 'store') || prioritized[0];
+                  current.current.onSelect(mainAsset
+                    ? { kind: 'facility', id: mainAsset.id }
+                    : { kind: 'city', id: c.id });
+                  return;
+                }
+              }
+            }
             const city = current.current.cities.find(
               (c) =>
                 Math.hypot(c.x * MAP_UNITS - w.x, c.y * MAP_UNITS - w.y) <=
@@ -633,6 +711,10 @@ export function CountryMap(props: Props) {
     props.selectedCityId,
     props.selection,
     props.metrics,
+    props.stocks,
+    props.products,
+    props.factories,
+    props.playerId,
     layer,
   ]);
   return (
