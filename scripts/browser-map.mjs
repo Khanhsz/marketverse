@@ -16,9 +16,12 @@ try {
     assert.equal(await page.locator('canvas').count(), 1);
     assert.equal(await page.locator('.mapSurface').getAttribute('data-artwork'), 'ready');
   };
-  const dismiss = async () => {
-    const close = page.getByRole('button', { name: 'Dismiss map actions', exact: true });
-    if (await close.isVisible()) await close.click();
+  const switchDepartment = async (name, layer) => {
+    await page.getByRole('button', { name, exact: true }).click();
+    await page.waitForFunction(
+      (expected) => document.querySelector('.mapSurface')?.dataset.layer === expected,
+      layer,
+    );
   };
   const camera = async () =>
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
@@ -38,23 +41,28 @@ try {
   assert.deepEqual(imageSize, { width: 1536, height: 1024 });
   await ready();
   for (let cycle = 0; cycle < 3; cycle++) {
-    for (const layer of ['Market', 'Competition', 'Operations', 'Logistics', 'Economy']) {
-      await page.getByRole('button', { name: layer, exact: true }).click();
-      await page
-        .getByLabel('Select city', { exact: true })
-        .selectOption(['north', 'central', 'south'][cycle]);
-      await dismiss();
+    for (const [name, layer] of [
+      ['Sản phẩm', 'Market'],
+      ['Logistics', 'Logistics'],
+      ['Tài chính', 'Economy'],
+      ['Vận hành', 'Operations'],
+      ['Marketing', 'Market'],
+    ]) {
+      await switchDepartment(name, layer);
       await ready();
     }
   }
+  await switchDepartment('Cài đặt', 'Operations');
+  await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Start national campaign', exact: true }).click();
   await page.waitForFunction((k) => JSON.parse(localStorage.getItem(k)).cities.length === 8, key);
-  await page.getByLabel('Select city', { exact: true }).selectOption('central');
-  await dismiss();
-  await page.getByRole('button', { name: 'Operations', exact: true }).click();
-  await page.getByRole('button', { name: 'Reset view', exact: true }).click();
-  await page.getByRole('button', { name: 'Center selection', exact: true }).click();
+  await switchDepartment('Vận hành', 'Operations');
+  const mapKeyboard = page.getByRole('application', {
+    name: 'Country map: arrow keys pan, plus or minus zoom, Home fits view',
+  });
+  await mapKeyboard.focus();
+  await page.keyboard.press('Home');
   for (let zoom = 0; zoom < 5; zoom++)
     await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
   assert.equal(await page.locator('.mapSurface').getAttribute('data-detail-band'), '2');
@@ -62,25 +70,27 @@ try {
     const c = await camera();
     const box = await page.locator('canvas').boundingBox();
     return {
-      x: box.x + box.width / 2 + (1100 - 28 - c.x) * c.scale,
-      y: box.y + box.height / 2 + (600 + 52 - c.y) * c.scale,
+      x: box.x + box.width / 2 + (0.565 * 1920 - 28 - c.x) * c.scale,
+      y: box.y + box.height / 2 + (0.475 * 1280 + 52 - c.y) * c.scale,
     };
   };
-  let p = await point();
+  const p = await point();
   await page.mouse.click(p.x, p.y);
   assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:hq');
-  await page.getByLabel('Select city', { exact: true }).selectOption('central');
-  await dismiss();
-  await page.getByRole('button', { name: 'Market', exact: true }).click();
-  p = await point();
-  await page.mouse.click(p.x, p.y);
+  await switchDepartment('Sản phẩm', 'Market');
+  const c = await camera();
+  const box = await page.locator('canvas').boundingBox();
+  await page.mouse.click(
+    box.x + box.width / 2 + (0.565 * 1920 - c.x) * c.scale,
+    box.y + box.height / 2 + (0.475 * 1280 - c.y) * c.scale,
+  );
   assert.equal(
     await page.locator('.panel').getAttribute('data-selection'),
     'city:central',
     'hidden facilities cannot intercept map clicks',
   );
   for (let turn = 0; turn < 3; turn++) {
-    await page.getByRole('button', { name: 'NEXT WEEK' }).click();
+    await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).click();
     await page.getByRole('button', { name: 'Commit week', exact: true }).click();
     await ready();
   }
