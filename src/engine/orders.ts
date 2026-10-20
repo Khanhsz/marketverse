@@ -319,4 +319,3 @@ export function validateOrdersState(state: GameState) {
     virtual.push(proposal);
   }
 }
-
