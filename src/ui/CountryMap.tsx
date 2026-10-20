@@ -49,7 +49,7 @@ export function CountryMap(props: Props) {
     const app = new Application();
     void app
       .init({
-        background: '#e9eeec',
+        background: '#edf1ee',
         antialias: true,
         resolution: window.devicePixelRatio || 1,
         autoDensity: true,
@@ -121,6 +121,22 @@ export function CountryMap(props: Props) {
             .fill(0xd4ddda)
             .stroke({ color: 0xaebeb8, width: 4 });
           world.addChild(territory);
+          // Strategic Atlas: subtle coordinate grid and district geometry are decorative only.
+          const atlasGrid = new Graphics();
+          for (let gx = 160; gx <= 1760; gx += 160)
+            atlasGrid.moveTo(gx, 80).lineTo(gx, 1200);
+          for (let gy = 160; gy <= 1120; gy += 160)
+            atlasGrid.moveTo(100, gy).lineTo(1820, gy);
+          atlasGrid.stroke({ color: 0xc9d7cf, alpha: 0.34, width: 1 });
+          world.addChildAt(atlasGrid, 0);
+          const districts = new Graphics();
+          for (const city of cities) {
+            const x = city.x * MAP_UNITS, y = city.y * MAP_UNITS;
+            districts.roundRect(x - 46, y - 34, 92, 68, 14)
+              .fill({ color: 0xf6f9f6, alpha: 0.42 })
+              .stroke({ color: 0x9fb7a9, alpha: 0.42, width: 1.5 });
+          }
+          world.addChild(districts);
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
@@ -158,8 +174,10 @@ export function CountryMap(props: Props) {
                 .fill({ color: active === 'Market' ? 0x82a898 : 0xb9ad83, alpha: 0.26 });
               world.addChild(halo);
             }
-            if (selected)
+            if (selected) {
+              world.addChild(new Graphics().circle(x, y, 44).fill({ color: 0x24554b, alpha: 0.09 }));
               world.addChild(new Graphics().circle(x, y, 36).stroke({ color: 0x24554b, width: 3 }));
+            }
             world.addChild(
               new Graphics()
                 .roundRect(x - 15, y - 15, 30, 30, 6)
