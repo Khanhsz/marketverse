@@ -24,6 +24,8 @@ const legends: Record<Layer, string> = {
   Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
+const layerColors: Record<Layer, number> = { Market:0x3d8068, Competition:0x5576a0, Operations:0x647d8b, Logistics:0x3c8391, Economy:0x98834d };
+const layerNames: Record<Layer, string> = { Market:'Demand intensity', Competition:'Player market share', Operations:'Operating facilities', Logistics:'Incoming cargo & routes', Economy:'Purchasing power' };
 const ownerColor = (id: string) =>
   id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
 
@@ -39,6 +41,7 @@ export function CountryMap(props: Props) {
   const draw = useRef<() => void>(() => {});
   const controls = useRef<(action: 'in' | 'out' | 'reset' | 'focus') => void>(() => {});
   const [failure, setFailure] = useState('');
+  const [selectedLegend, setSelectedLegend] = useState(true);
 
   useEffect(() => {
     const element = mount.current;
@@ -142,6 +145,22 @@ export function CountryMap(props: Props) {
               .stroke({ color: 0x9fb7a9, alpha: 0.42, width: 1.5 });
           }
           world.addChild(districts);
+          // V3 cartography: muted water and urban footprints, anchored to actual city positions.
+          const geography = new Graphics();
+          geography.moveTo(240, 780).bezierCurveTo(430, 710, 650, 840, 830, 735)
+            .bezierCurveTo(1050, 610, 1290, 740, 1520, 585)
+            .stroke({color:0x95c0c5,width:18,alpha:.35});
+          world.addChild(geography);
+          const urban = new Graphics();
+          for (const city of cities) {
+            const x=city.x*MAP_UNITS,y=city.y*MAP_UNITS;
+            for(let i=0;i<9;i++){
+              const col=i%3,row=Math.floor(i/3);
+              urban.roundRect(x-52+col*27,y-52+row*25,18+(i%2)*5,13,2)
+                .fill({color:0x9cafaa,alpha:.2});
+            }
+          }
+          world.addChild(urban);
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
@@ -169,15 +188,33 @@ export function CountryMap(props: Props) {
             selectedLabel = city.id === selectedCityId;
             const selected = city.id === selectedCityId,
               metric = current.current.metrics.find((m) => m.cityId === city.id);
-            if (active === 'Market' || active === 'Economy') {
+            if (active === 'Market' || active === 'Economy' || active === 'Competition' || active === 'Logistics') {
+              const measured = active === 'Market'
+                ? (metric?.potential ?? city.population / 100)
+                : active === 'Competition' ? (metric?.playerShare ?? 0)
+                : active === 'Logistics' ? (metric?.incoming ?? 0)
+                : city.power;
+              const intensity = active === 'Competition'
+                ? Math.max(0,Math.min(1,measured))
+                : active === 'Economy' ? Math.max(0,Math.min(1,measured/2))
+                : active === 'Logistics' ? Math.min(1,Math.log1p(measured)/8)
+                : Math.min(1,Math.log1p(measured)/13);
               const halo = new Graphics()
-                .circle(
-                  x,
-                  y,
-                  active === 'Market' ? Math.sqrt(city.population) / 16 : city.power * 50,
-                )
-                .fill({ color: active === 'Market' ? 0x82a898 : 0xb9ad83, alpha: 0.26 });
+                .circle(x,y,active === 'Market' ? 60+intensity*65 : active === 'Economy' ? 65+intensity*40 : 48+intensity*50)
+                .fill({ color:layerColors[active], alpha:0.10+intensity*.29 })
+                .stroke({color:layerColors[active],alpha:.18+intensity*.3,width:2});
               world.addChild(halo);
+            }
+            if (active === 'Competition' && metric?.playerShare != null) {
+              const share=Math.max(0,Math.min(1,metric.playerShare));
+              world.addChild(new Graphics().circle(x,y,31).stroke({color:0xcdd9d5,width:9}));
+              if(share>0) world.addChild(new Graphics().arc(x,y,31,-Math.PI/2,-Math.PI/2+share*Math.PI*2).stroke({color:layerColors.Competition,width:9}));
+            }
+            if (active === 'Operations') {
+              const count=facilities.filter(f=>f.cityId===city.id).length;
+              world.addChild(new Graphics().roundRect(x-28,y-28,56,56,8)
+                .fill({color:layerColors.Operations,alpha:Math.min(.65,.13+count*.09)})
+                .stroke({color:layerColors.Operations,alpha:.6,width:2}));
             }
             if (selected) {
               world.addChild(new Graphics().circle(x, y, 44).fill({ color: 0x24554b, alpha: 0.09 }));
@@ -524,6 +561,10 @@ export function CountryMap(props: Props) {
         </button>
       </div>
       <div className="mapZoomBadge" aria-live="polite">{zoomLevel} view</div>
+      <div className="atlasLegend" aria-label={layerNames[layer]}>
+        <button aria-expanded={selectedLegend} onClick={()=>setSelectedLegend(v=>!v)}>{layerNames[layer]} {selectedLegend?'−':'+'}</button>
+        {selectedLegend && <div className="atlasLegendContent"><span>Low</span><div className={`atlasScale atlasScale-${layer}`}/><span>High</span><small>{layer==='Competition'?'Measured player share; unavailable before sales':layer==='Market'?'Potential buyers after week resolution; population proxy before first week':layer==='Logistics'?'Incoming units and transport connections':layer==='Operations'?'Facility counts and owners': 'Relative city purchasing power'}</small></div>}
+      </div>
       <p className="mapLegend" aria-live="polite">
         {failure ? `Map unavailable: ${failure}` : legends[layer]}
         <span>Drag to pan · Scroll to zoom · Select a city</span>
