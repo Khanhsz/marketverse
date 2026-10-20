@@ -11,7 +11,6 @@
     "verify": "npm run format:check && npm run test && npm run build",
     "test:browser": "node scripts/run-browser-smoke.mjs",
     "test:visual": "BROWSER_SUITE=./browser-visual.mjs node scripts/run-browser-smoke.mjs",
-    "test:polygon": "BROWSER_SUITE=./browser-polygon.mjs BROWSER_PRODUCTION=1 node scripts/run-browser-smoke.mjs",
     "test:balance": "node --experimental-strip-types scripts/balance.mjs",
     "test:profile": "BROWSER_SUITE=./browser-profile.mjs node scripts/run-browser-smoke.mjs",
     "test:campaign": "BROWSER_SUITE=./browser-campaign.mjs node scripts/run-browser-smoke.mjs",
