@@ -55,9 +55,11 @@ try {
   assert.equal(await page.locator('.commandPanelContent h1').innerText(), 'Sản phẩm');
   assert.match(await page.locator('.commandPanelContent').innerText(), /NOVA AIR/);
   await page.getByRole('button', { name: 'Logistics', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.layer === 'Logistics');
   assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), 'Logistics');
   assert.match(await page.locator('.commandPanelContent').innerText(), /Lô hàng đang chuyển/);
   await page.getByRole('button', { name: 'Marketing', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.layer === 'Market');
   assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), 'Market');
   assert.match(await page.locator('.commandPanelContent').innerText(), /Nhận biết thương hiệu/);
   await page.getByRole('button', { name: 'Nhân sự', exact: true }).click();
