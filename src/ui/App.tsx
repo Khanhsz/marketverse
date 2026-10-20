@@ -38,6 +38,8 @@ function loadGame() {
 }
 export function App() {
   const panelRef = useRef<HTMLElement>(null);
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [weeklyChangesOpen, setWeeklyChangesOpen] = useState(false);
   const [resultOpen, setResultOpen] = useState(false),
     [importing, setImporting] = useState(false),
     [importError, setImportError] = useState('');
@@ -140,7 +142,11 @@ export function App() {
     return () => window.removeEventListener('keydown', key);
   }, [shortcuts, plannerOpen, reportsOpen, guideOpen, resultOpen, recovery, game.campaign.status]);
   const choose = (value: Selection) => {
-    if (resolveSelection(game, value)) { setSelection(value); if (window.innerWidth <= 849) setPanelOpen(true); }
+    if (resolveSelection(game, value)) {
+      setSelection(value);
+      setQuickActionsOpen(true);
+      if (window.innerWidth <= 849) setPanelOpen(false);
+    }
   };
   const cityButton = (id: string) => (
     <button className="entityLink" key={id} onClick={() => choose({ kind: 'city', id })}>
@@ -261,6 +267,23 @@ export function App() {
               onSelect={choose}
             />
           </Suspense>
+          {quickActionsOpen && <section className="mapQuickCard" aria-label="Map quick actions">
+            <button className="quickClose" aria-label="Dismiss map actions" onClick={() => setQuickActionsOpen(false)}>×</button>
+            <small>{context.kind.toUpperCase()} · SELECTED</small>
+            <h2>{context.entity.name}</h2>
+            <p>{city.name} · {number(city.population)} residents · {game.facilities.filter(f => f.cityId === city.id).length} facilities</p>
+            <div className="quickActions">
+              <button onClick={() => { setPanelOpen(true); setQuickActionsOpen(false); }}>Inspect</button>
+              <button onClick={() => { setPlannerOpen(true); setQuickActionsOpen(false); }}>Plan actions</button>
+              <button onClick={() => { setReportsOpen(true); setQuickActionsOpen(false); }}>Reports</button>
+            </div>
+          </section>}
+          {weeklyChangesOpen && game.reports.length > 0 && <section className="weeklyChanges" aria-label="Latest weekly events">
+            <button className="quickClose" aria-label="Dismiss weekly events" onClick={() => setWeeklyChangesOpen(false)}>×</button>
+            <strong>Week {game.absoluteWeek} · Economy update</strong>
+            {game.reports.at(-1)!.events.slice(0,3).map((event,i) => <p key={i}>{event}</p>)}
+            <button onClick={() => {setReportsOpen(true);setWeeklyChangesOpen(false);}}>Full report →</button>
+          </section>}
           <div className="mapFoot">
             {game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST
           </div>
@@ -585,6 +608,7 @@ export function App() {
           <span>Use Reset only when you are ready to discard the saved game.</span>
         </div>
       )}
+      <button className="mobilePlanFab" onClick={() => setPlannerOpen(true)} disabled={!!recovery || game.campaign.status !== 'active'} aria-label="Open weekly planner">Plan week →</button>
       <nav className="mobileNav" aria-label="Mobile game navigation">
         <button onClick={() => { setSelection({kind:'city',id:city.id}); setPanelOpen(false); }}>⌖ <span>Map</span></button>
         <button onClick={() => choose({kind:'company',id:player.id})}>▦ <span>Company</span></button>
@@ -644,6 +668,7 @@ export function App() {
             committedWeek.current = orders.expectedWeek;
             setGame(next);
             setPlannerOpen(false);
+            setWeeklyChangesOpen(true);
           }}
         />
       )}
