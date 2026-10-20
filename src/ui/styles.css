@@ -733,3 +733,35 @@ canvas:focus-visible {
  .saveWarning{left:8px;right:8px;top:64px}
 }
 @media(max-width:370px){.metrics>div:nth-child(2){display:none}.cityPicker{max-width:48%}.mapLegend{right:116px}}
+
+
+/* MarketVerse UX V2: map-first contextual decision surfaces */
+.mobileLayerToggle,.mobilePlanFab{display:none}
+.mapZoomBadge{position:absolute;top:116px;left:20px;pointer-events:none;padding:6px 10px;background:#fbfcfae8;border:1px solid #d7e4dc;border-radius:6px;font-size:10px;font-weight:700;color:#446a58}
+.mapQuickCard,.weeklyChanges{position:absolute;z-index:5;left:20px;top:155px;width:min(310px,calc(100% - 40px));padding:16px;background:#fbfcfaf7;border:1px solid #cbded1;border-radius:12px;box-shadow:0 14px 38px #254d3624;color:#274638}
+.mapQuickCard small{font-size:9px;letter-spacing:1.3px;color:#617e6c}
+.mapQuickCard h2{font-size:19px;margin:8px 0}
+.mapQuickCard p,.weeklyChanges p{font-size:12px;line-height:1.5;color:#597264}
+.quickClose{float:right;border:0;background:#e8eee9;border-radius:50%;width:28px;height:28px;font-size:20px;color:#375e4c}
+.quickActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.quickActions button,.weeklyChanges button:not(.quickClose){border:1px solid #c4d7c9;border-radius:6px;padding:9px;background:#f0f6f1;color:#285a44;font-weight:700;font-size:11px}
+.quickActions button:hover{background:#dcece1}
+.weeklyChanges{left:auto;right:20px;top:155px}
+.weeklyChanges strong{font-size:13px}
+.plannerTabs{position:sticky;top:-24px;z-index:2;display:flex;flex-wrap:wrap;gap:5px;background:#f8faf9;padding:12px 0;border-bottom:1px solid #d5e2d9;margin:14px 0}
+.plannerTabs button{border-radius:7px;font-size:12px;font-weight:700}
+.plannerTabs button[aria-pressed=true]{background:#285f4d;color:white}
+.plannerSectionInactive{display:none}
+@media(max-width:849px){
+ .mobileLayerToggle{display:block;position:absolute;z-index:4;left:10px;top:48px;border:1px solid #c8d9ce;border-radius:9px;background:#fbfcfaf2;padding:10px 12px;font-size:11px;font-weight:700;color:#285c48}
+ .mapLayers{display:none;top:90px;left:10px;right:auto;width:min(200px,calc(100% - 20px));max-width:none;flex-direction:column;align-items:stretch;overflow:visible;padding:5px;box-shadow:0 12px 32px #23453224}
+ .mapLayers.mobileLayersOpen{display:flex}
+ .mapLayers button{text-align:left}
+ .mapZoomBadge{top:49px;left:auto;right:12px;font-size:9px}
+ .mapQuickCard,.weeklyChanges{top:95px;left:10px;right:10px;width:auto;padding:12px}
+ .weeklyChanges{top:auto;bottom:75px}
+ .mobilePlanFab{display:block;position:absolute;z-index:7;right:12px;bottom:calc(116px + env(safe-area-inset-bottom));background:#285f4d;color:white;border:0;border-radius:24px;padding:11px 16px;font-size:12px;font-weight:700;box-shadow:0 6px 20px #254d3650}
+ .mobilePlanFab:disabled{opacity:.5}
+ .plannerTabs{top:-16px;flex-wrap:nowrap;overflow-x:auto}
+ .plannerTabs button{white-space:nowrap;font-size:10px;padding:8px}
+}
