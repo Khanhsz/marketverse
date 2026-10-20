@@ -17,6 +17,7 @@ type Props = {
   onClose: () => void;
 };
 export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
+  const [section, setSection] = useState<'products'|'marketing'|'finance'|'projects'>('products');
   const [policy, setPolicy] = useState(() => structuredClone(game.policies[game.playerId]));
   const [projects, setProjects] = useState<ProjectRequest[]>([]);
   const [destination, setDestination] = useState(cityId);
@@ -75,7 +76,11 @@ export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
         Policies persist until changed. New projects reserve cash immediately and progress one week
         per committed turn.
       </p>
-      <h3>Product policies</h3>
+      <nav className="plannerTabs" aria-label="Decision sections">
+        {([['products','Products'],['marketing','Marketing & staff'],['finance','Finance'],['projects','Projects & review']] as const).map(([id,name]) =>
+          <button key={id} aria-pressed={section===id} onClick={()=>setSection(id)}>{name}</button>)}
+      </nav>
+      <div className={section==='products' ? '' : 'plannerSectionInactive'}><h3>Product policies</h3>
       {owned.map((p) => (
         <div className="formRow" key={p.id}>
           <strong>{p.name}</strong>
@@ -111,7 +116,7 @@ export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
           </label>
         </div>
       ))}
-      <h3>Marketing and people</h3>
+      </div><div className={section==='marketing' ? '' : 'plannerSectionInactive'}><h3>Marketing and people</h3>
       <div className="formRow">
         <label>
           Media segment
@@ -172,7 +177,7 @@ export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
         <button onClick={() => add({ kind: 'hiring', role, quantity: hires })}>Add hiring</button>
         <span>1,000 per hire · 2 weeks · weekly salary after arrival</span>
       </div>
-      <h3>Financing</h3>
+      </div><div className={section==='finance' ? '' : 'plannerSectionInactive'}><h3>Financing</h3>
       <div className="formRow">
         <label>
           Borrow credits
@@ -194,7 +199,7 @@ export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
         </label>
         <span>Debt limit 500,000 · Weekly interest 0.1%</span>
       </div>
-      <h3>New projects</h3>
+      </div><div className={section==='projects' ? '' : 'plannerSectionInactive'}><h3>New projects</h3>
       <div className="formRow">
         <label>
           Destination
@@ -337,7 +342,7 @@ export function WeeklyPlanner({ game, cityId, onCommit, onClose }: Props) {
         {game.companies.find((c) => c.id === game.playerId)!.cash.toLocaleString()}
       </p>
       {(reviewError || error) && <p role="alert">{reviewError || error}</p>}
-      <div className="plannerActions">
+      </div><div className="plannerActions">
         <button onClick={onClose}>Keep planning</button>
         <button
           className="primary"
