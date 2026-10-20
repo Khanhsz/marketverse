@@ -440,7 +440,7 @@ export function CountryMap(props: Props) {
                 height: cardHeight,
               } = cityCardBounds(city, expanded);
               const isEmpty = !mainAsset;
-                            {
+              {
                 // Short location tether keeps the chip associated with its city,
                 // even when the chip is deliberately nudged off the road/shore.
                 const connectorX = Math.max(cardX + 15, Math.min(x, cardX + cardWidth - 15));
@@ -598,10 +598,7 @@ export function CountryMap(props: Props) {
             const w = screenToWorld(camera, view, p);
             if (layerRef.current === 'Operations') {
               for (const c of current.current.cities) {
-                const card = cityCardBounds(
-                  c
-                  c.id === current.current.selectedCityId,
-                );
+                const card = cityCardBounds(c, c.id === current.current.selectedCityId);
                 if (
                   w.x >= card.x &&
                   w.x <= card.x + card.width &&
