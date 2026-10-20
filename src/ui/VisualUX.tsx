@@ -172,6 +172,7 @@ type PanelProps = {
   onGuide: () => void;
   onExport: () => void;
   onReset: () => void;
+  onStartNational: () => void;
   onInspect: () => void;
 };
 function Stat({ name, value }: { name: string; value: string }) {
@@ -200,6 +201,7 @@ export function DepartmentPanel({
   onGuide,
   onExport,
   onReset,
+  onStartNational,
   onInspect,
 }: PanelProps) {
   const player = game.companies.find((c) => c.id === game.playerId)!;
@@ -522,6 +524,18 @@ export function DepartmentPanel({
             />
             <Stat name="Cơ sở toàn quốc" value={String(ownFacilities.length)} />
           </Section>
+          {game.cities.length === 3 && game.campaign.mode === 'foundation' && (
+            <section className="commandSection">
+              <h3>Bản đồ 8 thành phố</h3>
+              <p className="commandSupporting">
+                Save này thuộc Foundation Sandbox cũ (3 thành phố). Chuyển sang National Campaign
+                sẽ khởi tạo quốc gia 8 thành phố và thay thế save hiện tại. Hãy xuất save trước.
+              </p>
+              <button className="commandPrimary" onClick={onStartNational}>
+                Bắt đầu với 8 thành phố →
+              </button>
+            </section>
+          )}
           <button className="commandPrimary" onClick={onExport}>
             Xuất file lưu game →
           </button>
