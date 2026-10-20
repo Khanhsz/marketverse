@@ -20,13 +20,13 @@ const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] a
 type Layer = (typeof layers)[number];
 const legends: Record<Layer, string> = {
   Market: 'Population and last resolved week potential buyers',
-  Competition: 'Ownership colors and measured player share of fulfilled units',
+  Competition: 'Week 1: company presence by city · after sales: measured market share',
   Operations: 'Facility labels show existing assets; select for operational details',
   Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
 const layerColors: Record<Layer, number> = { Market:0x3d8068, Competition:0x5576a0, Operations:0x647d8b, Logistics:0x3c8391, Economy:0x98834d };
-const layerNames: Record<Layer, string> = { Market:'Demand intensity', Competition:'Player market share', Operations:'Operating facilities', Logistics:'Incoming cargo & routes', Economy:'Purchasing power' };
+const layerNames: Record<Layer, string> = { Market:'Demand intensity', Competition:'Company presence / market share', Operations:'Operating facilities', Logistics:'Incoming cargo & routes', Economy:'Purchasing power' };
 const ownerColor = (id: string) =>
   id === 'player' ? 0x24554b : id === 'value' ? 0x6a7e96 : 0x9a7845;
 
@@ -67,7 +67,10 @@ export function CountryMap(props: Props) {
           return;
         }
         app.stop(); // The map is static between interactions; render only when dirty.
-        const atlasTexture = await Assets.load('/atlas-country.svg');
+        // Asset contract: public/marketverse-v6-map.png is the approved hand-drawn B-style artwork.
+        // Until the binary is committed, preserve the existing illustrated atlas.
+        const artwork = await fetch('/marketverse-v6-map.png', {method:'HEAD'}).then(r=>r.ok).catch(()=>false);
+        const atlasTexture = await Assets.load(artwork ? '/marketverse-v6-map.png' : '/atlas-country.svg');
         if (disposed) { app.destroy(true, { children: true }); return; }
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
@@ -150,11 +153,12 @@ export function CountryMap(props: Props) {
                   16,
                 );
             }
-          roads.stroke({
-            color: active === 'Logistics' ? 0x618c80 : 0xf8faf8,
-            width: active === 'Logistics' ? 10 : 7,
-          });
-          world.addChild(roads);
+          // The illustrated map already contains its own permanent roads.
+          // Show simulation connectivity only in the logistics layer.
+          if (active === 'Logistics') {
+            roads.stroke({color:0x167f96,width:8,alpha:.82});
+            world.addChild(roads);
+          } else roads.destroy();
           for (const city of cities) {
             const x = city.x * MAP_UNITS,
               y = city.y * MAP_UNITS;
@@ -182,6 +186,14 @@ export function CountryMap(props: Props) {
               const share=Math.max(0,Math.min(1,metric.playerShare));
               world.addChild(new Graphics().circle(x,y,31).stroke({color:0xcdd9d5,width:9}));
               if(share>0) world.addChild(new Graphics().arc(x,y,31,-Math.PI/2,-Math.PI/2+share*Math.PI*2).stroke({color:layerColors.Competition,width:9}));
+            }
+            if (active === 'Competition' && metric?.playerShare == null) {
+              const owners=[...new Set(facilities.filter(f=>f.cityId===city.id).map(f=>f.companyId))];
+              const presence = new Graphics();
+              owners.forEach((owner,i)=>{
+                presence.circle(x-18+i*17,y+36,7).fill(ownerColor(owner)).stroke({color:0xffffff,width:2});
+              });
+              world.addChild(presence);
             }
             if (active === 'Operations') {
               const count=facilities.filter(f=>f.cityId===city.id).length;
@@ -219,18 +231,16 @@ export function CountryMap(props: Props) {
               label(`INCOMING ${metric?.incoming || 0} UNITS`, x + 40, y + 12, 16);
             if (active === 'Competition')
               label(
-                metric?.playerShare === null
-                  ? 'NO SALES YET'
-                  : `PLAYER SHARE ${((metric?.playerShare || 0) * 100).toFixed(1)}%`,
-                x + 40,
-                y + 12,
-                16,
+                metric?.playerShare == null
+                  ? `${new Set(facilities.filter(f=>f.cityId===city.id).map(f=>f.companyId)).size} COMPANIES PRESENT`
+                  : `PLAYER SHARE ${((metric.playerShare || 0) * 100).toFixed(1)}%`,
+                x + 40, y + 12, 16,
               );
             const assets = facilities.filter((f) => f.cityId === city.id);
-            if (active === 'Operations' && assets.length > 0)
+            if (active === 'Operations' && assets.length > 0 && camera.scale / fitCamera(view).scale >= 2.6)
               label(`${assets.length} FACILITIES`,x+40,y+12,16);
             assets.forEach((f, index) => {
-              if(camera.scale / fitCamera(view).scale < 2.6) return;
+              if(camera.scale / fitCamera(view).scale < 2.6 || (active !== 'Operations' && active !== 'Competition')) return;
               const fx = x - 28 + index * 32,
                 fy = y + 52;
               const selectedAsset =
@@ -540,7 +550,7 @@ export function CountryMap(props: Props) {
       <div className="mapZoomBadge" aria-live="polite">{zoomLevel} view</div>
       <div className="atlasLegend" aria-label={layerNames[layer]}>
         <button aria-expanded={selectedLegend} onClick={()=>setSelectedLegend(v=>!v)}>{layerNames[layer]} {selectedLegend?'−':'+'}</button>
-        {selectedLegend && <div className="atlasLegendContent"><span>Low</span><div className={`atlasScale atlasScale-${layer}`}/><span>High</span><small>{layer==='Competition'?'Measured player share; unavailable before sales':layer==='Market'?'Potential buyers after week resolution; population proxy before first week':layer==='Logistics'?'Incoming units and transport connections':layer==='Operations'?'Facility counts and owners': 'Relative city purchasing power'}</small></div>}
+        {selectedLegend && <div className="atlasLegendContent"><span>Low</span><div className={`atlasScale atlasScale-${layer}`}/><span>High</span><small>{layer==='Competition'?'Company presence before first sales; measured share afterward':layer==='Market'?'Potential buyers after week resolution; population proxy before first week':layer==='Logistics'?'Incoming units and transport connections':layer==='Operations'?'Facility counts and owners': 'Relative city purchasing power'}</small></div>}
       </div>
       <p className="mapLegend" aria-live="polite">
         {failure ? `Map unavailable: ${failure}` : legends[layer]}
