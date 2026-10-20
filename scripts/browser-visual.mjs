@@ -51,23 +51,9 @@ try {
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
-  // New Coffee Inc 2-inspired V7 city map is opt-in; the country map remains the default.
-  await page.getByRole('button', { name: 'Central City · V7' }).click();
-  await page.getByLabel('Thông tin địa điểm trên bản đồ').waitFor();
-  assert.equal(await page.locator('[data-view="city-v7"]').count(), 1);
-  await page.getByRole('button', { name: 'Central Plaza', exact: true }).click();
-  assert.match(
-    await page.getByLabel('Thông tin địa điểm trên bản đồ').innerText(),
-    /chưa có hệ thống thuê/,
-  );
-  await page.getByRole('button', { name: 'NOVA Flagship', exact: true }).click();
-  await page.getByRole('button', { name: 'Xem cơ sở trong game' }).click();
-  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:store');
-  await page.getByRole('button', { name: 'Quốc gia', exact: true }).click();
-  await page.waitForFunction(
-    () => document.querySelector('.mapSurface')?.dataset.artwork === 'ready',
-  );
+  // The country map is the sole map view; no V7 preview or switch remains.
   assert.equal(await page.locator('[data-view="city-v7"]').count(), 0);
+  assert.equal(await page.getByRole('button', { name: 'Central City · V7' }).count(), 0);
   await page.getByRole('button', { name: 'Sản phẩm', exact: true }).click();
   assert.equal(await page.locator('.commandPanelContent h1').innerText(), 'Sản phẩm');
   assert.match(await page.locator('.commandPanelContent').innerText(), /NOVA AIR/);
