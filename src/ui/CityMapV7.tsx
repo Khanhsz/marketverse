@@ -65,7 +65,6 @@ const classification = (c: number, r: number): SiteType => {
   if (c < 3 || r > 7) return 'residential';
   return (c + r) % 4 === 0 ? 'retail' : 'office';
 };
-const number = (v: number) => new Intl.NumberFormat('vi-VN').format(v);
 
 function IsoBuilding({
   c,
