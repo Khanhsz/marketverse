@@ -5,7 +5,7 @@ import { loadArtworkStack } from '../map/artworkLoader';
 import { MAP_MODES } from '../map/atlasLayers';
 import type { City, Facility, Company, Product } from '../engine/game';
 import type { Factory, StockLot } from '../engine/operations';
-import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
+import { fitCamera, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
