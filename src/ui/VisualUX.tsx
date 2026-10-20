@@ -193,7 +193,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function DepartmentPanel({
   game,
   city,
-  selection,
   department,
   onPlan,
   onSelect,
