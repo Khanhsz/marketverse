@@ -263,11 +263,23 @@ export function App() {
           </div>
           <div className="commandNational">{cityViewOpen ? 'CITY VIEW' : 'NATIONAL'}</div>
           <div className="cityV7Switch" role="group" aria-label="Chế độ bản đồ">
-            <button type="button" aria-pressed={!cityViewOpen} onClick={() => setCityViewOpen(false)}>Quốc gia</button>
-            <button type="button" aria-pressed={cityViewOpen} onClick={() => {
-              setCityViewOpen(true);
-              choose({ kind: 'city', id: 'central' });
-            }}>Central City · V7</button>
+            <button
+              type="button"
+              aria-pressed={!cityViewOpen}
+              onClick={() => setCityViewOpen(false)}
+            >
+              Quốc gia
+            </button>
+            <button
+              type="button"
+              aria-pressed={cityViewOpen}
+              onClick={() => {
+                setCityViewOpen(true);
+                choose({ kind: 'city', id: 'central' });
+              }}
+            >
+              Central City · V7
+            </button>
           </div>
           <Suspense
             fallback={
@@ -285,32 +297,32 @@ export function App() {
                 onSelect={choose}
               />
             ) : (
-            <CountryMap
-              cities={game.cities}
-              facilities={game.facilities}
-              companies={game.companies}
-              selectedCityId={city.id}
-              selection={selection}
-              metrics={metrics}
-              products={game.products}
-              stocks={game.stocks}
-              factories={game.factories}
-              playerId={game.playerId}
-              activeLayer={
-                department === 'operations' || department === 'projects'
-                  ? 'Operations'
-                  : department === 'logistics'
-                    ? 'Logistics'
-                    : department === 'finance'
-                      ? 'Economy'
-                      : department === 'products' || department === 'marketing'
-                        ? 'Market'
-                        : department === 'people' || department === 'settings'
-                          ? 'Operations'
-                          : 'Competition'
-              }
-              onSelect={choose}
-            />
+              <CountryMap
+                cities={game.cities}
+                facilities={game.facilities}
+                companies={game.companies}
+                selectedCityId={city.id}
+                selection={selection}
+                metrics={metrics}
+                products={game.products}
+                stocks={game.stocks}
+                factories={game.factories}
+                playerId={game.playerId}
+                activeLayer={
+                  department === 'operations' || department === 'projects'
+                    ? 'Operations'
+                    : department === 'logistics'
+                      ? 'Logistics'
+                      : department === 'finance'
+                        ? 'Economy'
+                        : department === 'products' || department === 'marketing'
+                          ? 'Market'
+                          : department === 'people' || department === 'settings'
+                            ? 'Operations'
+                            : 'Competition'
+                }
+                onSelect={choose}
+              />
             )}
           </Suspense>
           {quickActionsOpen && (
@@ -382,7 +394,11 @@ export function App() {
               </button>
             </section>
           )}
-          <div className="mapFoot commandMapHint">{cityViewOpen ? 'BẢN MẪU V7 · Chưa kích hoạt cơ chế thuê địa điểm' : 'Chọn cơ sở để xem dữ liệu và thao tác'}</div>
+          <div className="mapFoot commandMapHint">
+            {cityViewOpen
+              ? 'BẢN MẪU V7 · Chưa kích hoạt cơ chế thuê địa điểm'
+              : 'Chọn cơ sở để xem dữ liệu và thao tác'}
+          </div>
         </main>
         <aside
           ref={panelRef}

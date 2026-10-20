@@ -2091,7 +2091,6 @@ button.commandListCard:hover {
   border-radius: 6px;
 }
 
-
 /* V7 Central City concept: dense illustrated business map, not an engine replacement. */
 .commandVisual .cityV7Switch {
   position: absolute;
@@ -2116,7 +2115,7 @@ button.commandListCard:hover {
   font-weight: 650;
   white-space: nowrap;
 }
-.commandVisual .cityV7Switch button[aria-pressed="true"] {
+.commandVisual .cityV7Switch button[aria-pressed='true'] {
   background: #a7dabd;
   color: #17372b;
 }
@@ -2138,7 +2137,7 @@ button.commandListCard:hover {
   height: 100%;
   object-fit: cover;
 }
-.cityV7Canvas svg [role="button"]:focus-visible {
+.cityV7Canvas svg [role='button']:focus-visible {
   outline: 3px solid #f8e7b5;
   outline-offset: 5px;
 }
@@ -2157,8 +2156,15 @@ button.commandListCard:hover {
   max-width: 285px;
   box-shadow: 0 4px 16px #203a2855;
 }
-.cityV7Title strong { font-size: 11px; line-height: 1.4; letter-spacing: .3px; }
-.cityV7Title span { font-size: 10px; color: #bdd8c8; }
+.cityV7Title strong {
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+.cityV7Title span {
+  font-size: 10px;
+  color: #bdd8c8;
+}
 .cityV7Site {
   position: absolute;
   z-index: 4;
@@ -2172,16 +2178,59 @@ button.commandListCard:hover {
   box-shadow: 0 8px 30px #15231d55;
   font-size: 12px;
 }
-.cityV7SiteHead { display: flex; align-items: start; justify-content: space-between; gap: 5px; }
-.cityV7SiteHead small { color: #a8c6b3; letter-spacing: .65px; font-size: 9px; }
-.cityV7SiteHead h2 { font-size: 18px; margin: 6px 0 0; line-height: 1.2; color: white; }
-.cityV7SiteHead > span { border-radius: 5px; padding: 5px 6px; font-size: 9px; font-weight: 800; white-space: nowrap; }
-.siteOperational { background: #b1e0c7; color: #1c4430; }
-.siteConcept { background: #594630; color: #f8d6a3; }
-.cityV7Site > p { color: #c5ded0; line-height: 1.5; margin: 11px 0; }
-.cityV7Meta { display: grid; grid-template-columns: auto 1fr; gap: 9px 10px; padding: 12px 0; border-top: 1px solid #375544; border-bottom: 1px solid #375544; }
-.cityV7Meta span { color: #a7c8b4; }
-.cityV7Meta strong { text-align: right; font-size: 11px; color: #fff; }
+.cityV7SiteHead {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 5px;
+}
+.cityV7SiteHead small {
+  color: #a8c6b3;
+  letter-spacing: 0.65px;
+  font-size: 9px;
+}
+.cityV7SiteHead h2 {
+  font-size: 18px;
+  margin: 6px 0 0;
+  line-height: 1.2;
+  color: white;
+}
+.cityV7SiteHead > span {
+  border-radius: 5px;
+  padding: 5px 6px;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.siteOperational {
+  background: #b1e0c7;
+  color: #1c4430;
+}
+.siteConcept {
+  background: #594630;
+  color: #f8d6a3;
+}
+.cityV7Site > p {
+  color: #c5ded0;
+  line-height: 1.5;
+  margin: 11px 0;
+}
+.cityV7Meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px 10px;
+  padding: 12px 0;
+  border-top: 1px solid #375544;
+  border-bottom: 1px solid #375544;
+}
+.cityV7Meta span {
+  color: #a7c8b4;
+}
+.cityV7Meta strong {
+  text-align: right;
+  font-size: 11px;
+  color: #fff;
+}
 .cityV7Site > button {
   display: block;
   width: 100%;
@@ -2215,20 +2264,67 @@ button.commandListCard:hover {
   font-size: 10px;
   color: white;
 }
-.cityV7Legend span { display: flex; align-items: center; gap: 5px; }
-.ownedDot, .leaseDot, .cityV7Shape { display: block; width: 9px; height: 9px; border-radius: 50%; }
-.ownedDot { background: #238b6b; border: 1px solid white; }
-.leaseDot { background: #d17157; border: 1px solid white; }
-.cityV7Shape { background: #8caaa5; border-radius: 2px; }
-@media(max-width:1100px) {
-  .cityV7Site { width: min(250px, 48%); bottom: 56px; }
-  .cityV7Title { top: 103px; }
+.cityV7Legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
-@media(max-width:849px) {
-  .commandVisual .cityV7Switch { top: 83px; right: 11px; }
-  .commandVisual .cityV7Switch button { padding: 6px; font-size: 10px; }
-  .cityV7Title { left: 9px; top: 128px; max-width: 50%; padding: 8px; }
-  .cityV7Site { width: calc(100% - 20px); max-width: 360px; right: 10px; bottom: 60px; padding: 10px; }
-  .cityV7SiteHead h2 { font-size: 15px; }
-  .cityV7Legend { bottom: 12px; left: 8px; }
+.ownedDot,
+.leaseDot,
+.cityV7Shape {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.ownedDot {
+  background: #238b6b;
+  border: 1px solid white;
+}
+.leaseDot {
+  background: #d17157;
+  border: 1px solid white;
+}
+.cityV7Shape {
+  background: #8caaa5;
+  border-radius: 2px;
+}
+@media (max-width: 1100px) {
+  .cityV7Site {
+    width: min(250px, 48%);
+    bottom: 56px;
+  }
+  .cityV7Title {
+    top: 103px;
+  }
+}
+@media (max-width: 849px) {
+  .commandVisual .cityV7Switch {
+    top: 83px;
+    right: 11px;
+  }
+  .commandVisual .cityV7Switch button {
+    padding: 6px;
+    font-size: 10px;
+  }
+  .cityV7Title {
+    left: 9px;
+    top: 128px;
+    max-width: 50%;
+    padding: 8px;
+  }
+  .cityV7Site {
+    width: calc(100% - 20px);
+    max-width: 360px;
+    right: 10px;
+    bottom: 60px;
+    padding: 10px;
+  }
+  .cityV7SiteHead h2 {
+    font-size: 15px;
+  }
+  .cityV7Legend {
+    bottom: 12px;
+    left: 8px;
+  }
 }
