@@ -320,14 +320,3 @@ export function validateOrdersState(state: GameState) {
   }
 }
 
-function nextStaffTotal(state: GameState, actor: string, role: StaffRole) {
-  return (
-    state.staff[actor][role] +
-    state.projects
-      .filter(
-        (p) =>
-          p.kind === 'hiring' && p.status === 'active' && p.companyId === actor && p.role === role,
-      )
-      .reduce((n, p) => n + (p.kind === 'hiring' ? p.quantity : 0), 0)
-  );
-}
