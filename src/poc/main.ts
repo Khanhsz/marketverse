@@ -215,7 +215,7 @@ function makeBuilding(b: Building) {
   group.addChild(graphic,selectedOutline,hit);
   return {group,outline:selectedOutline,hit};
 }
-function paintDistrict(parent: Container,d: District){
+function paintDistrict(parent: Container){
   const gfx=new Graphics();
   gfx.eventMode='static';
   gfx.cursor='pointer';
@@ -345,7 +345,7 @@ async function initialize() {
   const landZone=new Container();world.addChild(landZone);
   districtViews=new Map();
   for(const d of DISTRICTS){
-    const gfx=paintDistrict(landZone,d);
+    const gfx=paintDistrict(landZone);
     districtViews.set(d.id,gfx);
     gfx.on('pointertap',()=>{if(!pointerMoved)select({type:'district',id:d.id});});
     gfx.on('pointerover',()=>{hovered={type:'district',id:d.id};redraw();});
@@ -370,6 +370,7 @@ async function initialize() {
   const stats=buildings.length+DISTRICTS.length+treeCount+ISLAND.length;
   countLabel.textContent=stats.toLocaleString('vi-VN');
   mount.dataset.buildings=String(buildings.length);
+  mount.dataset.sampleBuilding=JSON.stringify(buildings.find(b=>b.districtId==='central'));
   mount.dataset.districts=String(DISTRICTS.length);
   mount.dataset.geometryOnly='true';
   drawReady=true;
