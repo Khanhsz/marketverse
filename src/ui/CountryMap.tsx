@@ -226,7 +226,14 @@ export function CountryMap(props: Props) {
             roads.stroke({ color: 0x167f96, width: 8, alpha: 0.82 });
             overlays.addChild(roads);
           } else roads.destroy();
-          for (const city of cities) {
+          // Draw selected card last so its details remain on top of compact chips.
+          const drawCities =
+            active === 'Operations' && layout === 'artwork'
+              ? [...cities].sort(
+                  (a, b) => Number(a.id === selectedCityId) - Number(b.id === selectedCityId),
+                )
+              : cities;
+          for (const city of drawCities) {
             const { x, y } = cityWorldPoint(city, layout);
             const { x: labelX, y: labelY } = cityLabelPoint(city, layout);
             selectedLabel = city.id === selectedCityId;
@@ -295,12 +302,13 @@ export function CountryMap(props: Props) {
             }
             if (active === 'Operations') {
               const count = facilities.filter((f) => f.cityId === city.id).length;
+              const radius = layout === 'artwork' ? 22 : 28;
               overlays.addChild(
                 new Graphics()
-                  .roundRect(x - 28, y - 28, 56, 56, 8)
+                  .roundRect(x - radius, y - radius, radius * 2, radius * 2, 8)
                   .fill({
                     color: layerColors.Operations,
-                    alpha: Math.min(0.65, 0.13 + count * 0.09),
+                    alpha: layout === 'artwork' ? 0.15 : Math.min(0.65, 0.13 + count * 0.09),
                   })
                   .stroke({ color: layerColors.Operations, alpha: 0.6, width: 2 }),
               );
@@ -395,16 +403,15 @@ export function CountryMap(props: Props) {
               });
             }
             if (active === 'Operations') {
-              const prioritized = [...assets].sort(
-                (a, b) =>
-                  Number(b.companyId === current.current.playerId) -
-                  Number(a.companyId === current.current.playerId),
-              );
+              // A city can have both player and rival assets; never label a rival
+              // factory as the player's operation when a player store exists.
+              const playerAssets = assets.filter((f) => f.companyId === current.current.playerId);
+              const candidates = playerAssets.length ? playerAssets : assets;
               const mainAsset =
-                prioritized.find((f) => f.kind === 'factory') ||
-                prioritized.find((f) => f.kind === 'warehouse') ||
-                prioritized.find((f) => f.kind === 'store') ||
-                prioritized[0];
+                candidates.find((f) => f.kind === 'factory') ||
+                candidates.find((f) => f.kind === 'warehouse') ||
+                candidates.find((f) => f.kind === 'store') ||
+                candidates[0];
               const isOwned = mainAsset?.companyId === current.current.playerId;
               const locationStock = current.current.stocks
                 .filter(
@@ -420,57 +427,102 @@ export function CountryMap(props: Props) {
               const facilityName = mainAsset
                 ? (
                     {
-                      factory: 'NHÀ MÁY',
-                      warehouse: 'KHO HÀNG',
-                      store: 'CỬA HÀNG',
-                      hq: 'TRỤ SỞ',
+                      factory: 'Nhà máy',
+                      warehouse: 'Kho hàng',
+                      store: 'Cửa hàng',
+                      hq: 'Trụ sở',
                       rd: 'R&D',
                     } as const
                   )[mainAsset.kind]
-                : 'CHƯA CÓ CƠ SỞ';
-              const factory =
-                mainAsset?.kind === 'factory'
-                  ? current.current.factories.find((f) => f.facilityId === mainAsset.id)
-                  : undefined;
-              const subtitle =
-                mainAsset?.kind === 'factory'
-                  ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
-                  : 'Tồn kho của bạn: ' + locationStock + ' SP';
-              const {
-                x: cardX,
-                y: cardY,
-                width: cardWidth,
-                height: cardHeight,
-              } = cityCardBounds(city, layout);
+                : 'Chưa có cơ sở';
+              const expanded = layout === 'legacy' || selected;
+              const { x: cardX, y: cardY, width: cardWidth, height: cardHeight } =
+                cityCardBounds(city, layout, expanded);
+              const isEmpty = !mainAsset;
+              const isVisual = layout === 'artwork';
+              if (isVisual) {
+                // Short location tether keeps the chip associated with its city,
+                // even when the chip is deliberately nudged off the road/shore.
+                const connectorX = Math.max(cardX + 15, Math.min(x, cardX + cardWidth - 15));
+                const connectorY = cardY > y ? cardY : cardY + cardHeight;
+                overlays.addChild(
+                  new Graphics()
+                    .moveTo(x, y)
+                    .lineTo(connectorX, connectorY)
+                    .stroke({ color: 0xffffff, alpha: selected ? 0.85 : 0.6, width: 2 }),
+                );
+              }
               overlays.addChild(
                 new Graphics()
-                  .roundRect(cardX, cardY, cardWidth, cardHeight, 13)
-                  .fill({ color: selected ? 0x122820 : 0x1b3329, alpha: 0.98 })
-                  .stroke({ color: selected ? 0xa9dac2 : 0x4d6e60, width: selected ? 3 : 2 }),
+                  .roundRect(cardX, cardY, cardWidth, cardHeight, expanded ? 12 : 10)
+                  .fill({
+                    color: expanded ? 0x172e25 : isEmpty ? 0x22352d : 0x1c3329,
+                    alpha: expanded ? 0.97 : 0.88,
+                  })
+                  .stroke({
+                    color: selected ? 0xa4e0bc : isOwned ? 0x89c9a7 : 0x648375,
+                    width: selected ? 2.5 : 1.3,
+                    alpha: selected ? 1 : 0.9,
+                  }),
               );
-              overlays.addChild(
-                new Text({
-                  text: city.name + ' · ' + facilityName,
-                  style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 21, fontWeight: 'bold' },
-                  x: cardX + 15,
-                  y: cardY + 11,
-                }),
-              );
-              overlays.addChild(
-                new Text({
-                  text: subtitle,
-                  style: {
-                    fill: locationStock ? 0xa3d8b7 : 0xf0ba87,
-                    fontFamily: 'Arial',
-                    fontSize: 16,
-                  },
-                  x: cardX + 15,
-                  y: cardY + 52,
-                }),
-              );
-              if (isOwned) {
+              const tint = isOwned ? 0xa5dfbd : isEmpty ? 0xb1c5b9 : 0xe6be8b;
+              if (!expanded && isVisual) {
                 overlays.addChild(
-                  new Graphics().circle(cardX + cardWidth - 17, cardY + 18, 6).fill(0x9ddac0),
+                  new Graphics()
+                    .circle(cardX + 14, cardY + 16, 4.5)
+                    .fill(tint),
+                );
+                overlays.addChild(
+                  new Text({
+                    text: city.name,
+                    style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 21, fontWeight: 'bold' },
+                    x: cardX + 26,
+                    y: cardY + 5,
+                  }),
+                );
+                overlays.addChild(
+                  new Text({
+                    text: isOwned ? 'Cơ sở của bạn' : isEmpty ? 'Chưa có cơ sở' : 'Cơ sở đối thủ',
+                    style: { fill: tint, fontFamily: 'Arial', fontSize: 15 },
+                    x: cardX + 26,
+                    y: cardY + 29,
+                  }),
+                );
+              } else {
+                const factory =
+                  mainAsset?.kind === 'factory'
+                    ? current.current.factories.find((f) => f.facilityId === mainAsset.id)
+                    : undefined;
+                const info = factory
+                  ? 'Công suất ' + factory.capacity + ' SP / tuần'
+                  : isOwned
+                    ? 'Tồn kho của bạn: ' + locationStock + ' SP'
+                    : isEmpty
+                      ? 'Chọn thành phố để mở rộng hoạt động'
+                      : 'Cơ sở của doanh nghiệp đối thủ';
+                overlays.addChild(
+                  new Text({
+                    text: city.name,
+                    style: { fill: 0xffffff, fontFamily: 'Arial', fontSize: 24, fontWeight: 'bold' },
+                    x: cardX + 16,
+                    y: cardY + 9,
+                  }),
+                );
+                overlays.addChild(
+                  new Text({
+                    text: (isOwned ? 'CỦA BẠN · ' : isEmpty ? '' : 'ĐỐI THỦ · ') + facilityName,
+                    style: { fill: tint, fontFamily: 'Arial', fontSize: 18, fontWeight: 'bold' },
+                    x: cardX + 16,
+                    y: cardY + 41,
+                  }),
+                );
+                overlays.addChild(
+                  new Text({
+                    text: info,
+                    style: { fill: 0xe0ede3, fontFamily: 'Arial', fontSize: 16 },
+                    x: cardX + 16,
+                    y: cardY + 72,
+                  }),
                 );
               }
             }
@@ -540,7 +592,11 @@ export function CountryMap(props: Props) {
             const w = screenToWorld(camera, view, p);
             if (layerRef.current === 'Operations') {
               for (const c of current.current.cities) {
-                const card = cityCardBounds(c, current.current.layout ?? 'artwork');
+                const card = cityCardBounds(
+                  c,
+                  current.current.layout ?? 'artwork',
+                  c.id === current.current.selectedCityId,
+                );
                 if (
                   w.x >= card.x &&
                   w.x <= card.x + card.width &&
@@ -548,16 +604,15 @@ export function CountryMap(props: Props) {
                   w.y <= card.y + card.height
                 ) {
                   const assets = current.current.facilities.filter((f) => f.cityId === c.id);
-                  const prioritized = [...assets].sort(
-                    (a, b) =>
-                      Number(b.companyId === current.current.playerId) -
-                      Number(a.companyId === current.current.playerId),
+                  const playerAssets = assets.filter(
+                    (f) => f.companyId === current.current.playerId,
                   );
+                  const candidates = playerAssets.length ? playerAssets : assets;
                   const mainAsset =
-                    prioritized.find((f) => f.kind === 'factory') ||
-                    prioritized.find((f) => f.kind === 'warehouse') ||
-                    prioritized.find((f) => f.kind === 'store') ||
-                    prioritized[0];
+                    candidates.find((f) => f.kind === 'factory') ||
+                    candidates.find((f) => f.kind === 'warehouse') ||
+                    candidates.find((f) => f.kind === 'store') ||
+                    candidates[0];
                   current.current.onSelect(
                     mainAsset ? { kind: 'facility', id: mainAsset.id } : { kind: 'city', id: c.id },
                   );
