@@ -59,7 +59,7 @@ try {
     canvas.x + canvas.width / 2 + (targetX - camera.x) * camera.scale,
     canvas.y + canvas.height / 2 + (targetY - camera.y) * camera.scale,
   );
-  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:store');
+  assert.equal(await page.locator('.panel').getAttribute('data-selection'), 'facility:player-factory');
   assert.equal(await page.locator('.commandPanelContent h1').innerText(), 'Vận hành');
 
   await page.getByRole('button', { name: 'Điều chỉnh sản xuất' }).click();
