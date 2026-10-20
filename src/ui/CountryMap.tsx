@@ -5,6 +5,8 @@ import type { City, Facility, Company } from '../engine/game';
 import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
+import { resolveLabels } from '../map/labels';
+import { countryOutline, terrainContours } from '../map/geography';
 
 type Props = {
   cities: City[];
@@ -73,7 +75,7 @@ export function CountryMap(props: Props) {
           'aria-label',
           'Country map: arrow keys pan, plus or minus zoom, Home fits view',
         );
-        const labels: { caption: Text; size: number; selected: boolean }[] = [];
+        const labels: { caption: Text; size: number; selected: boolean; id:string; anchorX:number; anchorY:number }[] = [];
         let selectedLabel = false;
         const world = new Container();
         app.stage.addChild(world);
@@ -90,9 +92,15 @@ export function CountryMap(props: Props) {
           );
           element.dataset.camera = JSON.stringify(camera);
           element.dataset.layer = layerRef.current;
+          const detail = camera.scale / fitCamera(view).scale;
+          const candidates = labels.filter(item=>item.selected || item.size>=22 || detail>=2.6).map(item=>{
+            const width = item.caption.width * camera.scale;
+            const height = item.caption.height * camera.scale;
+            return {id:item.id,x:view.width/2+(item.anchorX-camera.x)*camera.scale,y:view.height/2+(item.anchorY-camera.y)*camera.scale,width,height,priority:(item.selected?100:0)+(item.size>=22?20:0)};
+          });
+          const visibleLabels=resolveLabels(candidates,view,6);
           for (const item of labels) {
-            item.caption.visible =
-              item.size >= 22 || item.selected || camera.scale >= fitCamera(view).scale * 1.6;
+            item.caption.visible = visibleLabels.has(item.id);
             item.caption.scale.set(
               Math.max(1, (item.size >= 22 ? 12 : 10) / (item.size * camera.scale)),
             );
@@ -110,7 +118,7 @@ export function CountryMap(props: Props) {
           });
           caption.position.set(x, y);
           world.addChild(caption);
-          labels.push({ caption, size, selected: selectedLabel });
+          labels.push({ caption, size, selected: selectedLabel, id:`label-${labels.length}`,anchorX:x,anchorY:y });
         };
         draw.current = () => {
           labels.length = 0;
@@ -121,14 +129,18 @@ export function CountryMap(props: Props) {
           const territory = new Graphics();
           territory
             .poly(
-              [
-                280, 136, 385, 78, 521, 106, 611, 74, 750, 141, 790, 226, 746, 321, 801, 420, 717,
-                521, 586, 553, 505, 496, 389, 515, 317, 416, 243, 360, 274, 280, 226, 230,
-              ].map((n) => n * MAP_UNITS),
+              countryOutline.map((n) => n * MAP_UNITS),
             )
             .fill(0xd4ddda)
             .stroke({ color: 0xaebeb8, width: 4 });
           world.addChild(territory);
+          const contours=new Graphics();
+          for(const line of terrainContours){
+            contours.moveTo(line[0]*MAP_UNITS,line[1]*MAP_UNITS);
+            for(let i=2;i<line.length;i+=2)contours.lineTo(line[i]*MAP_UNITS,line[i+1]*MAP_UNITS);
+          }
+          contours.stroke({color:0xb0c0b4,alpha:.32,width:2});
+          world.addChild(contours);
           // Strategic Atlas: subtle coordinate grid and district geometry are decorative only.
           const atlasGrid = new Graphics();
           for (let gx = 160; gx <= 1760; gx += 160)
@@ -254,7 +266,10 @@ export function CountryMap(props: Props) {
                 16,
               );
             const assets = facilities.filter((f) => f.cityId === city.id);
+            if (active === 'Operations' && assets.length > 0)
+              label(`${assets.length} FACILITIES`,x+40,y+12,16);
             assets.forEach((f, index) => {
+              if(camera.scale / fitCamera(view).scale < 2.6) return;
               const fx = x - 28 + index * 32,
                 fy = y + 52;
               const selectedAsset =
@@ -269,7 +284,7 @@ export function CountryMap(props: Props) {
               world.addChild(
                 new Graphics().rect(fx - 9, fy - 9, 18, 18).fill(ownerColor(f.companyId)),
               );
-              if (active === 'Operations' || active === 'Competition')
+              if ((active === 'Operations' || active === 'Competition') && camera.scale / fitCamera(view).scale >= 3)
                 label(
                   active === 'Operations'
                     ? `${f.name} · ${f.kind.toUpperCase()}`
@@ -280,7 +295,7 @@ export function CountryMap(props: Props) {
                   ownerColor(f.companyId),
                 );
             });
-            if (active === 'Competition') {
+            if (active === 'Competition' && camera.scale / fitCamera(view).scale >= 3) {
               [...new Set(assets.map((f) => f.companyId))].forEach((id, index) => {
                 const cx = x - 28 + index * 40,
                   cy = y + 96;
