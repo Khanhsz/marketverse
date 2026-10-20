@@ -1,0 +1,29 @@
+name: Format Final Legacy Cleanup (one-shot)
+on:
+  push:
+    branches:
+      - chore/remove-legacy-ui-and-map
+    paths:
+      - .github/workflows/format-final-cleanup-once.yml
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/remove-legacy-ui-and-map
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --no-audit --no-fund
+      - run: npx prettier --write src/ui/CountryMap.tsx src/ui/styles.css scripts/browser-map.mjs scripts/browser-campaign.mjs scripts/browser-profile.mjs scripts/run-browser-smoke.mjs scripts/browser-smoke.mjs
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/ui/CountryMap.tsx src/ui/styles.css scripts/browser-map.mjs scripts/browser-campaign.mjs scripts/browser-profile.mjs scripts/run-browser-smoke.mjs scripts/browser-smoke.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m "style(test): format unified map browser regressions"
+            git push origin HEAD:chore/remove-legacy-ui-and-map
+          fi
