@@ -9,6 +9,7 @@ import { fitCamera, MAP_UNITS, panCamera, screenToWorld, zoomCamera } from './ca
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
+import { cityWorldPoint, cityLabelPoint, cityCardBounds } from '../map/cityAnchors';
 
 type Props = {
   cities: City[];
@@ -22,6 +23,7 @@ type Props = {
   factories: Factory[];
   playerId: string;
   activeLayer: Layer;
+  layout?: 'artwork' | 'legacy';
   onSelect: (selection: Selection) => void;
 };
 const layers = ['Market', 'Competition', 'Operations', 'Logistics', 'Economy'] as const;
@@ -203,6 +205,7 @@ export function CountryMap(props: Props) {
           for (const child of overlays.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
+          const layout = current.current.layout ?? 'artwork';
           // Illustrated cartography is loaded from a clean PNG artwork.
           // All dynamic game entities and routes are rendered separately above it.
           // Keep the decoded artwork mounted while only the data overlays are rebuilt.
@@ -211,14 +214,14 @@ export function CountryMap(props: Props) {
             for (const id of city.links) {
               const other = cities.find((c) => c.id === id);
               if (!other || city.id >= id) continue;
-              roads
-                .moveTo(city.x * MAP_UNITS, city.y * MAP_UNITS)
-                .lineTo(other.x * MAP_UNITS, other.y * MAP_UNITS);
+              const from = cityWorldPoint(city, layout);
+              const to = cityWorldPoint(other, layout);
+              roads.moveTo(from.x, from.y).lineTo(to.x, to.y);
               if (active === 'Logistics')
                 label(
                   'TRANSPORT LINK',
-                  ((city.x + other.x) * MAP_UNITS) / 2 + 20,
-                  ((city.y + other.y) * MAP_UNITS) / 2,
+                  (from.x + to.x) / 2 + 20,
+                  (from.y + to.y) / 2,
                   16,
                 );
             }
@@ -229,8 +232,8 @@ export function CountryMap(props: Props) {
             overlays.addChild(roads);
           } else roads.destroy();
           for (const city of cities) {
-            const x = city.x * MAP_UNITS,
-              y = city.y * MAP_UNITS;
+            const { x, y } = cityWorldPoint(city, layout);
+            const { x: labelX, y: labelY } = cityLabelPoint(city, layout);
             selectedLabel = city.id === selectedCityId;
             const selected = city.id === selectedCityId,
               metric = current.current.metrics.find((m) => m.cityId === city.id);
@@ -320,26 +323,26 @@ export function CountryMap(props: Props) {
                 .roundRect(x - 15, y - 15, 30, 30, 6)
                 .fill(selected ? 0x24554b : 0x6d8880),
             );
-            if (active !== 'Operations') label(city.name.toUpperCase(), x + 40, y - 18);
+            if (active !== 'Operations') label(city.name.toUpperCase(), labelX, labelY);
             if (active === 'Market')
               label(
                 `${(city.population / 1000000).toFixed(2)}M · ${metric?.potential == null ? 'DEMAND AFTER FIRST WEEK' : metric.potential + ' potential buyers'}`,
-                x + 40,
-                y + 12,
+                labelX,
+                labelY + 30,
                 16,
               );
             if (active === 'Economy')
-              label(`PURCHASING POWER ${city.power.toFixed(2)}×`, x + 40, y + 12, 16);
+              label(`PURCHASING POWER ${city.power.toFixed(2)}×`, labelX, labelY + 30, 16);
 
             if (active === 'Logistics')
-              label(`INCOMING ${metric?.incoming || 0} UNITS`, x + 40, y + 12, 16);
+              label(`INCOMING ${metric?.incoming || 0} UNITS`, labelX, labelY + 30, 16);
             if (active === 'Competition')
               label(
                 metric?.playerShare == null
                   ? `${new Set(facilities.filter((f) => f.cityId === city.id).map((f) => f.companyId)).size} COMPANIES PRESENT`
                   : `PLAYER SHARE ${((metric.playerShare || 0) * 100).toFixed(1)}%`,
-                x + 40,
-                y + 12,
+                labelX,
+                labelY + 30,
                 16,
               );
             const assets = facilities.filter((f) => f.cityId === city.id);
@@ -438,10 +441,8 @@ export function CountryMap(props: Props) {
                 mainAsset?.kind === 'factory'
                   ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
                   : 'Tồn kho của bạn: ' + locationStock + ' SP';
-              const cardY = y - 138;
-              const cardX = x - 16;
-              const cardWidth = 284;
-              const cardHeight = 91;
+              const { x: cardX, y: cardY, width: cardWidth, height: cardHeight } =
+                cityCardBounds(city, layout);
               overlays.addChild(
                 new Graphics()
                   .roundRect(cardX, cardY, cardWidth, cardHeight, 13)
@@ -540,9 +541,9 @@ export function CountryMap(props: Props) {
             const w = screenToWorld(camera, view, p);
             if (layerRef.current === 'Operations') {
               for (const c of current.current.cities) {
-                const x = c.x * MAP_UNITS;
-                const y = c.y * MAP_UNITS;
-                if (w.x >= x - 16 && w.x <= x + 268 && w.y >= y - 138 && w.y <= y - 47) {
+                const card = cityCardBounds(c, current.current.layout ?? 'artwork');
+                if (w.x >= card.x && w.x <= card.x + card.width &&
+                    w.y >= card.y && w.y <= card.y + card.height) {
                   const assets = current.current.facilities.filter((f) => f.cityId === c.id);
                   const prioritized = [...assets].sort(
                     (a, b) =>
@@ -563,8 +564,10 @@ export function CountryMap(props: Props) {
             }
             const city = current.current.cities.find(
               (c) =>
-                Math.hypot(c.x * MAP_UNITS - w.x, c.y * MAP_UNITS - w.y) <=
-                Math.max(20, 12 / camera.scale),
+                Math.hypot(
+                  cityWorldPoint(c, current.current.layout ?? 'artwork').x - w.x,
+                  cityWorldPoint(c, current.current.layout ?? 'artwork').y - w.y,
+                ) <= Math.max(20, 12 / camera.scale),
             );
             // Assets take priority over the wider city hit area. Positions match the rendered slots.
             for (const c of current.current.cities) {
@@ -576,8 +579,8 @@ export function CountryMap(props: Props) {
               const assets = current.current.facilities.filter((f) => f.cityId === c.id);
               const facility = assets.find(
                 (_, i) =>
-                  Math.abs(w.x - (c.x * MAP_UNITS - 28 + i * 32)) <= 12 &&
-                  Math.abs(w.y - (c.y * MAP_UNITS + 52)) <= 12,
+                  Math.abs(w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 32)) <= 12 &&
+                  Math.abs(w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 52)) <= 12,
               );
               if (facility) {
                 current.current.onSelect({ kind: 'facility', id: facility.id });
@@ -587,8 +590,8 @@ export function CountryMap(props: Props) {
                 const owner = [...new Set(assets.map((f) => f.companyId))].find(
                   (_, i) =>
                     Math.hypot(
-                      w.x - (c.x * MAP_UNITS - 28 + i * 40),
-                      w.y - (c.y * MAP_UNITS + 96),
+                      w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 40),
+                      w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 96),
                     ) <= 16,
                 );
                 if (owner) {
@@ -652,12 +655,11 @@ export function CountryMap(props: Props) {
             action === 'focus'
               ? {
                   ...camera,
-                  x:
-                    (current.current.cities.find((c) => c.id === current.current.selectedCityId)
-                      ?.x || 480) * MAP_UNITS,
-                  y:
-                    (current.current.cities.find((c) => c.id === current.current.selectedCityId)
-                      ?.y || 320) * MAP_UNITS,
+                  ...cityWorldPoint(
+                    current.current.cities.find((c) => c.id === current.current.selectedCityId) ||
+                    current.current.cities[0],
+                    current.current.layout ?? 'artwork',
+                  ),
                 }
               : action === 'reset'
                 ? fitCamera(view)
@@ -736,6 +738,7 @@ export function CountryMap(props: Props) {
     props.products,
     props.factories,
     props.playerId,
+    props.layout,
     layer,
   ]);
   return (
