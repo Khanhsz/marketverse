@@ -42,7 +42,7 @@ export function App() {
     [importing, setImporting] = useState(false),
     [importError, setImportError] = useState('');
   const announcedResult = useRef('');
-  const [panelOpen, setPanelOpen] = useState(true),
+  const [panelOpen, setPanelOpen] = useState(() => window.innerWidth > 849),
     [guideOpen, setGuideOpen] = useState(false);
   const [shortcuts, setShortcuts] = useState(() => {
     try {
@@ -140,7 +140,7 @@ export function App() {
     return () => window.removeEventListener('keydown', key);
   }, [shortcuts, plannerOpen, reportsOpen, guideOpen, resultOpen, recovery, game.campaign.status]);
   const choose = (value: Selection) => {
-    if (resolveSelection(game, value)) setSelection(value);
+    if (resolveSelection(game, value)) { setSelection(value); if (window.innerWidth <= 849) setPanelOpen(true); }
   };
   const cityButton = (id: string) => (
     <button className="entityLink" key={id} onClick={() => choose({ kind: 'city', id })}>
@@ -273,6 +273,7 @@ export function App() {
           aria-label="Selection details"
           data-selection={`${context.kind}:${context.entity.id}`}
         >
+          <button className="mobilePanelClose" aria-label="Close details" onClick={() => setPanelOpen(false)}>×</button>
           <small>{context.kind.toUpperCase()} INTELLIGENCE</small>
           <h1>{context.entity.name}</h1>
           {context.kind === 'city' && (
