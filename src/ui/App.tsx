@@ -15,7 +15,6 @@ const CountryMap = lazy(() =>
 );
 import {
   advanceWeek,
-  createInitialGame,
   deserializeGame,
   SAVE_KEY,
   serializeGame,
@@ -30,13 +29,13 @@ function loadGame() {
       try {
         return { game: deserializeGame(raw), recovery: '' };
       } catch {
-        return { game: createInitialGame(), recovery: raw };
+        return { game: createNationalCampaign(), recovery: raw };
       }
     }
   } catch {
-    return { game: createInitialGame(), recovery: 'Storage is unavailable' };
+    return { game: createNationalCampaign(), recovery: 'Storage is unavailable' };
   }
-  return { game: createInitialGame(), recovery: '' };
+  return { game: createNationalCampaign(), recovery: '' };
 }
 export function App() {
   const panelRef = useRef<HTMLElement>(null);
@@ -49,8 +48,21 @@ export function App() {
     setPlannerOpen(true);
   };
   const resetGame = () => {
-    if (window.confirm('Reset game? This discards the existing save.')) {
-      setGame(createInitialGame());
+    if (window.confirm('Bắt đầu lại với 8 thành phố? Save hiện tại sẽ bị thay thế. Hãy xuất file lưu game trước nếu muốn giữ tiến trình cũ.')) {
+      setGame(createNationalCampaign());
+      setSelection({ kind: 'city', id: 'central' });
+      setRecovery('');
+      committedWeek.current = 0;
+      announcedResult.current = '';
+    }
+  };
+  const startEightCities = () => {
+    if (
+      window.confirm(
+        'Chuyển sang quốc gia 8 thành phố (National Campaign 104 tuần)? Tiến trình hiện tại sẽ bị thay thế. Hãy xuất file lưu game trước để có thể khôi phục.',
+      )
+    ) {
+      setGame(createNationalCampaign());
       setSelection({ kind: 'city', id: 'central' });
       setRecovery('');
       committedWeek.current = 0;
@@ -390,6 +402,7 @@ export function App() {
               onGuide={() => setGuideOpen(true)}
               onExport={exportGame}
               onReset={resetGame}
+              onStartNational={startEightCities}
               onInspect={() => setDepartment('insight')}
             />
           )}
@@ -649,22 +662,7 @@ export function App() {
                   ))}
                 </>
               )}
-              <button
-                className="entityLink"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      'Start a new 104-week national campaign? Existing progress will be replaced.',
-                    )
-                  ) {
-                    setGame(createNationalCampaign());
-                    setSelection({ kind: 'city', id: 'central' });
-                    setRecovery('');
-                    committedWeek.current = 0;
-                    announcedResult.current = '';
-                  }
-                }}
-              >
+              <button className="entityLink" onClick={startEightCities}>
                 Start national campaign
               </button>
             </details>
