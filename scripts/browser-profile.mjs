@@ -56,7 +56,11 @@ try {
       await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
       true,
     );
-    await page.getByRole('button', { name: 'Reset view', exact: true }).click();
+    const keyboardMap = page.getByRole('application', {
+      name: 'Country map: arrow keys pan, plus or minus zoom, Home fits view',
+    });
+    await keyboardMap.focus();
+    await page.keyboard.press('Home');
     mkdirSync('.browser-artifacts', { recursive: true });
     await page.screenshot({ path: `.browser-artifacts/laptop-${width}-${dpr}x.png` });
     results.push({

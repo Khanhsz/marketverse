@@ -531,12 +531,6 @@ export function DepartmentPanel({
           <button className="commandSecondary" onClick={onInspect}>
             Thông tin nâng cao &amp; nhập save
           </button>
-          <button
-            className="commandSecondary"
-            onClick={() => window.location.assign(window.location.pathname + '?view=classic')}
-          >
-            Chuyển sang giao diện chi tiết
-          </button>
           <button className="commandDanger" onClick={onReset}>
             Bắt đầu lại trò chơi
           </button>

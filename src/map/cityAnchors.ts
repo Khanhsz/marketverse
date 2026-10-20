@@ -30,20 +30,19 @@ export const CITY_LABEL_OFFSETS = {
 } as const;
 
 type CityLocation = { id: string; x: number; y: number };
-type Layout = 'artwork' | 'legacy';
 type AnchorId = keyof typeof CITY_ARTWORK_ANCHORS;
 
 /** World-space coordinate used consistently by every Pixi overlay and hit test. */
-export function cityWorldPoint(city: CityLocation, layout: Layout = 'artwork') {
+export function cityWorldPoint(city: CityLocation) {
   const anchor = CITY_ARTWORK_ANCHORS[city.id as AnchorId];
-  if (layout === 'legacy' || !anchor) return { x: city.x * 2, y: city.y * 2 };
+  if (!anchor) return { x: city.x * 2, y: city.y * 2 };
   return { x: anchor.x * WORLD_SIZE.width, y: anchor.y * WORLD_SIZE.height };
 }
 
 /** Default Pixi labels are offset from the city marker to avoid covering it. */
-export function cityLabelPoint(city: CityLocation, layout: Layout = 'artwork') {
-  const center = cityWorldPoint(city, layout);
-  const shift = layout === 'artwork' ? CITY_LABEL_OFFSETS[city.id as AnchorId] : undefined;
+export function cityLabelPoint(city: CityLocation) {
+  const center = cityWorldPoint(city);
+  const shift = CITY_LABEL_OFFSETS[city.id as AnchorId];
   // Label offsets from the design are authored in PNG pixels (world/artwork = 1.25).
   return {
     x: center.x + 40 + (shift?.dx ?? 0) * 1.25,
@@ -54,13 +53,9 @@ export function cityLabelPoint(city: CityLocation, layout: Layout = 'artwork') {
 /**
  * In the visual UI, all cities have small clickable chips and only the
  * selected city gets a detailed card. This prevents 8 big banners over the map.
- * Legacy layout keeps the original full-size cards and old hit regions.
  */
-export function cityCardBounds(city: CityLocation, layout: Layout = 'artwork', expanded = false) {
-  const center = cityWorldPoint(city, layout);
-  if (layout === 'legacy') {
-    return { x: center.x - 16, y: center.y - 138, width: 284, height: 91 };
-  }
+export function cityCardBounds(city: CityLocation, expanded = false) {
+  const center = cityWorldPoint(city);
   const fullOffsets: Partial<Record<AnchorId, { dx: number; dy: number }>> = {
     north: { dx: 22, dy: -133 },
     lake: { dx: 28, dy: -130 },

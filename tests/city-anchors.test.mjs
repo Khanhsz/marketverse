@@ -28,13 +28,12 @@ test('the artwork has one grounded normalized anchor and label offset per nation
   }
 });
 
-test('city art anchors do not modify saved simulation coordinates or legacy hit locations', () => {
+test('city art anchors do not modify saved simulation coordinates', () => {
   const initial = createInitialGame();
   const before = structuredClone(initial.cities);
   assert.deepEqual(initial.cities.map((c) => c.id).sort(), ['central', 'north', 'south']);
   for (const city of initial.cities) {
-    assert.deepEqual(cityWorldPoint(city, 'legacy'), { x: city.x * 2, y: city.y * 2 });
-    assert.ok(cityWorldPoint(city, 'artwork').x !== city.x * 2);
+    assert.ok(cityWorldPoint(city).x !== city.x * 2);
   }
   assert.deepEqual(initial.cities, before);
   const unknown = { id: 'future-city', x: 110, y: 140 };
@@ -48,7 +47,7 @@ test('all city operation cards stay within the atlas and do not overlap each oth
   for (const selected of cities) {
     const cards = cities.map((city) => ({
       id: city.id,
-      ...cityCardBounds(city, 'artwork', city.id === selected.id),
+      ...cityCardBounds(city, city.id === selected.id),
     }));
     for (const card of cards) {
       assert.ok(card.x >= 0 && card.x + card.width <= 1920, selected.id + ': ' + card.id);

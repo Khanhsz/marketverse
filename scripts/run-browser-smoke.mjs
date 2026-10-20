@@ -19,9 +19,7 @@ try {
       await server.listen();
       stop = () => server.close();
     }
-    process.env.SMOKE_URL =
-      'http://127.0.0.1:5174/' +
-      (process.env.BROWSER_SUITE === './browser-visual.mjs' ? '' : '?view=classic');
+    process.env.SMOKE_URL = 'http://127.0.0.1:5174/';
   }
   await import(process.env.BROWSER_SUITE || './browser-smoke.mjs');
 } finally {

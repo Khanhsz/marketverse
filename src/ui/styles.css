@@ -1595,7 +1595,7 @@ canvas:focus-visible {
   color: var(--mv-ink);
 }
 .commandVisual .panel[hidden],
-.commandVisual .legacyPanelContent[hidden] {
+.commandVisual .detailPanelContent[hidden] {
   display: none;
 }
 .commandPanelContent {
@@ -1843,31 +1843,31 @@ button.commandListCard:hover {
   font-size: 9px;
   letter-spacing: 0.6px;
 }
-.commandVisual .legacyPanelContent {
+.commandVisual .detailPanelContent {
   padding: 22px 18px 30px;
   color: #e7f3e9;
 }
-.commandVisual .legacyPanelContent .muted,
-.commandVisual .legacyPanelContent .stat,
-.commandVisual .legacyPanelContent small,
-.commandVisual .legacyPanelContent .entityLink {
+.commandVisual .detailPanelContent .muted,
+.commandVisual .detailPanelContent .stat,
+.commandVisual .detailPanelContent small,
+.commandVisual .detailPanelContent .entityLink {
   color: #bcdbca;
 }
-.commandVisual .legacyPanelContent .productCard,
-.commandVisual .legacyPanelContent .notice,
-.commandVisual .legacyPanelContent .queueItem,
-.commandVisual .legacyPanelContent .reportTotals {
+.commandVisual .detailPanelContent .productCard,
+.commandVisual .detailPanelContent .notice,
+.commandVisual .detailPanelContent .queueItem,
+.commandVisual .detailPanelContent .reportTotals {
   background: #233c30;
   color: #e1f3e7;
   border-color: #45634e;
 }
-.commandVisual .legacyPanelContent .stat b {
+.commandVisual .detailPanelContent .stat b {
   color: #e9f6eb;
 }
-.commandVisual .legacyPanelContent h3 {
+.commandVisual .detailPanelContent h3 {
   color: #d2e9d9;
 }
-.commandVisual .legacyPanelContent hr {
+.commandVisual .detailPanelContent hr {
   border-color: #365a44;
 }
 .commandVisual .footer.commandFooter {
@@ -2061,4 +2061,32 @@ button.commandListCard:hover {
   .commandVisual *::after {
     transition-duration: 0s !important;
   }
+}
+
+/* Recoverable artwork load errors remain visible in the unified map interface. */
+.commandVisual .mapErrorBanner {
+  position: absolute;
+  z-index: 30;
+  top: 58px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 12px 16px;
+  color: #203e32;
+  background: #fffdf9;
+  border: 1px solid #b7c9bd;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px #193c2930;
+  transform: translateX(-50%);
+  font-size: 12px;
+}
+.commandVisual .mapErrorBanner button {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  color: #ffffff;
+  background: #265b4d;
+  border: 0;
+  border-radius: 6px;
 }
