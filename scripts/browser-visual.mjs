@@ -22,8 +22,9 @@ try {
   // Map cards must remain real, world-anchored and selectable.
   const camera = JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
   const canvas = await page.locator('canvas').boundingBox();
-  const targetX = 550 * 2 + 100;
-  const targetY = 300 * 2 - 92;
+  // The new artwork anchor is independent of the original engine x/y values.
+  const targetX = 0.63 * 1920 + 100;
+  const targetY = 0.47 * 1280 - 92;
   await page.mouse.click(
     canvas.x + canvas.width / 2 + (targetX - camera.x) * camera.scale,
     canvas.y + canvas.height / 2 + (targetY - camera.y) * camera.scale,
