@@ -63,7 +63,7 @@ function addText(
   y: number,
   size: number,
   color = 0xffffff,
-  weight = '700',
+  weight: '700' | '400' = '700',
 ) {
   const text = new Text({
     text: value,
