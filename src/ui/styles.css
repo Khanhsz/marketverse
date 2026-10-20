@@ -662,3 +662,28 @@ canvas:focus-visible {
   color: #426456;
   font-size: 14px;
 }
+
+
+/* Strategic Atlas A: laptop-first map UI. Pure presentation; simulation remains untouched. */
+:root{--atlas-ink:#233e35;--atlas-line:#d6e1da;--atlas-paper:#fbfcfa;--atlas-accent:#285f4d}
+.mapArea{background:#edf1ee}
+.mapSurface{background:radial-gradient(circle at 52% 44%,#f4f7f3 0%,#e9efeb 76%)}
+.mapLayers{top:58px;left:20px;right:auto;max-width:calc(100% - 40px);gap:0;padding:4px;border:1px solid var(--atlas-line);border-radius:10px;background:rgba(251,252,250,.95);box-shadow:0 5px 20px #28453612}
+.mapLayers button{border:0;border-radius:7px;background:transparent;color:#536d60;padding:10px 12px;font-size:11px;font-weight:700;transition:background .15s ease,color .15s ease}
+.mapLayers button:hover{background:#e9f0eb}
+.mapLayers button[aria-pressed='true']{background:var(--atlas-accent);color:white;box-shadow:0 2px 6px #244b3d24}
+.cityPicker{top:14px;right:18px;padding:5px 8px 5px 12px;border:1px solid var(--atlas-line);border-radius:9px;background:rgba(251,252,250,.96);font-weight:700;box-shadow:0 5px 20px #28453610}
+.cityPicker select{border:0;background:transparent;font-weight:600;min-width:130px}
+.mapControls{right:18px;bottom:58px;width:164px;gap:5px;padding:6px;border:1px solid var(--atlas-line);border-radius:10px;background:rgba(251,252,250,.96);box-shadow:0 5px 20px #28453612}
+.mapControls button{border:1px solid #e0e8e1;border-radius:6px;background:#fff;font-weight:700;min-height:34px}
+.mapControls button:hover{background:#e9f0eb}
+.mapLegend{left:20px;right:200px;bottom:46px;max-width:540px;border:1px solid var(--atlas-line);border-radius:9px;background:rgba(251,252,250,.95);box-shadow:0 5px 20px #2845360e;padding:12px 14px;line-height:1.45;color:var(--atlas-ink)}
+.overlay{top:19px;left:20px;color:#365e4d;font-size:10px;letter-spacing:1.6px}
+.panel{background:var(--atlas-paper);border-color:var(--atlas-line)}
+.panel h1{color:var(--atlas-ink)}
+.rail{background:var(--atlas-paper);border-color:var(--atlas-line)}
+.rail button{transition:background .15s ease,transform .15s ease}
+.rail button:hover{background:#e7efea;transform:translateY(-1px)}
+.rail button[aria-pressed='true']{background:#dceae1;color:#245a46}
+@media(max-width:1100px){.mapLayers{left:14px;top:58px}.mapLayers button{padding:9px 8px}.mapLegend{left:14px;right:192px}}
+@media(prefers-reduced-motion:reduce){.mapLayers button,.rail button{transition:none}}
