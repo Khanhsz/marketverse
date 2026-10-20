@@ -65,4 +65,76 @@
  </g>
 </g>
 <path d="M560 272L770 156L1042 212L1222 148L1500 282L1580 452L1492 642L1602 840L1434 1042L1172 1106L1010 992L778 1030L634 832L486 720L548 560L452 460Z" fill="none" stroke="#91aa9c" stroke-width="5"/>
+
+<!-- Atlas detail pass: authored streets, parks, docks, topography and landmarks -->
+<g clip-path="url(#land)">
+ <g fill="none" stroke="#b6c7b6" stroke-width="2.2" opacity=".58">
+  <path d="M505 360Q650 325 770 390T1010 405T1280 310T1540 380"/>
+  <path d="M505 380Q650 345 770 410T1010 425T1280 330T1540 400"/>
+  <path d="M505 400Q650 365 770 430T1010 445T1280 350T1540 420"/>
+  <path d="M525 860Q690 800 825 850T1070 885T1370 855T1550 890"/>
+  <path d="M525 885Q690 825 825 875T1070 910T1370 880T1550 915"/>
+  <path d="M525 910Q690 850 825 900T1070 935T1370 905T1550 940"/>
+ </g>
+ <g fill="#a9c4ad" opacity=".62">
+  <path d="M540 475l90 -25 60 55 -50 50 -90 -20z"/>
+  <path d="M1120 260l115 -28 95 70 -35 65 -125 -15z"/>
+  <path d="M690 805l110 -40 65 50 -45 75 -110 -15z"/>
+  <path d="M1350 650l115 -20 45 65 -60 50 -95 -15z"/>
+ </g>
+ <g fill="#dce8db" stroke="#a6c0ac" stroke-width="2">
+  <path d="M545 490l85 -18 37 36 -45 31 -65 -15z"/>
+  <path d="M1180 250l86 -10 43 42 -28 51 -84 -14z"/>
+  <path d="M1380 675l75 -15 30 38 -42 27 -55 -15z"/>
+ </g>
+ <g fill="none" stroke="#f6f8f2" stroke-width="5" opacity=".95">
+  <path d="M610 285H825M610 325H825M610 365H825M650 245V408M705 245V408M765 245V408"/>
+  <path d="M870 565H1190M870 605H1190M870 645H1190M870 685H1190M870 725H1190M915 525V765M970 525V765M1025 525V765M1080 525V765M1135 525V765"/>
+  <path d="M1245 825H1490M1245 865H1490M1245 905H1490M1245 945H1490M1290 805V965M1340 805V965M1390 805V965M1440 805V965"/>
+ </g>
+ <g fill="#a4b9ae" opacity=".83">
+  <rect x="626" y="294" width="17" height="18" rx="2"/><rect x="670" y="294" width="23" height="18" rx="2"/><rect x="716" y="294" width="33" height="18" rx="2"/>
+  <rect x="778" y="338" width="25" height="17" rx="2"/><rect x="630" y="374" width="35" height="21" rx="2"/>
+  <rect x="890" y="576" width="28" height="17" rx="2"/><rect x="934" y="577" width="28" height="18" rx="2"/>
+  <rect x="989" y="575" width="25" height="18" rx="2"/><rect x="1041" y="575" width="25" height="18" rx="2"/>
+  <rect x="1093" y="577" width="27" height="16" rx="2"/><rect x="1151" y="575" width="23" height="17" rx="2"/>
+  <rect x="891" y="620" width="27" height="19" rx="2"/><rect x="937" y="620" width="28" height="19" rx="2"/>
+  <rect x="993" y="620" width="25" height="19" rx="2"/><rect x="1040" y="620" width="29" height="18" rx="2"/>
+  <rect x="1093" y="620" width="28" height="18" rx="2"/><rect x="1152" y="620" width="24" height="18" rx="2"/>
+  <rect x="891" y="662" width="27" height="19" rx="2"/><rect x="938" y="662" width="28" height="19" rx="2"/>
+  <rect x="991" y="663" width="29" height="17" rx="2"/><rect x="1041" y="663" width="26" height="17" rx="2"/>
+  <rect x="1094" y="663" width="28" height="17" rx="2"/><rect x="1150" y="663" width="25" height="17" rx="2"/>
+  <rect x="1270" y="834" width="28" height="17" rx="2"/><rect x="1310" y="834" width="25" height="17" rx="2"/>
+  <rect x="1355" y="834" width="29" height="17" rx="2"/><rect x="1405" y="834" width="25" height="17" rx="2"/>
+  <rect x="1270" y="877" width="29" height="17" rx="2"/><rect x="1311" y="877" width="26" height="17" rx="2"/>
+  <rect x="1356" y="877" width="30" height="17" rx="2"/><rect x="1406" y="877" width="28" height="17" rx="2"/>
+ </g>
+ <g fill="#c4d3c2" stroke="#a3b9a8" stroke-width="2">
+  <path d="M730 510h110v67H730z"/><path d="M1230 720h125v78h-125z"/>
+  <path d="M800 860h105v65H800z"/><path d="M1080 350h110v68h-110z"/>
+ </g>
+ <g fill="#91ada0" opacity=".8">
+  <rect x="740" y="518" width="39" height="22" rx="2"/><rect x="787" y="518" width="42" height="22" rx="2"/>
+  <rect x="740" y="549" width="89" height="18" rx="2"/>
+  <rect x="1240" y="731" width="50" height="24" rx="2"/><rect x="1298" y="731" width="45" height="24" rx="2"/>
+  <rect x="1240" y="765" width="103" height="21" rx="2"/>
+ </g>
+ <g fill="none" stroke="#f5f8f1" stroke-width="5">
+  <path d="M660 430L770 480L840 535M1150 450L1260 505L1350 575M760 750L840 800L930 830M1160 820L1230 875L1290 930"/>
+ </g>
+ <g fill="#90b6b7" stroke="#f1f6f2" stroke-width="3" opacity=".8">
+  <path d="M1360 945l25 12 35 -12 18 15 -44 23 -37 -18z"/>
+  <path d="M1410 970l20 12 25 -10 13 12 -32 18 -31 -16z"/>
+ </g>
+</g>
+<g fill="none" stroke="#8aafa9" stroke-width="3" opacity=".75">
+ <path d="M1180 660l50 -18M1175 674l55 -18M1168 689l62 -18"/>
+ <path d="M1365 1010l50 15M1370 1020l50 15"/>
+</g>
+<g font-family="Arial,sans-serif" fill="#769286" font-size="18" letter-spacing="3" opacity=".78">
+ <text x="590" y="620">WESTERN LOWLANDS</text>
+ <text x="1070" y="485">HIGHLANDS</text>
+ <text x="1240" y="1080">SOUTHERN COAST</text>
+ <text x="880" y="890">INDUSTRIAL BELT</text>
+</g>
 </svg>
