@@ -41,7 +41,9 @@ function loadGame() {
 export function App() {
   const panelRef = useRef<HTMLElement>(null);
   const [department, setDepartment] = useState<Department>('operations');
-  const [plannerStart, setPlannerStart] = useState<'products' | 'marketing' | 'finance' | 'projects'>('products');
+  const [plannerStart, setPlannerStart] = useState<
+    'products' | 'marketing' | 'finance' | 'projects'
+  >('products');
   const planFor = (section: 'products' | 'marketing' | 'finance' | 'projects') => {
     setPlannerStart(section);
     setPlannerOpen(true);
@@ -214,7 +216,12 @@ export function App() {
   return (
     <div className="app commandVisual">
       <header className="header">
-        <div className="logo commandLogo"><div>⬡ <strong>MARKETVERSE</strong></div><span>COUNTRY STRATEGY MAP</span></div>
+        <div className="logo commandLogo">
+          <div>
+            ⬡ <strong>MARKETVERSE</strong>
+          </div>
+          <span>COUNTRY STRATEGY MAP</span>
+        </div>
         <div className="metrics">
           <div>
             <small>THỜI GIAN</small>
@@ -233,9 +240,21 @@ export function App() {
         </div>
       </header>
       <div className={`workspace ${panelOpen ? '' : 'panelCollapsed'}`}>
-        <DepartmentRail active={department} onChange={(id) => { setDepartment(id); setPanelOpen(true); setQuickActionsOpen(false); if (id === 'reports') setReportsOpen(true); }} />
+        <DepartmentRail
+          active={department}
+          onChange={(id) => {
+            setDepartment(id);
+            setPanelOpen(true);
+            setQuickActionsOpen(false);
+            if (id === 'reports') setReportsOpen(true);
+          }}
+        />
         <main className="mapArea">
-          <div className="overlay commandMapHeader">{department === 'insight' ? 'CITY INTELLIGENCE' : department.toUpperCase() + ' · COUNTRY STRATEGY'} </div>
+          <div className="overlay commandMapHeader">
+            {department === 'insight'
+              ? 'CITY INTELLIGENCE'
+              : department.toUpperCase() + ' · COUNTRY STRATEGY'}{' '}
+          </div>
           <div className="commandNational">NATIONAL</div>
           <Suspense
             fallback={
@@ -255,7 +274,19 @@ export function App() {
               stocks={game.stocks}
               factories={game.factories}
               playerId={game.playerId}
-              activeLayer={department === 'operations' || department === 'projects' ? 'Operations' : department === 'logistics' ? 'Logistics' : department === 'finance' ? 'Economy' : department === 'products' || department === 'marketing' ? 'Market' : department === 'people' || department === 'settings' ? 'Operations' : 'Competition'}
+              activeLayer={
+                department === 'operations' || department === 'projects'
+                  ? 'Operations'
+                  : department === 'logistics'
+                    ? 'Logistics'
+                    : department === 'finance'
+                      ? 'Economy'
+                      : department === 'products' || department === 'marketing'
+                        ? 'Market'
+                        : department === 'people' || department === 'settings'
+                          ? 'Operations'
+                          : 'Competition'
+              }
               onSelect={choose}
             />
           </Suspense>
@@ -345,313 +376,320 @@ export function App() {
           >
             ×
           </button>
-          {department !== 'insight' && <DepartmentPanel
-            game={game} city={city} selection={selection} department={department}
-            onPlan={planFor} onSelect={choose}
-            onReports={() => setReportsOpen(true)}
-            onGuide={() => setGuideOpen(true)}
-            onExport={exportGame} onReset={resetGame}
-            onInspect={() => setDepartment('insight')}
-          />}
+          {department !== 'insight' && (
+            <DepartmentPanel
+              game={game}
+              city={city}
+              selection={selection}
+              department={department}
+              onPlan={planFor}
+              onSelect={choose}
+              onReports={() => setReportsOpen(true)}
+              onGuide={() => setGuideOpen(true)}
+              onExport={exportGame}
+              onReset={resetGame}
+              onInspect={() => setDepartment('insight')}
+            />
+          )}
           <div className="legacyPanelContent" hidden={department !== 'insight'}>
-          <small>{context.kind.toUpperCase()} INTELLIGENCE</small>
-          <h1>{context.entity.name}</h1>
-          {context.kind === 'city' && (
-            <>
-              <p className="muted">Regional economic overview</p>
-              <hr />
-              <div className="stat">
-                POPULATION <b>{number(context.entity.population)}</b>
-              </div>
-              <div className="stat">
-                PURCHASING POWER <b>{context.entity.power.toFixed(2)}×</b>
-              </div>
-              <div className="stat">
-                TRANSPORT LINKS <b>{context.entity.links.length}</b>
-              </div>
-              <hr />
-              <h3>CONSUMER SEGMENTS</h3>
-              {Object.entries(context.entity.segments).map(([name, share]) => (
-                <div className="segment" key={name}>
-                  <div>
-                    {name.toUpperCase()} <b>{Math.round(share * 100)}%</b>
-                  </div>
-                  <div className="bar">
-                    <i style={{ width: share * 100 + '%' }} />
-                  </div>
-                </div>
-              ))}
-              <hr />
-              <h3>TRANSPORT CONNECTIONS</h3>
-              {context.entity.links.length ? (
-                context.entity.links.map(cityButton)
-              ) : (
-                <p className="muted">No direct connections</p>
-              )}
-              <h3>BUSINESS PRESENCE</h3>
-              {game.facilities
-                .filter((f) => f.cityId === city.id)
-                .map((f) => (
-                  <div className="facility" key={f.id}>
-                    <button
-                      className="entityLink"
-                      onClick={() => choose({ kind: 'facility', id: f.id })}
-                    >
-                      {f.name}
-                    </button>
-                    <small>{f.kind.toUpperCase()}</small>
-                    {ownerButton(f.companyId)}
-                  </div>
-                ))}
-              <h3>PLAYER PLACEMENT CHECK</h3>
-              <p className="muted">
-                One facility per kind and company in each city; one HQ per company. Use Next Week to
-                review construction orders.
-              </p>
-              {FACILITY_KINDS.map((kind) => (
-                <div className="stat" key={kind}>
-                  {kind.toUpperCase()}{' '}
-                  <span>
-                    {placementError(game, { companyId: player.id, cityId: city.id, kind })
-                      ? 'Already established'
-                      : 'Site available'}
-                  </span>
-                </div>
-              ))}
-            </>
-          )}
-          {context.kind === 'facility' && (
-            <>
-              <p className="muted">
-                {context.entity.kind.toUpperCase()} ·{' '}
-                {context.entity.companyId === player.id ? 'Player owned' : 'Competitor owned'}
-              </p>
-              <hr />
-              <h3>OWNER</h3>
-              {ownerButton(context.entity.companyId)}
-              <h3>LOCATION</h3>
-              {cityButton(context.entity.cityId)}
-              <h3>TRANSPORT CONNECTIONS</h3>
-              {city.links.map(cityButton)}
-              <div className="notice">
-                Select the company to inspect its products. Production requires workforce, component
-                kits and cash; every shipment has an arrival week.
-              </div>
-            </>
-          )}
-          {context.kind === 'company' && (
-            <>
-              <p className="muted">
-                {context.entity.control === 'human' ? 'Player company' : 'AI competitor'} ·{' '}
-                {context.entity.id}
-              </p>
-              <hr />
-              <div className="stat">
-                CASH <b>{number(context.entity.cash)}</b>
-              </div>
-              <div className="stat">
-                DEBT <b>{number(context.entity.debt)}</b>
-              </div>
-              <h3>PRODUCT PORTFOLIO</h3>
-              {game.products
-                .filter((p) => p.companyId === context.entity.id)
-                .map((p) => (
-                  <div className="productCard" key={p.id}>
-                    <strong>{p.name}</strong>
-                    <p>
-                      R{p.revision} · {p.lifecycle} · {p.segment}
-                    </p>
-                    <p>
-                      Price {p.price} · unit cost {p.cost} · stock {p.inventory}
-                    </p>
-                    <p>
-                      Quality {p.quality} · Design {p.attributes.design} · Performance{' '}
-                      {p.attributes.performance} · Durability {p.attributes.durability}
-                    </p>
-                  </div>
-                ))}
-              <h3>FACILITIES</h3>
-              {game.facilities
-                .filter((f) => f.companyId === context.entity.id)
-                .map((f) => (
-                  <div className="facility" key={f.id}>
-                    <button
-                      className="entityLink"
-                      onClick={() => choose({ kind: 'facility', id: f.id })}
-                    >
-                      {f.name}
-                    </button>
-                    {cityButton(f.cityId)}
-                  </div>
-                ))}
-              {context.entity.strategy && <p>Strategy: {context.entity.strategy}</p>}
-              <h3>COMPANY REGISTER</h3>
-              {game.companies.map((c) => (
-                <div key={c.id}>{ownerButton(c.id)}</div>
-              ))}
-            </>
-          )}
-          {game.reports.at(-1)?.demand && (
-            <details className="demandReport">
-              <summary>Market demand · {city.name}</summary>
-              {game.reports
-                .at(-1)!
-                .demand!.filter((d) => d.cityId === city.id)
-                .map((d) => (
-                  <p className="muted" key={d.segment}>
-                    {d.segment}: {d.potential} potential ·{' '}
-                    {d.allocations.reduce((n, a) => n + a.desired, 0)} preferred units · {d.outside}{' '}
-                    no purchase
-                  </p>
-                ))}
-              <p className="muted">
-                Preferences are potential orders; realized sales require local stock.
-              </p>
-            </details>
-          )}
-          <h3>LOCAL INVENTORY · {city.name}</h3>
-          {game.products
-            .filter((p) => p.companyId === player.id || localStock(game, p.id, city.id) > 0)
-            .map((p) => (
-              <p className="muted" key={p.id}>
-                {p.name}: {localStock(game, p.id, city.id)} units
-              </p>
-            ))}
-          {game.reports.at(-1)?.financials && (
-            <details className="financialReport" open>
-              <summary>Financial results · last week</summary>
-              {game.reports
-                .at(-1)!
-                .financials!.filter((f) => f.companyId === player.id)
-                .map((f) => (
-                  <div key={f.companyId}>
-                    <p>
-                      Revenue {number(f.revenue)} · COGS {number(f.cogs)}
-                    </p>
-                    <p>
-                      Expenses {number(f.expenses)} · Profit {number(f.profit)}
-                    </p>
-                    <p>
-                      Cash change {number(f.cashChange)} · Capex {number(f.capex)}
-                    </p>
-                    <p>
-                      Payables {number(f.payables)} · Net worth {number(f.netWorth)}
-                    </p>
-                  </div>
-                ))}
-            </details>
-          )}
-          <details className="staffReport">
-            <summary>People and brand</summary>
-            <p>
-              Production {game.staff[player.id].production} · Sales {game.staff[player.id].sales} ·
-              Research {game.staff[player.id].research}
-            </p>
-            {(['value', 'mainstream', 'premium'] as const).map((segment) => (
-              <p key={segment}>
-                {segment} awareness in {city.name}:{' '}
-                {Math.round((game.brand[brandKey(player.id, city.id, segment)] || 0) * 100)}%
-              </p>
-            ))}
-          </details>
-          <details className="macroReport">
-            <summary>Economy and events</summary>
-            <p>
-              Purchasing-power index {game.macro.index.toFixed(3)} · Seasonal demand{' '}
-              {game.macro.seasonal.toFixed(3)}×
-            </p>
-            {game.macro.events.slice(-2).map((e) => (
-              <p key={e.id}>
-                Week {e.week}: {e.title} · {(e.delta * 100).toFixed(1)} index points
-              </p>
-            ))}
-          </details>
-          <h3>PROJECT QUEUE</h3>
-          {game.projects
-            .filter((p) => p.companyId === player.id && p.status === 'active')
-            .map((p) => (
-              <p className="queueItem" key={p.id}>
-                {p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}
-              </p>
-            ))}
-          {game.reports.length > 0 && (
-            <details>
-              <summary>Last weekly report</summary>
-              {game.reports.at(-1)!.events.map((e, i) => (
-                <p className="muted" key={i}>
-                  {e}
-                </p>
-              ))}
-              <p>Cash change: {game.reports.at(-1)!.cashDelta[player.id]}</p>
-            </details>
-          )}
-          <div className="notice">
-            Sales use local stock; shipments require owned facilities at both ends. Production
-            requires a factory and a persistent target.
-          </div>
-          <details className="campaignReport" open>
-            <summary>
-              {game.campaign.mode === 'national'
-                ? '104-week national campaign'
-                : 'Foundation sandbox'}
-            </summary>
-            {game.campaign.mode === 'national' && (
+            <small>{context.kind.toUpperCase()} INTELLIGENCE</small>
+            <h1>{context.entity.name}</h1>
+            {context.kind === 'city' && (
               <>
-                <p>
-                  Completed {game.absoluteWeek - game.campaign.startWeek} / 104 weeks ·{' '}
-                  {game.campaign.status}
+                <p className="muted">Regional economic overview</p>
+                <hr />
+                <div className="stat">
+                  POPULATION <b>{number(context.entity.population)}</b>
+                </div>
+                <div className="stat">
+                  PURCHASING POWER <b>{context.entity.power.toFixed(2)}×</b>
+                </div>
+                <div className="stat">
+                  TRANSPORT LINKS <b>{context.entity.links.length}</b>
+                </div>
+                <hr />
+                <h3>CONSUMER SEGMENTS</h3>
+                {Object.entries(context.entity.segments).map(([name, share]) => (
+                  <div className="segment" key={name}>
+                    <div>
+                      {name.toUpperCase()} <b>{Math.round(share * 100)}%</b>
+                    </div>
+                    <div className="bar">
+                      <i style={{ width: share * 100 + '%' }} />
+                    </div>
+                  </div>
+                ))}
+                <hr />
+                <h3>TRANSPORT CONNECTIONS</h3>
+                {context.entity.links.length ? (
+                  context.entity.links.map(cityButton)
+                ) : (
+                  <p className="muted">No direct connections</p>
+                )}
+                <h3>BUSINESS PRESENCE</h3>
+                {game.facilities
+                  .filter((f) => f.cityId === city.id)
+                  .map((f) => (
+                    <div className="facility" key={f.id}>
+                      <button
+                        className="entityLink"
+                        onClick={() => choose({ kind: 'facility', id: f.id })}
+                      >
+                        {f.name}
+                      </button>
+                      <small>{f.kind.toUpperCase()}</small>
+                      {ownerButton(f.companyId)}
+                    </div>
+                  ))}
+                <h3>PLAYER PLACEMENT CHECK</h3>
+                <p className="muted">
+                  One facility per kind and company in each city; one HQ per company. Use Next Week
+                  to review construction orders.
                 </p>
-                <p>Multi-axis score: {campaignScore.total}/100</p>
-                {campaignScore.axes.map((a) => (
-                  <p key={a.name}>
-                    {a.name}: {a.value.toFixed(2)} / {a.target} {a.met ? '✓' : ''}
-                  </p>
+                {FACILITY_KINDS.map((kind) => (
+                  <div className="stat" key={kind}>
+                    {kind.toUpperCase()}{' '}
+                    <span>
+                      {placementError(game, { companyId: player.id, cityId: city.id, kind })
+                        ? 'Already established'
+                        : 'Site available'}
+                    </span>
+                  </div>
                 ))}
               </>
             )}
-            <button
-              className="entityLink"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    'Start a new 104-week national campaign? Existing progress will be replaced.',
-                  )
-                ) {
-                  setGame(createNationalCampaign());
-                  setSelection({ kind: 'city', id: 'central' });
-                  setRecovery('');
-                  committedWeek.current = 0;
-                  announcedResult.current = '';
-                }
-              }}
-            >
-              Start national campaign
+            {context.kind === 'facility' && (
+              <>
+                <p className="muted">
+                  {context.entity.kind.toUpperCase()} ·{' '}
+                  {context.entity.companyId === player.id ? 'Player owned' : 'Competitor owned'}
+                </p>
+                <hr />
+                <h3>OWNER</h3>
+                {ownerButton(context.entity.companyId)}
+                <h3>LOCATION</h3>
+                {cityButton(context.entity.cityId)}
+                <h3>TRANSPORT CONNECTIONS</h3>
+                {city.links.map(cityButton)}
+                <div className="notice">
+                  Select the company to inspect its products. Production requires workforce,
+                  component kits and cash; every shipment has an arrival week.
+                </div>
+              </>
+            )}
+            {context.kind === 'company' && (
+              <>
+                <p className="muted">
+                  {context.entity.control === 'human' ? 'Player company' : 'AI competitor'} ·{' '}
+                  {context.entity.id}
+                </p>
+                <hr />
+                <div className="stat">
+                  CASH <b>{number(context.entity.cash)}</b>
+                </div>
+                <div className="stat">
+                  DEBT <b>{number(context.entity.debt)}</b>
+                </div>
+                <h3>PRODUCT PORTFOLIO</h3>
+                {game.products
+                  .filter((p) => p.companyId === context.entity.id)
+                  .map((p) => (
+                    <div className="productCard" key={p.id}>
+                      <strong>{p.name}</strong>
+                      <p>
+                        R{p.revision} · {p.lifecycle} · {p.segment}
+                      </p>
+                      <p>
+                        Price {p.price} · unit cost {p.cost} · stock {p.inventory}
+                      </p>
+                      <p>
+                        Quality {p.quality} · Design {p.attributes.design} · Performance{' '}
+                        {p.attributes.performance} · Durability {p.attributes.durability}
+                      </p>
+                    </div>
+                  ))}
+                <h3>FACILITIES</h3>
+                {game.facilities
+                  .filter((f) => f.companyId === context.entity.id)
+                  .map((f) => (
+                    <div className="facility" key={f.id}>
+                      <button
+                        className="entityLink"
+                        onClick={() => choose({ kind: 'facility', id: f.id })}
+                      >
+                        {f.name}
+                      </button>
+                      {cityButton(f.cityId)}
+                    </div>
+                  ))}
+                {context.entity.strategy && <p>Strategy: {context.entity.strategy}</p>}
+                <h3>COMPANY REGISTER</h3>
+                {game.companies.map((c) => (
+                  <div key={c.id}>{ownerButton(c.id)}</div>
+                ))}
+              </>
+            )}
+            {game.reports.at(-1)?.demand && (
+              <details className="demandReport">
+                <summary>Market demand · {city.name}</summary>
+                {game.reports
+                  .at(-1)!
+                  .demand!.filter((d) => d.cityId === city.id)
+                  .map((d) => (
+                    <p className="muted" key={d.segment}>
+                      {d.segment}: {d.potential} potential ·{' '}
+                      {d.allocations.reduce((n, a) => n + a.desired, 0)} preferred units ·{' '}
+                      {d.outside} no purchase
+                    </p>
+                  ))}
+                <p className="muted">
+                  Preferences are potential orders; realized sales require local stock.
+                </p>
+              </details>
+            )}
+            <h3>LOCAL INVENTORY · {city.name}</h3>
+            {game.products
+              .filter((p) => p.companyId === player.id || localStock(game, p.id, city.id) > 0)
+              .map((p) => (
+                <p className="muted" key={p.id}>
+                  {p.name}: {localStock(game, p.id, city.id)} units
+                </p>
+              ))}
+            {game.reports.at(-1)?.financials && (
+              <details className="financialReport" open>
+                <summary>Financial results · last week</summary>
+                {game.reports
+                  .at(-1)!
+                  .financials!.filter((f) => f.companyId === player.id)
+                  .map((f) => (
+                    <div key={f.companyId}>
+                      <p>
+                        Revenue {number(f.revenue)} · COGS {number(f.cogs)}
+                      </p>
+                      <p>
+                        Expenses {number(f.expenses)} · Profit {number(f.profit)}
+                      </p>
+                      <p>
+                        Cash change {number(f.cashChange)} · Capex {number(f.capex)}
+                      </p>
+                      <p>
+                        Payables {number(f.payables)} · Net worth {number(f.netWorth)}
+                      </p>
+                    </div>
+                  ))}
+              </details>
+            )}
+            <details className="staffReport">
+              <summary>People and brand</summary>
+              <p>
+                Production {game.staff[player.id].production} · Sales {game.staff[player.id].sales}{' '}
+                · Research {game.staff[player.id].research}
+              </p>
+              {(['value', 'mainstream', 'premium'] as const).map((segment) => (
+                <p key={segment}>
+                  {segment} awareness in {city.name}:{' '}
+                  {Math.round((game.brand[brandKey(player.id, city.id, segment)] || 0) * 100)}%
+                </p>
+              ))}
+            </details>
+            <details className="macroReport">
+              <summary>Economy and events</summary>
+              <p>
+                Purchasing-power index {game.macro.index.toFixed(3)} · Seasonal demand{' '}
+                {game.macro.seasonal.toFixed(3)}×
+              </p>
+              {game.macro.events.slice(-2).map((e) => (
+                <p key={e.id}>
+                  Week {e.week}: {e.title} · {(e.delta * 100).toFixed(1)} index points
+                </p>
+              ))}
+            </details>
+            <h3>PROJECT QUEUE</h3>
+            {game.projects
+              .filter((p) => p.companyId === player.id && p.status === 'active')
+              .map((p) => (
+                <p className="queueItem" key={p.id}>
+                  {p.kind} · {p.remaining} weeks left · ready W{p.dueWeek}
+                </p>
+              ))}
+            {game.reports.length > 0 && (
+              <details>
+                <summary>Last weekly report</summary>
+                {game.reports.at(-1)!.events.map((e, i) => (
+                  <p className="muted" key={i}>
+                    {e}
+                  </p>
+                ))}
+                <p>Cash change: {game.reports.at(-1)!.cashDelta[player.id]}</p>
+              </details>
+            )}
+            <div className="notice">
+              Sales use local stock; shipments require owned facilities at both ends. Production
+              requires a factory and a persistent target.
+            </div>
+            <details className="campaignReport" open>
+              <summary>
+                {game.campaign.mode === 'national'
+                  ? '104-week national campaign'
+                  : 'Foundation sandbox'}
+              </summary>
+              {game.campaign.mode === 'national' && (
+                <>
+                  <p>
+                    Completed {game.absoluteWeek - game.campaign.startWeek} / 104 weeks ·{' '}
+                    {game.campaign.status}
+                  </p>
+                  <p>Multi-axis score: {campaignScore.total}/100</p>
+                  {campaignScore.axes.map((a) => (
+                    <p key={a.name}>
+                      {a.name}: {a.value.toFixed(2)} / {a.target} {a.met ? '✓' : ''}
+                    </p>
+                  ))}
+                </>
+              )}
+              <button
+                className="entityLink"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      'Start a new 104-week national campaign? Existing progress will be replaced.',
+                    )
+                  ) {
+                    setGame(createNationalCampaign());
+                    setSelection({ kind: 'city', id: 'central' });
+                    setRecovery('');
+                    committedWeek.current = 0;
+                    announcedResult.current = '';
+                  }
+                }}
+              >
+                Start national campaign
+              </button>
+            </details>
+            <button className="entityLink" onClick={exportGame}>
+              Export save
             </button>
-          </details>
-          <button className="entityLink" onClick={exportGame}>
-            Export save
-          </button>
-          <button className="entityLink" disabled={!!recovery} onClick={exportReplay}>
-            Export replay from week {JSON.parse(game.replay.origin).absoluteWeek}
-          </button>
-          <label className="importLabel">
-            Import save or replay
-            <input
-              aria-label="Import save or replay"
-              type="file"
-              accept=".json,application/json"
-              disabled={importing}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void importGame(file);
-                e.target.value = '';
-              }}
-            />
-          </label>
-          {importing && <p role="status">Checking saved game and replay…</p>}
-          {importError && (
-            <p role="alert">Import failed: {importError}. Current progress is preserved.</p>
-          )}
+            <button className="entityLink" disabled={!!recovery} onClick={exportReplay}>
+              Export replay from week {JSON.parse(game.replay.origin).absoluteWeek}
+            </button>
+            <label className="importLabel">
+              Import save or replay
+              <input
+                aria-label="Import save or replay"
+                type="file"
+                accept=".json,application/json"
+                disabled={importing}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void importGame(file);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+            {importing && <p role="status">Checking saved game and replay…</p>}
+            {importError && (
+              <p role="alert">Import failed: {importError}. Current progress is preserved.</p>
+            )}
           </div>
         </aside>
       </div>
@@ -694,9 +732,30 @@ export function App() {
         </button>
       </nav>
       <footer className="footer commandFooter">
-        <div className="weeklyPlanStatus"><strong>Kế hoạch tuần {String(game.week).padStart(2, '0')} · {game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length} dự án đang chạy</strong><span>Thay đổi có hiệu lực sau khi xác nhận tuần</span></div>
-        <button className="roundAdvance" title="Mở kế hoạch tuần" aria-label="Mở kế hoạch tuần" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>↓</button>
-        <button className="next commandNext" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>Xem kế hoạch tuần <span>→</span></button>
+        <div className="weeklyPlanStatus">
+          <strong>
+            Kế hoạch tuần {String(game.week).padStart(2, '0')} ·{' '}
+            {game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length}{' '}
+            dự án đang chạy
+          </strong>
+          <span>Thay đổi có hiệu lực sau khi xác nhận tuần</span>
+        </div>
+        <button
+          className="roundAdvance"
+          title="Mở kế hoạch tuần"
+          aria-label="Mở kế hoạch tuần"
+          onClick={() => planFor('projects')}
+          disabled={!!recovery || game.campaign.status !== 'active'}
+        >
+          ↓
+        </button>
+        <button
+          className="next commandNext"
+          onClick={() => planFor('projects')}
+          disabled={!!recovery || game.campaign.status !== 'active'}
+        >
+          Xem kế hoạch tuần <span>→</span>
+        </button>
       </footer>
       {resultOpen && (
         <CampaignResult game={game} onClose={() => setResultOpen(false)} onExport={exportGame} />

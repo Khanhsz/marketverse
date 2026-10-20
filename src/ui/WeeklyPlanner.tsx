@@ -17,7 +17,13 @@ type Props = {
   onClose: () => void;
   initialSection?: 'products' | 'marketing' | 'finance' | 'projects';
 };
-export function WeeklyPlanner({ game, cityId, onCommit, onClose, initialSection = 'products' }: Props) {
+export function WeeklyPlanner({
+  game,
+  cityId,
+  onCommit,
+  onClose,
+  initialSection = 'products',
+}: Props) {
   const [section, setSection] = useState<'products' | 'marketing' | 'finance' | 'projects'>(
     initialSection,
   );

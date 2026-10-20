@@ -51,7 +51,9 @@ export function CountryMap(props: Props) {
   const current = useRef(props);
   current.current = props;
   const [layer, setLayer] = useState<Layer>(props.activeLayer);
-  useEffect(() => { setLayer(props.activeLayer); }, [props.activeLayer]);
+  useEffect(() => {
+    setLayer(props.activeLayer);
+  }, [props.activeLayer]);
   const [layerMenuOpen, setLayerMenuOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<'National' | 'Regional' | 'Business'>('National');
   const layerRef = useRef<Layer>(layer);
@@ -395,34 +397,47 @@ export function CountryMap(props: Props) {
               });
             }
             if (active === 'Operations') {
-              const prioritized = [...assets].sort((a, b) =>
-                Number(b.companyId === current.current.playerId) -
+              const prioritized = [...assets].sort(
+                (a, b) =>
+                  Number(b.companyId === current.current.playerId) -
                   Number(a.companyId === current.current.playerId),
               );
-              const mainAsset = prioritized.find((f) => f.kind === 'factory') ||
+              const mainAsset =
+                prioritized.find((f) => f.kind === 'factory') ||
                 prioritized.find((f) => f.kind === 'warehouse') ||
                 prioritized.find((f) => f.kind === 'store') ||
                 prioritized[0];
               const isOwned = mainAsset?.companyId === current.current.playerId;
               const locationStock = current.current.stocks
-                .filter((lot) =>
-                  lot.cityId === city.id &&
-                  current.current.products.some(
-                    (product) =>
-                      product.id === lot.productId &&
-                      product.companyId === current.current.playerId,
-                  ),
+                .filter(
+                  (lot) =>
+                    lot.cityId === city.id &&
+                    current.current.products.some(
+                      (product) =>
+                        product.id === lot.productId &&
+                        product.companyId === current.current.playerId,
+                    ),
                 )
                 .reduce((sum, lot) => sum + lot.quantity, 0);
               const facilityName = mainAsset
-                ? ({ factory: 'NHÀ MÁY', warehouse: 'KHO HÀNG', store: 'CỬA HÀNG', hq: 'TRỤ SỞ', rd: 'R&D' } as const)[mainAsset.kind]
+                ? (
+                    {
+                      factory: 'NHÀ MÁY',
+                      warehouse: 'KHO HÀNG',
+                      store: 'CỬA HÀNG',
+                      hq: 'TRỤ SỞ',
+                      rd: 'R&D',
+                    } as const
+                  )[mainAsset.kind]
                 : 'CHƯA CÓ CƠ SỞ';
-              const factory = mainAsset?.kind === 'factory'
-                ? current.current.factories.find((f) => f.facilityId === mainAsset.id)
-                : undefined;
-              const subtitle = mainAsset?.kind === 'factory'
-                ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
-                : 'Tồn kho của bạn: ' + locationStock + ' SP';
+              const factory =
+                mainAsset?.kind === 'factory'
+                  ? current.current.factories.find((f) => f.facilityId === mainAsset.id)
+                  : undefined;
+              const subtitle =
+                mainAsset?.kind === 'factory'
+                  ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
+                  : 'Tồn kho của bạn: ' + locationStock + ' SP';
               const cardY = y - 138;
               const cardX = x - 16;
               const cardWidth = 284;
@@ -444,16 +459,18 @@ export function CountryMap(props: Props) {
               overlays.addChild(
                 new Text({
                   text: subtitle,
-                  style: { fill: locationStock ? 0xa3d8b7 : 0xf0ba87, fontFamily: 'Arial', fontSize: 16 },
+                  style: {
+                    fill: locationStock ? 0xa3d8b7 : 0xf0ba87,
+                    fontFamily: 'Arial',
+                    fontSize: 16,
+                  },
                   x: cardX + 15,
                   y: cardY + 52,
                 }),
               );
               if (isOwned) {
                 overlays.addChild(
-                  new Graphics()
-                    .circle(cardX + cardWidth - 17, cardY + 18, 6)
-                    .fill(0x9ddac0),
+                  new Graphics().circle(cardX + cardWidth - 17, cardY + 18, 6).fill(0x9ddac0),
                 );
               }
             }
@@ -527,15 +544,19 @@ export function CountryMap(props: Props) {
                 const y = c.y * MAP_UNITS;
                 if (w.x >= x - 16 && w.x <= x + 268 && w.y >= y - 138 && w.y <= y - 47) {
                   const assets = current.current.facilities.filter((f) => f.cityId === c.id);
-                  const prioritized = [...assets].sort((a, b) =>
-                    Number(b.companyId === current.current.playerId) -
-                    Number(a.companyId === current.current.playerId));
-                  const mainAsset = prioritized.find((f) => f.kind === 'factory') ||
+                  const prioritized = [...assets].sort(
+                    (a, b) =>
+                      Number(b.companyId === current.current.playerId) -
+                      Number(a.companyId === current.current.playerId),
+                  );
+                  const mainAsset =
+                    prioritized.find((f) => f.kind === 'factory') ||
                     prioritized.find((f) => f.kind === 'warehouse') ||
-                    prioritized.find((f) => f.kind === 'store') || prioritized[0];
-                  current.current.onSelect(mainAsset
-                    ? { kind: 'facility', id: mainAsset.id }
-                    : { kind: 'city', id: c.id });
+                    prioritized.find((f) => f.kind === 'store') ||
+                    prioritized[0];
+                  current.current.onSelect(
+                    mainAsset ? { kind: 'facility', id: mainAsset.id } : { kind: 'city', id: c.id },
+                  );
                   return;
                 }
               }
