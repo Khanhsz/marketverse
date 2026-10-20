@@ -879,9 +879,14 @@ export function CountryMap(props: Props) {
           </div>
         )}
       </div>
+      {failure && (
+        <div className="mapErrorBanner" role="alert">
+          <strong>Map unavailable: {failure}</strong>
+          <button onClick={() => setAttempt((value) => value + 1)}>Retry map</button>
+        </div>
+      )}
       <p className="mapLegend" aria-live="polite">
-        {failure ? `Map unavailable: ${failure}` : legends[layer]}
-        {failure && <button onClick={() => setAttempt((value) => value + 1)}>Retry map</button>}
+        {legends[layer]}
         <span>Drag to pan · Scroll to zoom · Select a city</span>
       </p>
     </div>
