@@ -23,7 +23,12 @@ try {
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
 
   await ready();
-  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).cities.length), 8);
+  assert.equal(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).cities.length,
+    ),
+    8,
+  );
   assert.equal(await page.locator('.commandVisual').count(), 1);
   assert.equal(await page.locator('.commandRail .departmentNavButton').count(), 9);
   assert.equal(
@@ -133,7 +138,12 @@ try {
     () => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week === 1,
   );
   await ready();
-  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).cities.length), 8);
+  assert.equal(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).cities.length,
+    ),
+    8,
+  );
   await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
   page.once('dialog', (dialog) => dialog.accept());
   await page.getByRole('button', { name: 'Start national campaign', exact: true }).click();

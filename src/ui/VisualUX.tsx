@@ -528,8 +528,8 @@ export function DepartmentPanel({
             <section className="commandSection">
               <h3>Bản đồ 8 thành phố</h3>
               <p className="commandSupporting">
-                Save này thuộc Foundation Sandbox cũ (3 thành phố). Chuyển sang National Campaign
-                sẽ khởi tạo quốc gia 8 thành phố và thay thế save hiện tại. Hãy xuất save trước.
+                Save này thuộc Foundation Sandbox cũ (3 thành phố). Chuyển sang National Campaign sẽ
+                khởi tạo quốc gia 8 thành phố và thay thế save hiện tại. Hãy xuất save trước.
               </p>
               <button className="commandPrimary" onClick={onStartNational}>
                 Bắt đầu với 8 thành phố →

@@ -13,12 +13,7 @@ import { WeeklyPlanner } from './WeeklyPlanner';
 const CountryMap = lazy(() =>
   import('./CountryMap').then((module) => ({ default: module.CountryMap })),
 );
-import {
-  advanceWeek,
-  deserializeGame,
-  SAVE_KEY,
-  serializeGame,
-} from '../engine/game';
+import { advanceWeek, deserializeGame, SAVE_KEY, serializeGame } from '../engine/game';
 import { FACILITY_KINDS, placementError, resolveSelection } from '../engine/entities';
 import type { Selection } from '../engine/entities';
 const number = (v: number) => new Intl.NumberFormat('en-US').format(v);
@@ -48,7 +43,11 @@ export function App() {
     setPlannerOpen(true);
   };
   const resetGame = () => {
-    if (window.confirm('Bắt đầu lại với 8 thành phố? Save hiện tại sẽ bị thay thế. Hãy xuất file lưu game trước nếu muốn giữ tiến trình cũ.')) {
+    if (
+      window.confirm(
+        'Bắt đầu lại với 8 thành phố? Save hiện tại sẽ bị thay thế. Hãy xuất file lưu game trước nếu muốn giữ tiến trình cũ.',
+      )
+    ) {
       setGame(createNationalCampaign());
       setSelection({ kind: 'city', id: 'central' });
       setRecovery('');

@@ -21,11 +21,17 @@ try {
     .setInputFiles('tests/fixtures/save-v1.json');
   await page.waitForFunction((k) => JSON.parse(localStorage.getItem(k)).version === 9, key);
   assert.match(await page.locator('.campaignReport').innerText(), /Foundation sandbox/);
-  assert.equal(await page.evaluate((k) => JSON.parse(localStorage.getItem(k)).cities.length, key), 3);
+  assert.equal(
+    await page.evaluate((k) => JSON.parse(localStorage.getItem(k)).cities.length, key),
+    3,
+  );
   // Existing three-city saves must remain untouched until the player opts in.
   await page.reload();
   await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.camera);
-  assert.equal(await page.evaluate((k) => JSON.parse(localStorage.getItem(k)).cities.length, key), 3);
+  assert.equal(
+    await page.evaluate((k) => JSON.parse(localStorage.getItem(k)).cities.length, key),
+    3,
+  );
   await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
   await page.getByRole('button', { name: 'Bắt đầu với 8 thành phố' }).waitFor();
   await page.getByRole('button', { name: 'Thông tin nâng cao & nhập save' }).click();
