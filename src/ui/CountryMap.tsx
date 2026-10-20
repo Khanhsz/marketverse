@@ -218,12 +218,7 @@ export function CountryMap(props: Props) {
               const to = cityWorldPoint(other, layout);
               roads.moveTo(from.x, from.y).lineTo(to.x, to.y);
               if (active === 'Logistics')
-                label(
-                  'TRANSPORT LINK',
-                  (from.x + to.x) / 2 + 20,
-                  (from.y + to.y) / 2,
-                  16,
-                );
+                label('TRANSPORT LINK', (from.x + to.x) / 2 + 20, (from.y + to.y) / 2, 16);
             }
           // The illustrated map already contains its own permanent roads.
           // Show simulation connectivity only in the logistics layer.
@@ -441,8 +436,12 @@ export function CountryMap(props: Props) {
                 mainAsset?.kind === 'factory'
                   ? 'Công suất ' + (factory?.capacity ?? 0) + ' SP / tuần'
                   : 'Tồn kho của bạn: ' + locationStock + ' SP';
-              const { x: cardX, y: cardY, width: cardWidth, height: cardHeight } =
-                cityCardBounds(city, layout);
+              const {
+                x: cardX,
+                y: cardY,
+                width: cardWidth,
+                height: cardHeight,
+              } = cityCardBounds(city, layout);
               overlays.addChild(
                 new Graphics()
                   .roundRect(cardX, cardY, cardWidth, cardHeight, 13)
@@ -542,8 +541,12 @@ export function CountryMap(props: Props) {
             if (layerRef.current === 'Operations') {
               for (const c of current.current.cities) {
                 const card = cityCardBounds(c, current.current.layout ?? 'artwork');
-                if (w.x >= card.x && w.x <= card.x + card.width &&
-                    w.y >= card.y && w.y <= card.y + card.height) {
+                if (
+                  w.x >= card.x &&
+                  w.x <= card.x + card.width &&
+                  w.y >= card.y &&
+                  w.y <= card.y + card.height
+                ) {
                   const assets = current.current.facilities.filter((f) => f.cityId === c.id);
                   const prioritized = [...assets].sort(
                     (a, b) =>
@@ -579,8 +582,11 @@ export function CountryMap(props: Props) {
               const assets = current.current.facilities.filter((f) => f.cityId === c.id);
               const facility = assets.find(
                 (_, i) =>
-                  Math.abs(w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 32)) <= 12 &&
-                  Math.abs(w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 52)) <= 12,
+                  Math.abs(
+                    w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 32),
+                  ) <= 12 &&
+                  Math.abs(w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 52)) <=
+                    12,
               );
               if (facility) {
                 current.current.onSelect({ kind: 'facility', id: facility.id });
@@ -590,7 +596,8 @@ export function CountryMap(props: Props) {
                 const owner = [...new Set(assets.map((f) => f.companyId))].find(
                   (_, i) =>
                     Math.hypot(
-                      w.x - (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 40),
+                      w.x -
+                        (cityWorldPoint(c, current.current.layout ?? 'artwork').x - 28 + i * 40),
                       w.y - (cityWorldPoint(c, current.current.layout ?? 'artwork').y + 96),
                     ) <= 16,
                 );
@@ -657,7 +664,7 @@ export function CountryMap(props: Props) {
                   ...camera,
                   ...cityWorldPoint(
                     current.current.cities.find((c) => c.id === current.current.selectedCityId) ||
-                    current.current.cities[0],
+                      current.current.cities[0],
                     current.current.layout ?? 'artwork',
                   ),
                 }

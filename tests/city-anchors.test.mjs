@@ -13,11 +13,11 @@ import {
 test('the artwork has one grounded normalized anchor and label offset per national city', () => {
   const cities = nationalCities();
   assert.equal(cities.length, 8);
+  assert.deepEqual(cities.map((c) => c.id).sort(), Object.keys(CITY_ARTWORK_ANCHORS).sort());
   assert.deepEqual(
-    cities.map((c) => c.id).sort(),
+    Object.keys(CITY_LABEL_OFFSETS).sort(),
     Object.keys(CITY_ARTWORK_ANCHORS).sort(),
   );
-  assert.deepEqual(Object.keys(CITY_LABEL_OFFSETS).sort(), Object.keys(CITY_ARTWORK_ANCHORS).sort());
   for (const city of cities) {
     const normalized = CITY_ARTWORK_ANCHORS[city.id];
     assert.ok(normalized.x > 0 && normalized.x < 1);
@@ -31,10 +31,7 @@ test('the artwork has one grounded normalized anchor and label offset per nation
 test('city art anchors do not modify saved simulation coordinates or legacy hit locations', () => {
   const initial = createInitialGame();
   const before = structuredClone(initial.cities);
-  assert.deepEqual(
-    initial.cities.map((c) => c.id).sort(),
-    ['central', 'north', 'south'],
-  );
+  assert.deepEqual(initial.cities.map((c) => c.id).sort(), ['central', 'north', 'south']);
   for (const city of initial.cities) {
     assert.deepEqual(cityWorldPoint(city, 'legacy'), { x: city.x * 2, y: city.y * 2 });
     assert.ok(cityWorldPoint(city, 'artwork').x !== city.x * 2);
@@ -53,9 +50,10 @@ test('all city operation cards stay within the atlas and do not overlap each oth
   }
   for (let i = 0; i < cards.length; i++) {
     for (let j = i + 1; j < cards.length; j++) {
-      const a = cards[i], b = cards[j];
-      const overlap = a.x < b.x + b.width && a.x + a.width > b.x &&
-        a.y < b.y + b.height && a.y + a.height > b.y;
+      const a = cards[i],
+        b = cards[j];
+      const overlap =
+        a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
       assert.equal(overlap, false, a.id + ' overlaps ' + b.id);
     }
   }
