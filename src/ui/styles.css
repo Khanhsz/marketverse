@@ -765,3 +765,16 @@ canvas:focus-visible {
  .plannerTabs{top:-16px;flex-wrap:nowrap;overflow-x:auto}
  .plannerTabs button{white-space:nowrap;font-size:10px;padding:8px}
 }
+
+
+/* Strategic Atlas V3: thematic map legends */
+.atlasLegend{position:absolute;z-index:3;left:20px;bottom:112px;width:260px;max-width:calc(100% - 40px);background:#fbfcfaf5;border:1px solid #cfddd3;border-radius:10px;box-shadow:0 6px 22px #233e3516;padding:10px 12px;color:#365747}
+.atlasLegend>button{width:100%;text-align:left;border:0;background:transparent;font-size:11px;font-weight:800;color:#355f4d;padding:2px 0 8px}
+.atlasLegendContent{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:10px;color:#607d6d}
+.atlasLegendContent small{grid-column:1/-1;font-size:10px;line-height:1.4}
+.atlasScale{height:9px;border-radius:5px;background:linear-gradient(90deg,#e2ece5,#3d8068)}
+.atlasScale-Competition{background:linear-gradient(90deg,#e4eaf1,#5576a0)}
+.atlasScale-Operations{background:linear-gradient(90deg,#e6ebed,#647d8b)}
+.atlasScale-Logistics{background:linear-gradient(90deg,#dfecef,#3c8391)}
+.atlasScale-Economy{background:linear-gradient(90deg,#eee9d9,#98834d)}
+@media(max-width:849px){.atlasLegend{left:10px;bottom:117px;width:205px;padding:7px 9px}.atlasLegendContent small{font-size:9px}.atlasLegend>button{font-size:10px}.mapQuickCard{z-index:6}}
