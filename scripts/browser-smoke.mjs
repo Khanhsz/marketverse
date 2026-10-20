@@ -83,6 +83,7 @@ try {
   // Every business week must persist after browser reload.
   await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).click();
   await page.getByRole('dialog').waitFor();
+  await page.getByRole('button', { name: 'Products', exact: true }).click();
   await page.getByLabel('Price (nova)', { exact: true }).fill('270');
   await page.getByLabel('Production target (nova)', { exact: true }).fill('80');
   await page.getByRole('button', { name: 'Commit week', exact: true }).click();
