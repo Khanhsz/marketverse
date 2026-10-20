@@ -58,6 +58,10 @@ try {
   ]) {
     await page.getByRole('button', { name: button, exact: true }).click();
     assert.equal(await page.locator('.commandPanelContent h1').innerText(), heading);
+    await page.waitForFunction(
+      (expected) => document.querySelector('.mapSurface')?.dataset.layer === expected,
+      layer,
+    );
     assert.equal(await page.locator('.mapSurface').getAttribute('data-layer'), layer);
   }
   assert.ok(
