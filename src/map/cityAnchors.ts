@@ -6,14 +6,15 @@ import { WORLD_SIZE } from './atlasLayers.ts';
  * Keeping them here preserves existing saves, command replays, logistics costs and AI behavior.
  */
 export const CITY_ARTWORK_ANCHORS = {
-  north: { x: 0.39, y: 0.26 },
-  lake: { x: 0.61, y: 0.26 },
-  east: { x: 0.82, y: 0.39 },
-  central: { x: 0.63, y: 0.47 },
-  west: { x: 0.36, y: 0.49 },
-  river: { x: 0.52, y: 0.67 },
-  south: { x: 0.78, y: 0.7 },
-  harbor: { x: 0.7, y: 0.8 },
+  // Tied to identifiable urban / port / lake / river artwork, NOT to engine geography.
+  north: { x: 0.35, y: 0.275 },    // northwest port and docks
+  lake: { x: 0.445, y: 0.355 },    // central-north lake shore (not the mountain)
+  east: { x: 0.845, y: 0.40 },     // eastern industrial gateway
+  central: { x: 0.565, y: 0.475 }, // dense central interchange
+  west: { x: 0.315, y: 0.49 },     // western developed valley
+  river: { x: 0.445, y: 0.61 },    // west bank of river bend
+  south: { x: 0.75, y: 0.69 },     // southeast urban coastal district
+  harbor: { x: 0.685, y: 0.815 }, // southern harbor shoreline
 } as const;
 
 /** Visual offset in artwork pixels, not simulation/world units. */
@@ -50,19 +51,46 @@ export function cityLabelPoint(city: CityLocation, layout: Layout = 'artwork') {
   };
 }
 
-/** The card rectangle is shared by drawing and pointer hit detection. */
-export function cityCardBounds(city: CityLocation, layout: Layout = 'artwork') {
+/**
+ * In the visual UI, all cities have small clickable chips and only the
+ * selected city gets a detailed card. This prevents 8 big banners over the map.
+ * Legacy layout keeps the original full-size cards and old hit regions.
+ */
+export function cityCardBounds(
+  city: CityLocation,
+  layout: Layout = 'artwork',
+  expanded = false,
+) {
   const center = cityWorldPoint(city, layout);
-  const offsets: Partial<Record<AnchorId, { dx: number; dy: number }>> = {
-    east: { dx: -270, dy: -138 },
-    south: { dx: -16, dy: -138 },
-    harbor: { dx: -284, dy: 12 },
+  if (layout === 'legacy') {
+    return { x: center.x - 16, y: center.y - 138, width: 284, height: 91 };
+  }
+  const fullOffsets: Partial<Record<AnchorId, { dx: number; dy: number }>> = {
+    north: { dx: 22, dy: -133 },
+    lake: { dx: 28, dy: -130 },
+    east: { dx: -312, dy: -132 },
+    central: { dx: 24, dy: -132 },
+    west: { dx: 24, dy: -130 },
+    river: { dx: 24, dy: -132 },
+    south: { dx: -312, dy: -130 },
+    harbor: { dx: -318, dy: -140 },
   };
-  const offset = layout === 'artwork' ? offsets[city.id as AnchorId] : undefined;
+  const compactOffsets: Partial<Record<AnchorId, { dx: number; dy: number }>> = {
+    north: { dx: 25, dy: -91 },
+    lake: { dx: 26, dy: -91 },
+    east: { dx: -225, dy: -101 },
+    central: { dx: 25, dy: -86 },
+    west: { dx: 28, dy: -90 },
+    river: { dx: 24, dy: -85 },
+    south: { dx: -226, dy: -84 },
+    harbor: { dx: -224, dy: 16 },
+  };
+  const offset = (expanded ? fullOffsets : compactOffsets)[city.id as AnchorId] ??
+    { dx: 24, dy: -95 };
   return {
-    x: center.x + (offset?.dx ?? -16),
-    y: center.y + (offset?.dy ?? -138),
-    width: 284,
-    height: 91,
+    x: center.x + offset.dx,
+    y: center.y + offset.dy,
+    width: expanded ? 300 : 204,
+    height: expanded ? 108 : 50,
   };
 }
