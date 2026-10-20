@@ -1,4 +1,6 @@
 import { CampaignResult } from './CampaignResult';
+import { DepartmentRail, DepartmentPanel } from './VisualUX';
+import type { Department } from './VisualUX';
 import { downloadJson, readGameFile } from './saveFiles';
 import { Guide } from './Guide';
 import { createNationalCampaign, scoreCampaign } from '../engine/campaign';
@@ -38,6 +40,21 @@ function loadGame() {
 }
 export function App() {
   const panelRef = useRef<HTMLElement>(null);
+  const [department, setDepartment] = useState<Department>('operations');
+  const [plannerStart, setPlannerStart] = useState<'products' | 'marketing' | 'finance' | 'projects'>('products');
+  const planFor = (section: 'products' | 'marketing' | 'finance' | 'projects') => {
+    setPlannerStart(section);
+    setPlannerOpen(true);
+  };
+  const resetGame = () => {
+    if (window.confirm('Reset game? This discards the existing save.')) {
+      setGame(createInitialGame());
+      setSelection({ kind: 'city', id: 'central' });
+      setRecovery('');
+      committedWeek.current = 0;
+      announcedResult.current = '';
+    }
+  };
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [weeklyChangesOpen, setWeeklyChangesOpen] = useState(false);
   const [resultOpen, setResultOpen] = useState(false),
@@ -144,7 +161,7 @@ export function App() {
   const choose = (value: Selection) => {
     if (resolveSelection(game, value)) {
       setSelection(value);
-      setQuickActionsOpen(true);
+      setQuickActionsOpen(department === 'insight');
       if (window.innerWidth <= 849) setPanelOpen(false);
     }
   };
@@ -195,20 +212,18 @@ export function App() {
     }
   };
   return (
-    <div className="app">
+    <div className="app commandVisual">
       <header className="header">
-        <div className="logo">
-          ◆ MARKETVERSE <span>COUNTRY STRATEGY</span>
-        </div>
+        <div className="logo commandLogo"><div>⬡ <strong>MARKETVERSE</strong></div><span>COUNTRY STRATEGY MAP</span></div>
         <div className="metrics">
           <div>
-            <small>PERIOD</small>
+            <small>THỜI GIAN</small>
             <b>
               Y{game.year.toString().padStart(2, '0')} · W{game.week.toString().padStart(2, '0')}
             </b>
           </div>
           <div>
-            <small>CASH</small>
+            <small>TIỀN MẶT</small>
             <b>{number(player.cash)}</b>
           </div>
           <div>
@@ -218,38 +233,10 @@ export function App() {
         </div>
       </header>
       <div className={`workspace ${panelOpen ? '' : 'panelCollapsed'}`}>
-        <nav className="rail">
-          <button
-            aria-label="Map"
-            aria-pressed={context.kind === 'city'}
-            onClick={() => choose({ kind: 'city', id: city.id })}
-          >
-            ⌖
-          </button>
-          <button
-            aria-label="Company"
-            aria-pressed={context.kind === 'company'}
-            onClick={() => choose({ kind: 'company', id: player.id })}
-          >
-            ▦
-          </button>
-          <button aria-label="Reports" onClick={() => setReportsOpen(true)}>
-            ≋
-          </button>
-          <button
-            aria-label="Toggle details"
-            aria-expanded={panelOpen}
-            aria-controls="selection-panel"
-            onClick={() => setPanelOpen(!panelOpen)}
-          >
-            ☷
-          </button>
-          <button aria-label="How to play" onClick={() => setGuideOpen(true)}>
-            ?
-          </button>
-        </nav>
+        <DepartmentRail active={department} onChange={(id) => { setDepartment(id); setPanelOpen(true); setQuickActionsOpen(false); if (id === 'reports') setReportsOpen(true); }} />
         <main className="mapArea">
-          <div className="overlay">COUNTRY STRATEGY MAP</div>
+          <div className="overlay commandMapHeader">{department === 'insight' ? 'CITY INTELLIGENCE' : department.toUpperCase() + ' · COUNTRY STRATEGY'} </div>
+          <div className="commandNational">NATIONAL</div>
           <Suspense
             fallback={
               <p className="mapLoading" role="status">
@@ -264,6 +251,11 @@ export function App() {
               selectedCityId={city.id}
               selection={selection}
               metrics={metrics}
+              products={game.products}
+              stocks={game.stocks}
+              factories={game.factories}
+              playerId={game.playerId}
+              activeLayer={department === 'operations' || department === 'projects' ? 'Operations' : department === 'logistics' ? 'Logistics' : department === 'finance' ? 'Economy' : department === 'products' || department === 'marketing' ? 'Market' : department === 'people' || department === 'settings' ? 'Operations' : 'Competition'}
               onSelect={choose}
             />
           </Suspense>
@@ -336,9 +328,7 @@ export function App() {
               </button>
             </section>
           )}
-          <div className="mapFoot">
-            {game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST
-          </div>
+          <div className="mapFoot commandMapHint">Chọn cơ sở để xem dữ liệu và thao tác</div>
         </main>
         <aside
           ref={panelRef}
@@ -355,6 +345,15 @@ export function App() {
           >
             ×
           </button>
+          {department !== 'insight' && <DepartmentPanel
+            game={game} city={city} selection={selection} department={department}
+            onPlan={planFor} onSelect={choose}
+            onReports={() => setReportsOpen(true)}
+            onGuide={() => setGuideOpen(true)}
+            onExport={exportGame} onReset={resetGame}
+            onInspect={() => setDepartment('insight')}
+          />}
+          <div className="legacyPanelContent" hidden={department !== 'insight'}>
           <small>{context.kind.toUpperCase()} INTELLIGENCE</small>
           <h1>{context.entity.name}</h1>
           {context.kind === 'city' && (
@@ -653,6 +652,7 @@ export function App() {
           {importError && (
             <p role="alert">Import failed: {importError}. Current progress is preserved.</p>
           )}
+          </div>
         </aside>
       </div>
       {(recovery || storageError) && (
@@ -693,35 +693,10 @@ export function App() {
           ☷ <span>Details</span>
         </button>
       </nav>
-      <footer className="footer">
-        <div>
-          ● {recovery || storageError ? 'SAVE NEEDS ATTENTION' : 'LOCAL SAVE'}{' '}
-          <span>· Weekly engine active · Orders · Inventory · Finance active</span>
-        </div>
-        <div className="actions">
-          <button
-            onClick={() => {
-              if (window.confirm('Reset game? This discards the existing save.')) {
-                setGame(createInitialGame());
-                setSelection({ kind: 'city', id: 'central' });
-                setRecovery('');
-                committedWeek.current = 0;
-                announcedResult.current = '';
-              }
-            }}
-          >
-            RESET
-          </button>
-          <button
-            className="next"
-            disabled={
-              !!recovery || (game.campaign.mode === 'national' && game.campaign.status !== 'active')
-            }
-            onClick={() => setPlannerOpen(true)}
-          >
-            NEXT WEEK →
-          </button>
-        </div>
+      <footer className="footer commandFooter">
+        <div className="weeklyPlanStatus"><strong>Kế hoạch tuần {String(game.week).padStart(2, '0')} · {game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length} dự án đang chạy</strong><span>Thay đổi có hiệu lực sau khi xác nhận tuần</span></div>
+        <button className="roundAdvance" title="Mở kế hoạch tuần" aria-label="Mở kế hoạch tuần" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>↓</button>
+        <button className="next commandNext" onClick={() => planFor('projects')} disabled={!!recovery || game.campaign.status !== 'active'}>Xem kế hoạch tuần <span>→</span></button>
       </footer>
       {resultOpen && (
         <CampaignResult game={game} onClose={() => setResultOpen(false)} onExport={exportGame} />
@@ -738,6 +713,7 @@ export function App() {
         <WeeklyPlanner
           game={game}
           cityId={city.id}
+          initialSection={plannerStart}
           onClose={() => setPlannerOpen(false)}
           onCommit={(orders) => {
             if (committedWeek.current === orders.expectedWeek)
