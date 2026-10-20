@@ -10,9 +10,6 @@ import { brandKey } from '../engine/people';
 import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { localStock } from '../engine/operations';
 import { WeeklyPlanner } from './WeeklyPlanner';
-const CityMapV7 = lazy(() =>
-  import('./CityMapV7').then((module) => ({ default: module.CityMapV7 })),
-);
 const CountryMap = lazy(() =>
   import('./CountryMap').then((module) => ({ default: module.CountryMap })),
 );
@@ -44,7 +41,6 @@ function loadGame() {
 export function App() {
   const panelRef = useRef<HTMLElement>(null);
   const [department, setDepartment] = useState<Department>('operations');
-  const [cityViewOpen, setCityViewOpen] = useState(false);
   const [plannerStart, setPlannerStart] = useState<
     'products' | 'marketing' | 'finance' | 'projects'
   >('products');
@@ -261,26 +257,7 @@ export function App() {
                 ? 'CITY INTELLIGENCE'
                 : department.toUpperCase() + ' · COUNTRY STRATEGY'}
           </div>
-          <div className="commandNational">{cityViewOpen ? 'CITY VIEW' : 'NATIONAL'}</div>
-          <div className="cityV7Switch" role="group" aria-label="Chế độ bản đồ">
-            <button
-              type="button"
-              aria-pressed={!cityViewOpen}
-              onClick={() => setCityViewOpen(false)}
-            >
-              Quốc gia
-            </button>
-            <button
-              type="button"
-              aria-pressed={cityViewOpen}
-              onClick={() => {
-                setCityViewOpen(true);
-                choose({ kind: 'city', id: 'central' });
-              }}
-            >
-              Central City · V7
-            </button>
-          </div>
+          <div className="commandNational">NATIONAL</div>
           <Suspense
             fallback={
               <p className="mapLoading" role="status">
@@ -288,15 +265,6 @@ export function App() {
               </p>
             }
           >
-            {cityViewOpen ? (
-              <CityMapV7
-                city={game.cities.find((candidate) => candidate.id === 'central') || game.cities[0]}
-                facilities={game.facilities}
-                companies={game.companies}
-                playerId={game.playerId}
-                onSelect={choose}
-              />
-            ) : (
               <CountryMap
                 cities={game.cities}
                 facilities={game.facilities}
@@ -323,7 +291,6 @@ export function App() {
                 }
                 onSelect={choose}
               />
-            )}
           </Suspense>
           {quickActionsOpen && (
             <section className="mapQuickCard" aria-label="Map quick actions">
@@ -394,11 +361,7 @@ export function App() {
               </button>
             </section>
           )}
-          <div className="mapFoot commandMapHint">
-            {cityViewOpen
-              ? 'BẢN MẪU V7 · Chưa kích hoạt cơ chế thuê địa điểm'
-              : 'Chọn cơ sở để xem dữ liệu và thao tác'}
-          </div>
+          <div className="mapFoot commandMapHint">Chọn cơ sở để xem dữ liệu và thao tác</div>
         </main>
         <aside
           ref={panelRef}
