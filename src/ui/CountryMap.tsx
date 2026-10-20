@@ -32,6 +32,8 @@ export function CountryMap(props: Props) {
   const current = useRef(props);
   current.current = props;
   const [layer, setLayer] = useState<Layer>('Market');
+  const [layerMenuOpen, setLayerMenuOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState<'National' | 'Regional' | 'Business'>('National');
   const layerRef = useRef<Layer>(layer);
   layerRef.current = layer;
   const draw = useRef<() => void>(() => {});
@@ -75,6 +77,9 @@ export function CountryMap(props: Props) {
         let view: Viewport = { width: element.clientWidth, height: element.clientHeight };
         let camera: Camera = fitCamera(view);
         const applyCamera = () => {
+          const relative = camera.scale / fitCamera(view).scale;
+          const nextLevel = relative < 1.55 ? 'National' : relative < 3 ? 'Regional' : 'Business';
+          setZoomLevel(old => old === nextLevel ? old : nextLevel);
           world.scale.set(camera.scale);
           world.position.set(
             view.width / 2 - camera.x * camera.scale,
@@ -296,7 +301,7 @@ export function CountryMap(props: Props) {
           app.canvas.setPointerCapture(event.pointerId);
         };
         const move = (event: PointerEvent) => {
-          if (!gesture || gesture.id !== event.pointerId) return;
+          if (!gesture || gesture.id !== event.pointerId || touches.size > 1) return;
           const p = point(event);
           if (Math.hypot(p.x - gesture.startX, p.y - gesture.startY) > 5) gesture.dragged = true;
           if (gesture.dragged) {
@@ -354,6 +359,33 @@ export function CountryMap(props: Props) {
             if (city) current.current.onSelect({ kind: 'city', id: city.id });
           }
         };
+        let touchPinch: { distance: number; center: { x: number; y: number } } | undefined;
+        const touches = new Map<number, { x: number; y: number }>();
+        const touchDown = (event: PointerEvent) => {
+          if (event.pointerType !== 'touch') return;
+          touches.set(event.pointerId, point(event));
+          if (touches.size === 2) {
+            const [a,b] = [...touches.values()];
+            touchPinch = { distance: Math.hypot(a.x-b.x,a.y-b.y), center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2} };
+            gesture = undefined;
+          }
+        };
+        const touchMove = (event: PointerEvent) => {
+          if (!touches.has(event.pointerId)) return;
+          touches.set(event.pointerId, point(event));
+          if (touches.size !== 2 || !touchPinch) return;
+          const [a,b] = [...touches.values()];
+          const center = {x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+          const distance = Math.hypot(a.x-b.x,a.y-b.y);
+          if (touchPinch.distance > 0) camera = zoomCamera(camera,view,center,distance/touchPinch.distance);
+          camera = panCamera(camera,center.x-touchPinch.center.x,center.y-touchPinch.center.y);
+          touchPinch = {distance,center};
+          applyCamera();
+        };
+        const touchEnd = (event: PointerEvent) => {
+          touches.delete(event.pointerId);
+          if (touches.size < 2) touchPinch = undefined;
+        };
         const wheel = (event: WheelEvent) => {
           event.preventDefault();
           const pixels =
@@ -404,6 +436,10 @@ export function CountryMap(props: Props) {
           }
         };
         app.canvas.addEventListener('keydown', keydown);
+        app.canvas.addEventListener('pointerdown', touchDown);
+        app.canvas.addEventListener('pointermove', touchMove);
+        app.canvas.addEventListener('pointerup', touchEnd);
+        app.canvas.addEventListener('pointercancel', touchEnd);
         app.canvas.addEventListener('pointerdown', down);
         app.canvas.addEventListener('pointermove', move);
         app.canvas.addEventListener('pointerup', end);
@@ -412,6 +448,10 @@ export function CountryMap(props: Props) {
         app.canvas.addEventListener('wheel', wheel, { passive: false });
         cleanup = () => {
           app.canvas.removeEventListener('keydown', keydown);
+          app.canvas.removeEventListener('pointerdown', touchDown);
+          app.canvas.removeEventListener('pointermove', touchMove);
+          app.canvas.removeEventListener('pointerup', touchEnd);
+          app.canvas.removeEventListener('pointercancel', touchEnd);
           app.canvas.removeEventListener('pointerdown', down);
           app.canvas.removeEventListener('pointermove', move);
           app.canvas.removeEventListener('pointerup', end);
@@ -461,9 +501,10 @@ export function CountryMap(props: Props) {
           ))}
         </select>
       </label>
-      <div className="mapLayers" role="group" aria-label="Map layers">
+      <button className="mobileLayerToggle" aria-expanded={layerMenuOpen} onClick={() => setLayerMenuOpen(v => !v)}>Layers · {layer} ▾</button>
+      <div className={`mapLayers ${layerMenuOpen ? 'mobileLayersOpen' : ''}`} role="group" aria-label="Map layers">
         {layers.map((name) => (
-          <button key={name} aria-pressed={layer === name} onClick={() => setLayer(name)}>
+          <button key={name} aria-pressed={layer === name} onClick={() => { setLayer(name); setLayerMenuOpen(false); }}>
             {name}
           </button>
         ))}
@@ -482,6 +523,7 @@ export function CountryMap(props: Props) {
           Center selection
         </button>
       </div>
+      <div className="mapZoomBadge" aria-live="polite">{zoomLevel} view</div>
       <p className="mapLegend" aria-live="polite">
         {failure ? `Map unavailable: ${failure}` : legends[layer]}
         <span>Drag to pan · Scroll to zoom · Select a city</span>
