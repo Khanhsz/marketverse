@@ -215,9 +215,20 @@ export function App() {
     }
   };
   return (
-    <div className={visualMode ? "app commandVisual" : "app"}>
+    <div className={visualMode ? 'app commandVisual' : 'app'}>
       <header className="header">
-        {visualMode ? <div className="logo commandLogo"><div>⬡ <strong>MARKETVERSE</strong></div><span>COUNTRY STRATEGY MAP</span></div> : <div className="logo">◆ MARKETVERSE <span>COUNTRY STRATEGY</span></div>}
+        {visualMode ? (
+          <div className="logo commandLogo">
+            <div>
+              ⬡ <strong>MARKETVERSE</strong>
+            </div>
+            <span>COUNTRY STRATEGY MAP</span>
+          </div>
+        ) : (
+          <div className="logo">
+            ◆ MARKETVERSE <span>COUNTRY STRATEGY</span>
+          </div>
+        )}
         <div className="metrics">
           <div>
             <small>{visualMode ? 'THỜI GIAN' : 'PERIOD'}</small>
@@ -237,22 +248,68 @@ export function App() {
       </header>
       <div className={`workspace ${panelOpen ? '' : 'panelCollapsed'}`}>
         {visualMode ? (
-          <DepartmentRail active={department} onChange={(id) => { setDepartment(id); setPanelOpen(true); setQuickActionsOpen(false); if (id === 'reports') setReportsOpen(true); }} />
+          <DepartmentRail
+            active={department}
+            onChange={(id) => {
+              setDepartment(id);
+              setPanelOpen(true);
+              setQuickActionsOpen(false);
+              if (id === 'reports') setReportsOpen(true);
+            }}
+          />
         ) : (
-                  <nav className="rail">
-          <button aria-label="Map" aria-pressed={context.kind === 'city'} onClick={() => choose({ kind: 'city', id: city.id })}>⌖</button>
-          <button aria-label="Company" aria-pressed={context.kind === 'company'} onClick={() => choose({ kind: 'company', id: player.id })}>▦</button>
-          <button aria-label="Reports" onClick={() => setReportsOpen(true)}>≋</button>
-          <button aria-label="Toggle details" aria-expanded={panelOpen} aria-controls="selection-panel" onClick={() => setPanelOpen(!panelOpen)}>☷</button>
-          <button aria-label="How to play" onClick={() => setGuideOpen(true)}>?</button>
-          <button aria-label="Visual command center" onClick={() => window.location.assign(window.location.pathname)}>✧</button>
-        </nav>
+          <nav className="rail">
+            <button
+              aria-label="Map"
+              aria-pressed={context.kind === 'city'}
+              onClick={() => choose({ kind: 'city', id: city.id })}
+            >
+              ⌖
+            </button>
+            <button
+              aria-label="Company"
+              aria-pressed={context.kind === 'company'}
+              onClick={() => choose({ kind: 'company', id: player.id })}
+            >
+              ▦
+            </button>
+            <button aria-label="Reports" onClick={() => setReportsOpen(true)}>
+              ≋
+            </button>
+            <button
+              aria-label="Toggle details"
+              aria-expanded={panelOpen}
+              aria-controls="selection-panel"
+              onClick={() => setPanelOpen(!panelOpen)}
+            >
+              ☷
+            </button>
+            <button aria-label="How to play" onClick={() => setGuideOpen(true)}>
+              ?
+            </button>
+            <button
+              aria-label="Visual command center"
+              onClick={() => window.location.assign(window.location.pathname)}
+            >
+              ✧
+            </button>
+          </nav>
         )}
         <main className="mapArea">
-          {visualMode ? <>
-            <div className="overlay commandMapHeader">{department === 'operations' ? 'OPERATIONS · CÔNG SUẤT & TỒN KHO' : department === 'insight' ? 'CITY INTELLIGENCE' : department.toUpperCase() + ' · COUNTRY STRATEGY'}</div>
-            <div className="commandNational">NATIONAL</div>
-          </> : <div className="overlay">COUNTRY STRATEGY MAP</div>}
+          {visualMode ? (
+            <>
+              <div className="overlay commandMapHeader">
+                {department === 'operations'
+                  ? 'OPERATIONS · CÔNG SUẤT & TỒN KHO'
+                  : department === 'insight'
+                    ? 'CITY INTELLIGENCE'
+                    : department.toUpperCase() + ' · COUNTRY STRATEGY'}
+              </div>
+              <div className="commandNational">NATIONAL</div>
+            </>
+          ) : (
+            <div className="overlay">COUNTRY STRATEGY MAP</div>
+          )}
           <Suspense
             fallback={
               <p className="mapLoading" role="status">
@@ -272,17 +329,19 @@ export function App() {
               factories={game.factories}
               playerId={game.playerId}
               activeLayer={
-                !visualMode ? 'Market' : department === 'operations' || department === 'projects'
-                  ? 'Operations'
-                  : department === 'logistics'
-                    ? 'Logistics'
-                    : department === 'finance'
-                      ? 'Economy'
-                      : department === 'products' || department === 'marketing'
-                        ? 'Market'
-                        : department === 'people' || department === 'settings'
-                          ? 'Operations'
-                          : 'Competition'
+                !visualMode
+                  ? 'Market'
+                  : department === 'operations' || department === 'projects'
+                    ? 'Operations'
+                    : department === 'logistics'
+                      ? 'Logistics'
+                      : department === 'finance'
+                        ? 'Economy'
+                        : department === 'products' || department === 'marketing'
+                          ? 'Market'
+                          : department === 'people' || department === 'settings'
+                            ? 'Operations'
+                            : 'Competition'
               }
               onSelect={choose}
             />
@@ -356,7 +415,13 @@ export function App() {
               </button>
             </section>
           )}
-          {visualMode ? <div className="mapFoot commandMapHint">Chọn cơ sở để xem dữ liệu và thao tác</div> : <div className="mapFoot">{game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST</div>}
+          {visualMode ? (
+            <div className="mapFoot commandMapHint">Chọn cơ sở để xem dữ liệu và thao tác</div>
+          ) : (
+            <div className="mapFoot">
+              {game.cities.length} CITIES · {game.companies.length} COMPANIES · NO FOG · MAP-FIRST
+            </div>
+          )}
         </main>
         <aside
           ref={panelRef}
@@ -730,37 +795,55 @@ export function App() {
       </nav>
       {visualMode ? (
         <footer className="footer commandFooter">
-        <div className="weeklyPlanStatus">
-          <strong>
-            Kế hoạch tuần {String(game.week).padStart(2, '0')} ·{' '}
-            {game.projects.filter((p) => p.companyId === player.id && p.status === 'active').length}{' '}
-            dự án đang chạy
-          </strong>
-          <span>Thay đổi có hiệu lực sau khi xác nhận tuần</span>
-        </div>
-        <button
-          className="roundAdvance"
-          title="Mở kế hoạch tuần"
-          aria-label="Mở kế hoạch tuần"
-          onClick={() => planFor('projects')}
-          disabled={!!recovery || game.campaign.status !== 'active'}
-        >
-          ↓
-        </button>
-        <button
-          className="next commandNext"
-          onClick={() => planFor('projects')}
-          disabled={!!recovery || game.campaign.status !== 'active'}
-        >
-          Xem kế hoạch tuần <span>→</span>
-        </button>
-      </footer>
+          <div className="weeklyPlanStatus">
+            <strong>
+              Kế hoạch tuần {String(game.week).padStart(2, '0')} ·{' '}
+              {
+                game.projects.filter((p) => p.companyId === player.id && p.status === 'active')
+                  .length
+              }{' '}
+              dự án đang chạy
+            </strong>
+            <span>Thay đổi có hiệu lực sau khi xác nhận tuần</span>
+          </div>
+          <button
+            className="roundAdvance"
+            title="Mở kế hoạch tuần"
+            aria-label="Mở kế hoạch tuần"
+            onClick={() => planFor('projects')}
+            disabled={!!recovery || game.campaign.status !== 'active'}
+          >
+            ↓
+          </button>
+          <button
+            className="next commandNext"
+            onClick={() => planFor('projects')}
+            disabled={!!recovery || game.campaign.status !== 'active'}
+          >
+            Xem kế hoạch tuần <span>→</span>
+          </button>
+        </footer>
       ) : (
         <footer className="footer">
-          <div>● {recovery || storageError ? 'SAVE NEEDS ATTENTION' : 'LOCAL SAVE'} <span>· Weekly engine active · Orders · Inventory · Finance active</span></div>
+          <div>
+            ● {recovery || storageError ? 'SAVE NEEDS ATTENTION' : 'LOCAL SAVE'}{' '}
+            <span>· Weekly engine active · Orders · Inventory · Finance active</span>
+          </div>
           <div className="actions">
             <button onClick={resetGame}>RESET</button>
-            <button className="next" disabled={!!recovery || (game.campaign.mode === 'national' && game.campaign.status !== 'active')} onClick={() => {setPlannerStart('products'); setPlannerOpen(true);}}>NEXT WEEK →</button>
+            <button
+              className="next"
+              disabled={
+                !!recovery ||
+                (game.campaign.mode === 'national' && game.campaign.status !== 'active')
+              }
+              onClick={() => {
+                setPlannerStart('products');
+                setPlannerOpen(true);
+              }}
+            >
+              NEXT WEEK →
+            </button>
           </div>
         </footer>
       )}

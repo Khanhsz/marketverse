@@ -9,7 +9,9 @@ try {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(process.env.SMOKE_URL || 'http://127.0.0.1:5174/');
-  await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.artwork === 'ready');
+  await page.waitForFunction(
+    () => document.querySelector('.mapSurface')?.dataset.artwork === 'ready',
+  );
   assert.equal(await page.locator('.commandVisual').count(), 1);
   assert.equal(await page.locator('.commandRail .departmentNavButton').count(), 9);
   assert.equal(await page.locator('.panel h1').first().innerText(), 'Vận hành');
@@ -31,7 +33,10 @@ try {
 
   await page.getByRole('button', { name: 'Điều chỉnh sản xuất' }).click();
   await page.getByRole('dialog').waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Products', exact: true }).getAttribute('aria-pressed'), 'true');
+  assert.equal(
+    await page.getByRole('button', { name: 'Products', exact: true }).getAttribute('aria-pressed'),
+    'true',
+  );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
 
   await page.getByRole('button', { name: 'Sản phẩm', exact: true }).click();
@@ -52,26 +57,44 @@ try {
   await page.getByRole('button', { name: 'Vận hành', exact: true }).click();
   await page.getByRole('button', { name: 'Xem kế hoạch tuần' }).click();
   await page.getByRole('dialog').waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Projects & review', exact: true }).getAttribute('aria-pressed'), 'true');
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Projects & review', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
   await page.getByRole('button', { name: 'Commit week', exact: true }).click();
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week === 2);
+  await page.waitForFunction(
+    () => JSON.parse(localStorage.getItem('marketverse:sprint01:state')).week === 2,
+  );
   await page.reload();
-  await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.artwork === 'ready');
+  await page.waitForFunction(
+    () => document.querySelector('.mapSurface')?.dataset.artwork === 'ready',
+  );
   assert.equal(await page.locator('.commandPanelContent h1').innerText(), 'Vận hành');
   assert.match(await page.locator('.metrics').innerText(), /W02/);
 
   await page.setViewportSize({ width: 1024, height: 700 });
-  await page.waitForFunction(() => document.querySelector('canvas').clientWidth === document.querySelector('.mapSurface').clientWidth);
+  await page.waitForFunction(
+    () =>
+      document.querySelector('canvas').clientWidth ===
+      document.querySelector('.mapSurface').clientWidth,
+  );
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await page.screenshot({ path: '.browser-artifacts/visual-command-1024.png' });
   await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
-  assert.match(await page.locator('.commandPanelContent').innerText(), /Chuyển sang giao diện chi tiết/);
+  assert.match(
+    await page.locator('.commandPanelContent').innerText(),
+    /Chuyển sang giao diện chi tiết/,
+  );
   await page.getByRole('button', { name: 'Chuyển sang giao diện chi tiết' }).click();
   await page.waitForURL(/view=classic/);
   assert.equal(await page.locator('.commandVisual').count(), 0);
   assert.equal(await page.locator('.panel h1').innerText(), 'Central City');
   assert.deepEqual(errors, []);
-  console.log('PASS: visual operations panel, Pixi facility cards, 9 department views, deep-linked weekly planner, save/reload, laptop breakpoints and accessible classic fallback');
+  console.log(
+    'PASS: visual operations panel, Pixi facility cards, 9 department views, deep-linked weekly planner, save/reload, laptop breakpoints and accessible classic fallback',
+  );
 } finally {
   await browser.close();
 }
