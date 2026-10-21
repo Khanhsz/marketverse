@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture } from 'pixi.js';
+import { Container, Sprite, Text, Texture } from 'pixi.js';
 import { ARTWORK_SIZE, WORLD_SIZE } from './atlasLayers';
 import { ENTITY_TEXTURES, MAP_ENTITIES, type EntityKind } from './entityLayout';
 import { COUNTRIES } from '../data/countries';
@@ -25,7 +25,7 @@ export async function loadArtworkStack(): Promise<ArtworkStack> {
   };
   const kinds = Object.keys(ENTITY_TEXTURES) as EntityKind[];
   const decoded = await Promise.all([
-    decode('/marketverse-v6-map-clean.png'),
+    decode('/marketverse-ocean.png'),
     ...COUNTRIES.map((country) => decode(countryArtworkPath(country))),
     ...kinds.map((kind) => decode(`/maps/entities/${kind}.png`)),
   ]);
@@ -33,7 +33,7 @@ export async function loadArtworkStack(): Promise<ArtworkStack> {
   const countryImages = decoded.slice(1, 1 + COUNTRIES.length);
   const images = decoded.slice(1 + COUNTRIES.length);
   if (source.naturalWidth !== ARTWORK_SIZE.width || source.naturalHeight !== ARTWORK_SIZE.height)
-    throw new Error('The world map image has unexpected dimensions.');
+    throw new Error('The ocean image has unexpected dimensions.');
   const entityTextures = Object.fromEntries(
     kinds.map((kind, i) => [kind, Texture.from(images[i])]),
   ) as Record<EntityKind, Texture>;
@@ -47,7 +47,7 @@ export async function loadArtworkStack(): Promise<ArtworkStack> {
         const selected = country.id === countryId;
         const sprite = countrySprites[country.id];
         const highlight = countryHighlights[country.id];
-        sprite.alpha = selected ? 1 : 0.72;
+        sprite.alpha = 1;
         sprite.zIndex = selected ? 13 : 10;
         highlight.visible = selected;
       }
@@ -58,7 +58,7 @@ export async function loadArtworkStack(): Promise<ArtworkStack> {
   root.eventMode = 'none';
   root.sortableChildren = true;
   const sprite = new Sprite(Texture.from(source));
-  sprite.label = 'world-artwork-image';
+  sprite.label = 'world-ocean-image';
   sprite.width = WORLD_SIZE.width;
   sprite.height = WORLD_SIZE.height;
   sprite.alpha = 1;
@@ -88,11 +88,28 @@ export async function loadArtworkStack(): Promise<ArtworkStack> {
     countrySprite.position.set(x, y);
     countrySprite.rotation = placement.rotation ?? 0;
     countrySprite.scale.set(scale);
-    countrySprite.alpha = 0.72;
+    countrySprite.alpha = 1;
     countrySprite.zIndex = 10 + index / 1000;
     countrySprite.eventMode = 'none';
     countrySprites[country.id] = countrySprite;
     root.addChild(highlight, countrySprite);
+    const countryLabel = new Text({
+      text: country.name.toUpperCase(),
+      style: {
+        fill: 0x213f39,
+        fontSize: 11,
+        fontFamily: 'Arial',
+        fontWeight: 'bold',
+        letterSpacing: 1.2,
+        stroke: { color: 0xf4f0df, width: 2 },
+      },
+    });
+    countryLabel.label = `country-label-${country.id}`;
+    countryLabel.anchor.set(0.5);
+    countryLabel.position.set(country.center.x, country.center.y);
+    countryLabel.zIndex = 20;
+    countryLabel.eventMode = 'none';
+    root.addChild(countryLabel);
   }
   for (const entity of [...MAP_ENTITIES].sort((a, b) => a.y - b.y)) {
     const landmark = new Sprite(entityTextures[entity.kind]);

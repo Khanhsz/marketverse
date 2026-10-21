@@ -4,7 +4,7 @@ All 38 named countries visible inside the seven illustrated continents are selec
 
 Pointer resolution keeps gameplay targets predictable: facility cards and markers resolve first, then public world entities, then city anchors, then the country below the pointer. A coarse polygon for each continent prevents open ocean from resolving to the nearest country. Selecting a country highlights that country's actual terrain sprite and label, routes the contextual panel to its nearest operating city and shows the country's full stats. A persistent country selector provides a keyboard-accessible alternative.
 
-The renderer now decodes 38 independent transparent PNG country layers in the shared 1920×1280 world coordinate system. The original atlas remains the geographic underlay, country terrain sprites render above it, and all 57 landmark plus simulation overlays render above the country artwork. The previously missing Lumara cutout was extracted from the source Lumara continent artwork so the renderer and gameplay roster are complete.
+The renderer now decodes 38 independent transparent PNG country layers in the shared 1920×1280 world coordinate system. The combined atlas PNG has been removed: a dedicated ocean texture is the only geographic underlay, country sprites and labels render above it, and all 57 landmark plus simulation overlays render above the country artwork. The previously missing Lumara cutout was extracted from the source Lumara continent artwork so the renderer and gameplay roster are complete.
 
 Validation:
 

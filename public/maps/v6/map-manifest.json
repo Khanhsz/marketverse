@@ -1,19 +1,25 @@
 {
-  "version": "7.1",
-  "style": "fictional-world-atlas-with-isometric-entities",
+  "version": "7.2",
+  "style": "ocean-and-independent-country-sprites",
   "world": {
     "width": 1920,
     "height": 1280
   },
-  "original": {
-    "file": "/marketverse-v6-map-clean.png",
+  "ocean": {
+    "file": "/marketverse-ocean.png",
     "width": 1536,
     "height": 1024,
-    "sizeBytes": 1777150,
-    "sha256": "ba10ec232d2829b94178ef461ab482de57548de71e4dc872cc58bc03c8398aab",
-    "status": "verified-clean-artwork"
+    "sizeBytes": 784665,
+    "sha256": "0e7504ccc6dcd47d5ec66922bab753a098eb68d52de1de3bb641e53405cad161",
+    "status": "verified-ocean-only"
   },
   "layers": [
+    {
+      "id": "ocean",
+      "file": "/marketverse-ocean.png",
+      "kind": "raster-background",
+      "interactive": false
+    },
     {
       "id": "country-artwork",
       "directory": "/maps/countries",
@@ -36,5 +42,5 @@
     "selectionSource": "simulation-state",
     "anchors": "resolve-from-engine-city-coordinates"
   },
-  "notes": "Approved world atlas remains the geographic underlay. All 38 countries are independently decoded transparent PNG sprites in the shared world/camera coordinate system; 57 authored visual landmarks and simulation overlays render above them."
+  "notes": "The combined world-atlas PNG has been removed. The renderer now contains only an ocean background, 38 independent transparent country sprites, country labels, 57 landmarks and simulation overlays."
 }

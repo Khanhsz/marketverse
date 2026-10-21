@@ -26,7 +26,7 @@ try {
   };
   const camera = async () =>
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));
-  const asset = await page.request.get(new URL('/marketverse-v6-map-clean.png', page.url()).href);
+  const asset = await page.request.get(new URL('/marketverse-ocean.png', page.url()).href);
   assert.equal(asset.status(), 200);
   const artworkBytes = await asset.body();
   // A CDN can losslessly recompress the response; the build gate pins the source bytes.
@@ -122,7 +122,7 @@ try {
   mkdirSync('.browser-artifacts', { recursive: true });
   await page.screenshot({ path: '.browser-artifacts/map-p0-national.png' });
   // Reproduce the original invalid upload; retry must recover without replacing progress.
-  await page.route('**/marketverse-v6-map-clean.png', (route) =>
+  await page.route('**/marketverse-ocean.png', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'image/png',
@@ -133,7 +133,7 @@ try {
   await page.reload();
   await page.getByRole('button', { name: 'Retry map', exact: true }).waitFor();
   assert.equal(await page.evaluate((k) => localStorage.getItem(k), key), saved);
-  await page.unroute('**/marketverse-v6-map-clean.png');
+  await page.unroute('**/marketverse-ocean.png');
   await page.getByRole('button', { name: 'Retry map', exact: true }).click();
   await ready();
   assert.equal(await page.evaluate((k) => localStorage.getItem(k), key), saved);
@@ -156,7 +156,7 @@ try {
   };
   writeFileSync('.browser-artifacts/map-p0.json', JSON.stringify(result, null, 2) + '\n');
   console.log(
-    'PASS: approved PNG, repeated map redraws, eight cities, zoomed facility selection, hidden hit targets, weekly save/reload, invalid-image recovery, one canvas and no uncaught errors',
+    'PASS: ocean-only PNG, 38 country sprites, repeated map redraws, eight cities, zoomed facility selection, weekly save/reload, invalid-image recovery, one canvas and no uncaught errors',
   );
 } finally {
   await browser.close();
