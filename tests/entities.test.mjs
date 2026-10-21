@@ -17,9 +17,10 @@ test('stable city/company/facility selections survive save roundtrip and array r
     ['city', 'central', 'Central City'],
     ['company', 'player', 'NOVA INDUSTRIES'],
     ['facility', 'hq', 'NOVA HQ'],
+    ['world', 'central-city-1', 'Central City Urban Core 1'],
   ])
     assert.equal(resolveSelection(state, { kind, id }).entity.name, name);
-  for (const kind of ['city', 'company', 'facility', 'unknown'])
+  for (const kind of ['city', 'company', 'facility', 'world', 'unknown'])
     assert.equal(resolveSelection(state, { kind, id: 'missing' }), undefined);
 });
 test('schema accepts eight cities while preserving the three-city starter', () => {

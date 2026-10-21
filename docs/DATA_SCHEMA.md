@@ -4,7 +4,11 @@ Current **save version 9**, **replay rules version 1**. The local save key remai
 
 `GameState` contains identity/seed/calendar, cities, companies, products, facilities, policies, projects, command IDs, located stock lots, factories, company finance/opening balances, journals, role-based staff, awareness, macro baselines/events, reports, campaign and replay.
 
+The authored world model lives outside saves because it is immutable rules data. `CITY_PROFILES` defines sector, annual growth, wage, rent, tax, talent and infrastructure for every national city. `WORLD_ENTITIES` defines all 57 illustrated map entities with a stable ID, owning city, type, map position, level, condition, workforce, capacity, public upkeep and four local-effect values. UI selections reference these stable IDs with `kind: "world"`.
+
 - Geography uses stable city IDs and world coordinates. The fixture remains three cities; national mode is eight connected cities with four distinct AI archetypes.
+- One aggregate (`cityOperationalStats`) combines each city profile with the condition-adjusted contribution of all its public entities. Demand, factory and store capacity, shipping cost/lead time, rent/tax, payroll, R&D and annual population growth consume this aggregate or its authored profile fields.
+- Company facilities expose derived level, condition, workforce, capacity, efficiency and weekly cost. Their persisted identity and placement schema remains unchanged, so version-9 saves do not need migration.
 - Product IDs remain stable across saves. R&D creates a new revision/ID with a parent; old stock retains its attributes and lot cost. Policies switch production to the new SKU, while legacy inventory can still sell.
 - Goods and credits are integers. Credits are the smallest game currency unit. Every journal sums signed debit amounts to zero. Inventory cost includes cargo while in transit.
 - Continuous awareness, macro indices and power are rounded to nine decimal places at state transitions. Preference weights are quantized before Hamilton integer allocation. Brand scoring accumulates integer nanounits to avoid object-order-dependent sums.

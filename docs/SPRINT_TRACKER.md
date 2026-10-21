@@ -33,3 +33,7 @@ The existing Alpha review site is https://marketverse-alpha.onrender.com and aut
 ## Authorized artwork follow-up — 2026-10-21
 
 Sprint 16 remains accepted. User-requested world atlas and 57 scattered landmarks are implemented at `b9ab8aab573b4da8594f3e7ea174af87c9bde7a2`. Eight PNG sprite types also represent existing facilities (R&D uses the HQ silhouette). `npm run verify` passed 63 tests, format, image integrity, TypeScript and build. Production map and general UI browser suites passed. See `validation/ENTITY_ATLAS.md`.
+
+## Authorized city/entity simulation follow-up — 2026-10-21
+
+All eight national cities now have authored economic profiles, and all 57 map landmarks are selectable gameplay entities with complete operating stats. One audited aggregate connects local entities to demand, logistics, facility capacity/cost, payroll, R&D and annual growth while preserving deterministic replay and version-9 save compatibility. `npm run verify:alpha` passed 66 tests, production browser/map checks, a 104-week campaign, exact cross-runtime replay, DPR performance profiling and 20 balance scenarios. See `validation/ENTITY_SIMULATION.md`.

@@ -1,6 +1,7 @@
 import { brandKey } from './people.ts';
 import type { GameState, Product, City, Segment } from './game.ts';
 import { SEGMENT_RULES, WEEKLY_PURCHASE_RATE, ATTRIBUTE_WEIGHTS } from '../data/rules.ts';
+import { cityOperationalStats } from './entityStats.ts';
 export type DemandCell = {
   cityId: string;
   segment: Segment;
@@ -47,12 +48,14 @@ export function calculateDemand(state: GameState): DemandCell[] {
   const cells: DemandCell[] = [];
   for (const city of [...state.cities].sort((a, b) => a.id.localeCompare(b.id)))
     for (const segment of Object.keys(SEGMENT_RULES) as Segment[]) {
+      const local = cityOperationalStats(city);
       const potential = Math.floor(
         city.population *
           city.segments[segment] *
           WEEKLY_PURCHASE_RATE *
           city.power *
-          state.macro.seasonal,
+          state.macro.seasonal *
+          local.demandMultiplier,
       );
       const products = state.products
         .filter(

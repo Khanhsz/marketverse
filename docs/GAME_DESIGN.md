@@ -26,8 +26,10 @@ Build a company, understand the market, shape the economy. An original strategic
 ## World
 - Fictional country for initial release; scope grows from 3 test cities to 8 Alpha cities.
 - Cities have population, segments, spending power, wages, infrastructure, growth and demand.
+- Each national city also has a sector, rent and tax environment, talent pool and a roster of public map entities. Airports, ports, warehouses, factories, commercial centers, residential districts, headquarters and urban cores contribute condition-adjusted demand, logistics, productivity or retail effects.
 - Companies have their own assets, inventory, stores, balance sheets, rival intentions and geography.
 - Logistics graph maps routes, shipping costs and lead times to serviceable markets.
+- Facility output and cost are local: infrastructure and nearby entities affect capacity, rent and tax affect weekly cost, headquarters location affects payroll, and talent affects R&D economics.
 - No fog; uncertainty is market *information quality*, not masked map tiles.
 
 ## Industry

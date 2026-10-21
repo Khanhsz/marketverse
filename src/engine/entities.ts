@@ -1,5 +1,6 @@
 import type { Facility, GameState } from './game.ts';
-export type Selection = { kind: 'city' | 'company' | 'facility'; id: string };
+import { worldEntity } from '../data/worldEntities.ts';
+export type Selection = { kind: 'city' | 'company' | 'facility' | 'world'; id: string };
 export const FACILITY_KINDS = ['hq', 'store', 'factory', 'warehouse', 'rd'] as const;
 export function resolveSelection(state: GameState, selection: Selection) {
   if (selection.kind === 'city') {
@@ -9,6 +10,10 @@ export function resolveSelection(state: GameState, selection: Selection) {
   if (selection.kind === 'company') {
     const company = state.companies.find((c) => c.id === selection.id);
     return company ? { kind: 'company' as const, entity: company } : undefined;
+  }
+  if (selection.kind === 'world') {
+    const entity = worldEntity(selection.id);
+    return entity ? { kind: 'world' as const, entity } : undefined;
   }
   if (selection.kind !== 'facility') return undefined;
   const facility = state.facilities.find((f) => f.id === selection.id);

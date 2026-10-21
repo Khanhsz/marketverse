@@ -5,6 +5,7 @@ import type { DemandCell } from './demand.ts';
 import { post } from './finance.ts';
 import { FINANCE_RULES } from '../data/rules.ts';
 import { FACTORY_RULE } from '../data/rules.ts';
+import { facilityOperationalStats } from './entityStats.ts';
 export type StockLot = {
   id: string;
   productId: string;
@@ -122,10 +123,12 @@ export function simulateOperations(
     a.facilityId.localeCompare(b.facilityId),
   )) {
     const facility = state.facilities.find((f) => f.id === factory.facilityId)!;
+    const city = state.cities.find((city) => city.id === facility.cityId)!;
+    const entityStats = facilityOperationalStats(facility, city);
     const company = state.companies.find((c) => c.id === facility.companyId)!;
     if (state.finance[company.id].bankrupt) continue;
     let capacity = Math.floor(
-      factory.capacity * Math.min(1, factory.workers / FACTORY_RULE.requiredWorkers),
+      entityStats.capacity * Math.min(1, factory.workers / FACTORY_RULE.requiredWorkers),
     );
     for (const p of state.products
       .filter((p) => p.companyId === company.id)
@@ -172,8 +175,28 @@ export function simulateOperations(
       });
     }
   }
+  const storeCapacity = Object.fromEntries(
+    state.companies.flatMap((company) =>
+      state.cities.map((city) => {
+        const stores = state.facilities.filter(
+          (facility) =>
+            facility.companyId === company.id &&
+            facility.cityId === city.id &&
+            facility.kind === 'store',
+        );
+        const storeCapacity = stores.reduce(
+          (total, store) => total + facilityOperationalStats(store, city).capacity,
+          0,
+        );
+        return [`${company.id}|${city.id}`, storeCapacity];
+      }),
+    ),
+  );
   const salesCapacity = Object.fromEntries(
-    state.companies.map((c) => [c.id, state.staff[c.id].sales * HR_RULES.unitsPerSeller]),
+    state.companies.map((company) => [
+      company.id,
+      state.staff[company.id].sales * HR_RULES.unitsPerSeller,
+    ]),
   );
   for (const cell of demand)
     for (const allocation of cell.allocations) {
@@ -188,9 +211,11 @@ export function simulateOperations(
         ? Math.min(
             allocation.desired,
             localStock(state, p.id, cell.cityId),
+            storeCapacity[`${p.companyId}|${cell.cityId}`],
             salesCapacity[p.companyId],
           )
         : 0;
+      storeCapacity[`${p.companyId}|${cell.cityId}`] -= units;
       salesCapacity[p.companyId] -= units;
       const cargo = consumeStock(state, p.id, cell.cityId, units);
       const revenue = units * p.price,

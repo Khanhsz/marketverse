@@ -2,6 +2,12 @@ import type { GameState, City } from '../engine/game';
 import type { Selection } from '../engine/entities';
 import { localStock } from '../engine/operations';
 import { brandKey } from '../engine/people';
+import {
+  cityEntities,
+  cityOperationalStats,
+  facilityOperationalStats,
+} from '../engine/entityStats';
+import { worldEntity } from '../data/worldEntities';
 
 export type Department =
   | 'operations'
@@ -194,6 +200,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function DepartmentPanel({
   game,
   city,
+  selection,
   department,
   onPlan,
   onSelect,
@@ -219,7 +226,13 @@ export function DepartmentPanel({
   const playerFactories = game.factories.filter((f) =>
     ownFacilities.some((asset) => asset.id === f.facilityId),
   );
-  const capacity = playerFactories.reduce((sum, f) => sum + f.capacity, 0);
+  const capacity = playerFactories.reduce((sum, factory) => {
+    const facility = ownFacilities.find((asset) => asset.id === factory.facilityId);
+    const factoryCity = facility && game.cities.find((item) => item.id === facility.cityId);
+    return (
+      sum + (facility && factoryCity ? facilityOperationalStats(facility, factoryCity).capacity : 0)
+    );
+  }, 0);
   const production = (latest?.production || [])
     .filter((p) => ownProducts.some((product) => product.id === p.productId))
     .reduce((sum, p) => sum + p.units, 0);
@@ -229,6 +242,15 @@ export function DepartmentPanel({
   );
   const localShipment = activeProjects.filter((p) => p.kind === 'shipment' && p.cityId === city.id);
   const dept = DEPARTMENTS.find((d) => d.id === department);
+  const cityStats = cityOperationalStats(city);
+  const selectedWorld = selection.kind === 'world' ? worldEntity(selection.id) : undefined;
+  const selectedFacility =
+    selection.kind === 'facility'
+      ? game.facilities.find((asset) => asset.id === selection.id)
+      : undefined;
+  const selectedFacilityStats = selectedFacility
+    ? facilityOperationalStats(selectedFacility, city)
+    : undefined;
   return (
     <div className="commandPanelContent">
       <div className="commandEyebrow">CITY &amp; BUSINESS INTELLIGENCE</div>
@@ -249,6 +271,99 @@ export function DepartmentPanel({
           ? localOwn.map((a) => facilityNames[a.kind]).join(', ')
           : 'Chưa có cơ sở của bạn'}
       </p>
+      <Section title="Hồ sơ thành phố">
+        <Stat name="Ngành chủ lực" value={cityStats.sector} />
+        <Stat name="Dân số" value={fmt(city.population)} />
+        <Stat name="Tăng trưởng năm" value={(cityStats.growthRate * 100).toFixed(1) + '%'} />
+        <Stat
+          name="Hạ tầng / Nhân tài"
+          value={cityStats.infrastructure + ' / ' + cityStats.talentIndex}
+        />
+        <Stat
+          name="Lương / Thuê mặt bằng"
+          value={cityStats.wageIndex.toFixed(2) + '× / ' + cityStats.rentIndex.toFixed(2) + '×'}
+        />
+        <Stat name="Thuế" value={(cityStats.taxRate * 100).toFixed(0) + '%'} />
+      </Section>
+      {selectedWorld && (
+        <Section title="Entity đang chọn">
+          <strong>{selectedWorld.name}</strong>
+          <p className="commandSupporting">
+            {selectedWorld.kind.toUpperCase()} · vận hành công cộng
+          </p>
+          <Stat
+            name="Cấp / Tình trạng"
+            value={'L' + selectedWorld.stats.level + ' / ' + selectedWorld.stats.condition + '%'}
+          />
+          <Stat
+            name="Nhân lực / Công suất"
+            value={fmt(selectedWorld.stats.workforce) + ' / ' + fmt(selectedWorld.stats.capacity)}
+          />
+          <Stat name="Bảo trì tuần" value={cash(selectedWorld.stats.weeklyUpkeep)} />
+          <Stat
+            name="Cầu / Bán lẻ"
+            value={
+              '+' +
+              (selectedWorld.stats.demandBoost * 100).toFixed(1) +
+              '% / +' +
+              (selectedWorld.stats.retailBoost * 100).toFixed(1) +
+              '%'
+            }
+          />
+          <Stat
+            name="Logistics / Sản xuất"
+            value={
+              '+' +
+              (selectedWorld.stats.logisticsBoost * 100).toFixed(1) +
+              '% / +' +
+              (selectedWorld.stats.productivityBoost * 100).toFixed(1) +
+              '%'
+            }
+          />
+        </Section>
+      )}
+      {selectedFacility && selectedFacilityStats && (
+        <Section title="Cơ sở đang chọn">
+          <strong>{selectedFacility.name}</strong>
+          <p className="commandSupporting">
+            {facilityNames[selectedFacility.kind]} ·{' '}
+            {selectedFacility.companyId === player.id ? 'của bạn' : 'đối thủ'}
+          </p>
+          <Stat
+            name="Cấp / Tình trạng"
+            value={
+              'L' + selectedFacilityStats.level + ' / ' + selectedFacilityStats.condition + '%'
+            }
+          />
+          <Stat
+            name="Nhân lực / Công suất"
+            value={
+              fmt(selectedFacilityStats.workforce) + ' / ' + fmt(selectedFacilityStats.capacity)
+            }
+          />
+          <Stat
+            name="Hiệu suất / Chi phí tuần"
+            value={
+              selectedFacilityStats.efficiency + '% / ' + cash(selectedFacilityStats.weeklyCost)
+            }
+          />
+        </Section>
+      )}
+      <Section title={'Entity địa phương · ' + cityStats.entityCount}>
+        {cityEntities(city.id).map((entity) => (
+          <button
+            className="commandListCard"
+            key={entity.id}
+            aria-pressed={selection.kind === 'world' && selection.id === entity.id}
+            onClick={() => onSelect({ kind: 'world', id: entity.id })}
+          >
+            <strong>{entity.name}</strong>
+            <small>
+              {entity.kind.toUpperCase()} · L{entity.stats.level} · {entity.stats.condition}%
+            </small>
+          </button>
+        ))}
+      </Section>
       {department === 'operations' && (
         <>
           <div className="operationsFlow" aria-label="Chuỗi vận hành">

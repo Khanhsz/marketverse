@@ -23,13 +23,13 @@
     16
   ],
   "status": "alpha_candidate",
-  "nextAction": "P0 map stability is complete on the verified Render build. Next authorized step: implement P1 first-twelve-weeks onboarding from docs/PRODUCT_REVIEW_PLAN.md; human playtests remain required for product acceptance.",
+  "nextAction": "City/entity simulation is fully implemented and locally Alpha-verified; monitor the authorized branch auto-deploy and remote CI, then continue P1 onboarding.",
   "evidence": {
     "lastPassedCICommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
     "lastPassedCITests": 56,
-    "browserSmoke": "passed: P0 production map locally and on Render, general UI regression, 104-week production campaign and exact Node/Chromium replay",
+    "browserSmoke": "passed: entity canvas selection, general UI, production map, 104-week campaign, exact Node/Chromium replay and DPR profile",
     "lastValidatedCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
-    "lastLocalTests": 56,
+    "lastLocalTests": 66,
     "remoteCI": "success: https://github.com/Khanhsz/marketverse/actions/runs/39416889137 at 4574ab478b7962edac5f2ff0168f286b9a308db4",
     "alphaVersion": "0.1.0-alpha.1",
     "alphaArtifactSha256": "2aefde66830b8d3340dc2424efdb392803a8453e7beb185f9458623cbd35351e",
@@ -38,7 +38,7 @@
     "nodeChromiumReplayExact": true,
     "balanceCampaigns": 20,
     "balanceCompleted": 20,
-    "balanceProfitable": 14,
+    "balanceProfitable": 12,
     "alphaArtifactStatus": "historical Sprint 16 package; not rebuilt for this P0 follow-up"
   },
   "automation": {
@@ -55,7 +55,7 @@
     "type": "static_site",
     "status": "live_verified",
     "serviceId": "srv-dbbfrqbbc2fs73b2cocg",
-    "workspaceName": "Kh\u00e1nh's workspace",
+    "workspaceName": "Khánh's workspace",
     "url": "https://marketverse-alpha.onrender.com",
     "blueprint": "render.yaml",
     "branch": "codex/marketverse-sprint-continuation",
@@ -88,7 +88,7 @@
     "lastValidatedRuntimeCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4"
   },
   "entityArtworkFollowup": {
-    "status": "locally_verified",
+    "status": "superseded_by_entity_simulation",
     "authorizedScope": "World atlas and scattered map entities; simulation unchanged",
     "testedCommit": "b9ab8aab573b4da8594f3e7ea174af87c9bde7a2",
     "landmarks": 57,
@@ -101,11 +101,41 @@
     "deployment": "Render live: dep-dbcamg5g1s2s738kgt9g at implementation commit",
     "limitations": [
       "Country boundaries remain baked into the world atlas; country cutouts are not interactive polygons.",
-      "Landmarks are visual context, not newly simulated facilities.",
-      "Existing eight-city economy and saved logistics distances are unchanged."
+      "World entities are immutable public infrastructure; company facilities remain saved mutable business assets."
     ],
     "implementationCommit": "076cd453a56487d5d5ffe6d88f568747aa89ac9f",
     "sourceTree": "7812b0a0d64bf9739d472cdc208bbdf1f30f8ddf",
     "remoteCI": "Initial run 39597251808 failed only in visual suite due to stale click coordinates; follow-up rerun required."
+  },
+  "entitySimulationFollowup": {
+    "status": "locally_alpha_verified",
+    "authorizedScope": "City profiles, stats for all world and company entities, and alignment of dependent game logic",
+    "cities": 8,
+    "worldEntities": 57,
+    "selectionKind": "world",
+    "saveVersion": 9,
+    "migrationRequired": false,
+    "systems": [
+      "demand",
+      "production",
+      "retail",
+      "logistics",
+      "rent",
+      "tax",
+      "payroll",
+      "research",
+      "population growth"
+    ],
+    "tests": {
+      "node": 66,
+      "verifyAlpha": "passed",
+      "browserSelection": "passed",
+      "campaignWeeks": 104,
+      "crossRuntimeReplayExact": true,
+      "balanceCampaigns": 20,
+      "dpr2PanP95Ms": 57.5
+    },
+    "evidence": "docs/validation/ENTITY_SIMULATION.md",
+    "deployment": "pending branch auto-deploy"
   }
 }

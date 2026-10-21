@@ -3,6 +3,7 @@ import { HR_RULES } from '../data/rules.ts';
 import type { GameState } from './game.ts';
 import { inventoryValue } from './operations.ts';
 import { BUILD_RULES, FINANCE_RULES } from '../data/rules.ts';
+import { cityOperationalStats, facilityOperationalStats } from './entityStats.ts';
 export const ACCOUNTS = [
   'cash',
   'inventory',
@@ -138,9 +139,16 @@ export function settleExpenses(state: GameState, events: string[]) {
   for (const company of state.companies) {
     const f = state.finance[company.id];
     let missed = false;
-    const payroll = STAFF_ROLES.reduce(
-      (n, r) => n + state.staff[company.id][r] * HR_RULES.wages[r],
-      0,
+    const wageCity = state.cities.find(
+      (city) =>
+        city.id ===
+        (state.facilities.find((asset) => asset.companyId === company.id && asset.kind === 'hq')
+          ?.cityId || state.facilities.find((asset) => asset.companyId === company.id)?.cityId),
+    );
+    const wageIndex = wageCity ? cityOperationalStats(wageCity).wageIndex : 1;
+    const payroll = Math.round(
+      STAFF_ROLES.reduce((n, r) => n + state.staff[company.id][r] * HR_RULES.wages[r], 0) *
+        wageIndex,
     );
     const bills: { account: Account; amount: number }[] = [
       { account: 'payroll', amount: payroll },
@@ -148,7 +156,15 @@ export function settleExpenses(state: GameState, events: string[]) {
         account: 'rent',
         amount: state.facilities
           .filter((x) => x.companyId === company.id)
-          .reduce((n, x) => n + FINANCE_RULES.rent[x.kind], 0),
+          .reduce(
+            (n, facility) =>
+              n +
+              facilityOperationalStats(
+                facility,
+                state.cities.find((city) => city.id === facility.cityId)!,
+              ).weeklyCost,
+            0,
+          ),
       },
       { account: 'marketing', amount: marketingBudget(state.policies[company.id]) },
       { account: 'interest', amount: Math.ceil(company.debt * FINANCE_RULES.weeklyInterest) },

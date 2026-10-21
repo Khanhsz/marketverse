@@ -16,6 +16,11 @@ const CountryMap = lazy(() =>
 import { advanceWeek, deserializeGame, SAVE_KEY, serializeGame } from '../engine/game';
 import { FACILITY_KINDS, placementError, resolveSelection } from '../engine/entities';
 import type { Selection } from '../engine/entities';
+import {
+  cityEntities,
+  cityOperationalStats,
+  facilityOperationalStats,
+} from '../engine/entityStats';
 const number = (v: number) => new Intl.NumberFormat('en-US').format(v);
 function loadGame() {
   try {
@@ -106,9 +111,11 @@ export function App() {
   const cityId =
     context.kind === 'city'
       ? context.entity.id
-      : context.kind === 'facility'
+      : context.kind === 'world'
         ? context.entity.cityId
-        : game.facilities.find((f) => f.companyId === context.entity.id)?.cityId;
+        : context.kind === 'facility'
+          ? context.entity.cityId
+          : game.facilities.find((f) => f.companyId === context.entity.id)?.cityId;
   const city = game.cities.find((c) => c.id === cityId) || game.cities[0];
   const player = game.companies.find((c) => c.id === game.playerId)!;
   useEffect(() => {
@@ -491,6 +498,116 @@ export function App() {
                 </div>
               </>
             )}
+            {context.kind === 'world' && (
+              <>
+                <p className="muted">
+                  {context.entity.kind.toUpperCase()} · {context.entity.status.toUpperCase()} ·
+                  public infrastructure
+                </p>
+                <hr />
+                <div className="stat">
+                  LEVEL <b>{context.entity.stats.level}</b>
+                </div>
+                <div className="stat">
+                  CONDITION <b>{context.entity.stats.condition}%</b>
+                </div>
+                <div className="stat">
+                  WORKFORCE <b>{number(context.entity.stats.workforce)}</b>
+                </div>
+                <div className="stat">
+                  CAPACITY <b>{number(context.entity.stats.capacity)}</b>
+                </div>
+                <div className="stat">
+                  WEEKLY UPKEEP <b>{number(context.entity.stats.weeklyUpkeep)} CR</b>
+                </div>
+                <h3>LOCAL EFFECTS</h3>
+                <div className="stat">
+                  DEMAND <b>+{(context.entity.stats.demandBoost * 100).toFixed(1)}%</b>
+                </div>
+                <div className="stat">
+                  LOGISTICS <b>+{(context.entity.stats.logisticsBoost * 100).toFixed(1)}%</b>
+                </div>
+                <div className="stat">
+                  PRODUCTIVITY <b>+{(context.entity.stats.productivityBoost * 100).toFixed(1)}%</b>
+                </div>
+                <div className="stat">
+                  RETAIL <b>+{(context.entity.stats.retailBoost * 100).toFixed(1)}%</b>
+                </div>
+                <h3>LOCATION</h3>
+                {cityButton(context.entity.cityId)}
+              </>
+            )}
+            {context.kind === 'facility' &&
+              (() => {
+                const stats = facilityOperationalStats(context.entity, city);
+                return (
+                  <>
+                    <h3>OPERATING STATS</h3>
+                    <div className="stat">
+                      LEVEL <b>{stats.level}</b>
+                    </div>
+                    <div className="stat">
+                      CONDITION <b>{stats.condition}%</b>
+                    </div>
+                    <div className="stat">
+                      WORKFORCE <b>{number(stats.workforce)}</b>
+                    </div>
+                    <div className="stat">
+                      CAPACITY <b>{number(stats.capacity)}</b>
+                    </div>
+                    <div className="stat">
+                      EFFICIENCY <b>{stats.efficiency}%</b>
+                    </div>
+                    <div className="stat">
+                      WEEKLY COST <b>{number(stats.weeklyCost)} CR</b>
+                    </div>
+                  </>
+                );
+              })()}
+            {context.kind === 'city' &&
+              (() => {
+                const stats = cityOperationalStats(context.entity);
+                return (
+                  <>
+                    <h3>CITY OPERATING PROFILE</h3>
+                    <div className="stat">
+                      SECTOR <b>{stats.sector}</b>
+                    </div>
+                    <div className="stat">
+                      ANNUAL GROWTH <b>{(stats.growthRate * 100).toFixed(1)}%</b>
+                    </div>
+                    <div className="stat">
+                      INFRASTRUCTURE <b>{stats.infrastructure}/100</b>
+                    </div>
+                    <div className="stat">
+                      TALENT <b>{stats.talentIndex}/100</b>
+                    </div>
+                    <div className="stat">
+                      WAGE / RENT{' '}
+                      <b>
+                        {stats.wageIndex.toFixed(2)}× / {stats.rentIndex.toFixed(2)}×
+                      </b>
+                    </div>
+                    <div className="stat">
+                      TAX RATE <b>{(stats.taxRate * 100).toFixed(0)}%</b>
+                    </div>
+                    <h3>PUBLIC ENTITIES · {stats.entityCount}</h3>
+                    {cityEntities(context.entity.id).map((entity) => (
+                      <button
+                        className="commandListCard"
+                        key={entity.id}
+                        onClick={() => choose({ kind: 'world', id: entity.id })}
+                      >
+                        <strong>{entity.name}</strong>
+                        <small>
+                          {entity.kind.toUpperCase()} · L{entity.stats.level} ·{' '}
+                          {entity.stats.condition}%
+                        </small>
+                      </button>
+                    ))}
+                  </>
+                );
+              })()}
             {context.kind === 'company' && (
               <>
                 <p className="muted">

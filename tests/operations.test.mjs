@@ -8,6 +8,7 @@ import {
 } from '../src/engine/game.ts';
 import { localStock, syncInventory, refreshFactories } from '../src/engine/operations.ts';
 import { initializeFinance } from '../src/engine/finance.ts';
+import { facilityOperationalStats } from '../src/engine/entityStats.ts';
 const empty = (s) => {
   s.stocks = [];
   syncInventory(s);
@@ -80,11 +81,17 @@ test('factory output obeys target, labor capacity, material spending and cash bu
   s.policies.player.production.nova = 180;
   s.staff.player.production = 2;
   let n = advanceWeek(s);
-  assert.equal(n.reports.at(-1).production[0].units, 100);
-  assert.equal(localStock(n, 'nova', 'central'), 100);
+  const effectiveCapacity = facilityOperationalStats(
+    s.facilities.find((f) => f.id === 'factory'),
+    s.cities.find((c) => c.id === 'central'),
+  ).capacity;
+  const expectedUnits = Math.floor(effectiveCapacity / 2);
+  assert.equal(n.reports.at(-1).production[0].units, expectedUnits);
+  assert.equal(localStock(n, 'nova', 'central'), expectedUnits);
   assert.equal(
     s.companies[0].cash - n.companies[0].cash,
-    100 * 124 + n.reports.at(-1).financials.find((f) => f.companyId === s.playerId).expenses,
+    expectedUnits * 124 +
+      n.reports.at(-1).financials.find((f) => f.companyId === s.playerId).expenses,
   );
   s.factories[0].workers = 0;
   s.staff.player.production = 0;

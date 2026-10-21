@@ -10,6 +10,7 @@ import type { Cargo } from './operations.ts';
 import type { GameState, Facility } from './game.ts';
 import { placementError, FACILITY_KINDS } from './entities.ts';
 import { BUILD_RULES, SHIPPING_RULE } from '../data/rules.ts';
+import { cityOperationalStats, transportQuoteModifiers } from './entityStats.ts';
 export type Policy = {
   prices: Record<string, number>;
   production: Record<string, number>;
@@ -87,7 +88,17 @@ export function quoteProject(
   if (request.kind === 'hiring') {
     if (!STAFF_ROLES.includes(request.role) || !integer(request.quantity, 1, 100))
       throw new Error('Invalid hiring');
-    return { cost: request.quantity * HR_RULES.hiringCost, weeks: HR_RULES.hiringWeeks };
+    const home = state.cities.find(
+      (city) =>
+        city.id ===
+        (state.facilities.find((asset) => asset.companyId === actor && asset.kind === 'hq')
+          ?.cityId || state.facilities.find((asset) => asset.companyId === actor)?.cityId),
+    );
+    const wageIndex = home ? cityOperationalStats(home).wageIndex : 1;
+    return {
+      cost: Math.round(request.quantity * HR_RULES.hiringCost * wageIndex),
+      weeks: HR_RULES.hiringWeeks,
+    };
   }
   if (request.kind === 'construction') {
     const pending = state.projects
@@ -125,9 +136,22 @@ export function quoteProject(
     if (request.segment && !['value', 'mainstream', 'premium'].includes(request.segment))
       throw new Error('Invalid target segment');
     const q = quoteResearch(product, request.attributes);
+    const researchCity = state.cities.find(
+      (city) =>
+        city.id ===
+        (state.facilities.find((asset) => asset.companyId === actor && asset.kind === 'rd')
+          ?.cityId ||
+          state.facilities.find((asset) => asset.companyId === actor && asset.kind === 'hq')
+            ?.cityId),
+    );
+    const talentDiscount = researchCity
+      ? Math.min(0.2, cityOperationalStats(researchCity).talentIndex / 500)
+      : 0;
     return {
       ...q,
-      cost: Math.round(q.cost * (1 - Math.min(0.2, state.staff[actor].research * 0.02))),
+      cost: Math.round(
+        q.cost * (1 - Math.min(0.2, state.staff[actor].research * 0.02)) * (1 - talentDiscount),
+      ),
     };
   }
   if (request.kind !== 'shipment' || !integer(request.quantity, 1))
@@ -140,9 +164,14 @@ export function quoteProject(
       throw new Error('Company needs facilities at both shipment nodes');
   if (localStock(state, product.id, request.originId) < request.quantity)
     throw new Error('Insufficient inventory');
+  const origin = state.cities.find((city) => city.id === request.originId)!,
+    destination = state.cities.find((city) => city.id === request.cityId)!,
+    modifiers = transportQuoteModifiers(origin, destination),
+    rawCost =
+      SHIPPING_RULE.base + request.quantity * (path.length - 1) * SHIPPING_RULE.perUnitPerLink;
   return {
-    cost: SHIPPING_RULE.base + request.quantity * (path.length - 1) * SHIPPING_RULE.perUnitPerLink,
-    weeks: Math.min(3, path.length - 1),
+    cost: Math.max(SHIPPING_RULE.base, Math.round(rawCost * modifiers.cost)),
+    weeks: Math.max(1, Math.min(3, path.length - 1 + modifiers.leadTime)),
   };
 }
 export function validatePolicy(state: GameState, actor: string, policy: Policy) {

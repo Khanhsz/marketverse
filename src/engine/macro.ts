@@ -2,6 +2,7 @@ import { roundSimulation } from './precision.ts';
 import type { GameState } from './game.ts';
 import { createRng } from './game.ts';
 import { MACRO_RULES } from '../data/rules.ts';
+import { cityOperationalStats } from './entityStats.ts';
 export type MacroEvent = {
   id: string;
   week: number;
@@ -58,7 +59,8 @@ export function resolveMacro(state: GameState, events: string[]) {
     const base = macro.base[city.id],
       hash = [...city.id].reduce((n, c) => Math.imul(n, 31) + c.charCodeAt(0), state.seed),
       local = createRng(hash)();
-    const annualGrowth = MACRO_RULES.annualGrowthMin + local * MACRO_RULES.annualGrowthRange,
+    const authoredGrowth = cityOperationalStats(city).growthRate,
+      annualGrowth = authoredGrowth + (local - 0.5) * MACRO_RULES.annualGrowthRange * 0.25,
       years = (state.absoluteWeek - macro.originWeek + 1) / 52;
     city.population = Math.max(1, Math.round(base.population * Math.pow(1 + annualGrowth, years)));
     city.power = roundSimulation(base.power * macro.index * (1 + annualGrowth * 0.25 * years));

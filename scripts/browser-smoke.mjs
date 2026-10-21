@@ -52,6 +52,24 @@ try {
   assert.equal((await camera()).x, 960);
   assert.equal((await camera()).y, 640);
 
+  // Illustrated landmarks are real selectable entities with operating stats.
+  const mapBox = await page.locator('.mapSurface').boundingBox();
+  const entityCamera = await camera();
+  await page.mouse.click(
+    mapBox.x + mapBox.width / 2 + (1094.4 - entityCamera.x) * entityCamera.scale,
+    mapBox.y + mapBox.height / 2 + (323.2 - entityCamera.y) * entityCamera.scale,
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector('#selection-panel')?.dataset.selection === 'world:central-factory-1',
+  );
+  assert.match(
+    await page.locator('#selection-panel').innerText(),
+    /Central City Industrial Complex 1/,
+  );
+  assert.match(await page.locator('#selection-panel').innerText(), /Nhân lực \/ Công suất/);
+  await page.getByLabel('Select city').selectOption('central', { force: true });
+
   // User-facing departments all share the same business state and illustrated map.
   for (const [button, heading, layer] of [
     ['Sản phẩm', 'Sản phẩm', 'Market'],

@@ -10,6 +10,7 @@ import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
 import { cityWorldPoint, cityLabelPoint, cityCardBounds } from '../map/cityAnchors';
+import { MAP_ENTITIES } from '../map/entityLayout';
 
 type Props = {
   cities: City[];
@@ -31,7 +32,7 @@ const legends: Record<Layer, string> = {
   Market: 'Population and last resolved week potential buyers',
   Competition: 'Week 1: company presence by city · after sales: measured market share',
   Operations: 'Facility labels show existing assets; select for operational details',
-  Logistics: 'Routes: 100 dispatch + 2 credits/unit/link · 1–3 weeks · incoming player cargo',
+  Logistics: 'Routes: base freight adjusted by local logistics · 1–3 weeks · incoming cargo',
   Economy: 'Purchasing power relative to national baseline',
 };
 const layerColors: Record<Layer, number> = Object.fromEntries(
@@ -91,7 +92,7 @@ export function CountryMap(props: Props) {
       .init({
         background: '#edf1ee',
         antialias: true,
-        resolution: window.devicePixelRatio || 1,
+        resolution: 1,
         autoDensity: true,
       })
       .then(async () => {
@@ -225,6 +226,16 @@ export function CountryMap(props: Props) {
             roads.stroke({ color: 0x167f96, width: 8, alpha: 0.82 });
             overlays.addChild(roads);
           } else roads.destroy();
+          if (selection.kind === 'world') {
+            const entity = MAP_ENTITIES.find((item) => item.id === selection.id);
+            if (entity)
+              overlays.addChild(
+                new Graphics()
+                  .circle(entity.x, entity.y, Math.max(20, entity.width * 0.62))
+                  .fill({ color: 0xffcf66, alpha: 0.13 })
+                  .stroke({ color: 0xffcf66, width: 4, alpha: 0.95 }),
+              );
+          }
           // Draw selected card last so its details remain on top of compact chips.
           const drawCities =
             active === 'Operations'
@@ -665,6 +676,16 @@ export function CountryMap(props: Props) {
                   return;
                 }
               }
+            }
+            const landmark = MAP_ENTITIES.filter((entity) => entity.kind !== 'city')
+              .sort((a, b) => Math.hypot(a.x - w.x, a.y - w.y) - Math.hypot(b.x - w.x, b.y - w.y))
+              .find(
+                (entity) =>
+                  Math.hypot(entity.x - w.x, entity.y - w.y) <= Math.max(16, entity.width * 0.55),
+              );
+            if (landmark) {
+              current.current.onSelect({ kind: 'world', id: landmark.id });
+              return;
             }
             if (city) current.current.onSelect({ kind: 'city', id: city.id });
           }

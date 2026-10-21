@@ -8,6 +8,7 @@ import {
 } from '../src/engine/game.ts';
 import { brandKey } from '../src/engine/people.ts';
 import { calculateDemand } from '../src/engine/demand.ts';
+import { cityOperationalStats } from '../src/engine/entityStats.ts';
 const plan = (s, policy = s.policies.player, projects = []) => ({
   id: 'people-' + s.absoluteWeek,
   expectedWeek: s.absoluteWeek,
@@ -65,7 +66,13 @@ test('hiring has cost and delay, then persistent payroll and measurable staffing
       (e) =>
         e.companyId === 'player' &&
         e.memo === 'Weekly payroll' &&
-        e.lines.some((l) => l.amount === 700),
+        e.lines.some(
+          (l) =>
+            l.amount ===
+            Math.round(
+              700 * cityOperationalStats(s.cities.find((c) => c.id === 'central')).wageIndex,
+            ),
+        ),
     ),
   );
   assert.throws(
