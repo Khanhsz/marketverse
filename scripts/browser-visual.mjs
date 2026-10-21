@@ -43,18 +43,18 @@ try {
     );
   };
   // First click a compact rival-city chip, then the newly compact center chip.
-  await clickWorld(0.35 * 1920 + 70, 0.275 * 1280 - 65);
+  await clickWorld(0.4 * 1920 + 70, 0.215 * 1280 - 65);
   assert.equal(
     await page.locator('.panel').getAttribute('data-selection'),
     'facility:premium-factory',
   );
-  await clickWorld(0.565 * 1920 + 100, 0.475 * 1280 - 65);
+  await clickWorld(0.53 * 1920 + 100, 0.47 * 1280 - 65);
   assert.equal(
     await page.locator('.panel').getAttribute('data-selection'),
     'facility:player-factory',
   );
-  const targetX = 0.565 * 1920 + 100;
-  const targetY = 0.475 * 1280 - 92;
+  const targetX = 0.53 * 1920 + 100;
+  const targetY = 0.47 * 1280 - 92;
   await page.mouse.click(
     canvas.x + canvas.width / 2 + (targetX - camera.x) * camera.scale,
     canvas.y + canvas.height / 2 + (targetY - camera.y) * camera.scale,

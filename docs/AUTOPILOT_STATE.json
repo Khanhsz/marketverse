@@ -95,13 +95,17 @@
     "spriteTypes": 8,
     "tests": {
       "verify": "63 tests, formatting, artwork integrity, TypeScript and production build passed",
-      "browser": "UI regression and production map smoke passed; eight sprite images decoded"
+      "browser": "UI regression and production map smoke passed; eight sprite images decoded",
+      "visual": "Passed locally after updating test clicks from old atlas anchors"
     },
-    "deployment": "pending push and live verification",
+    "deployment": "Render live: dep-dbcamg5g1s2s738kgt9g at implementation commit",
     "limitations": [
       "Country boundaries remain baked into the world atlas; country cutouts are not interactive polygons.",
       "Landmarks are visual context, not newly simulated facilities.",
       "Existing eight-city economy and saved logistics distances are unchanged."
-    ]
+    ],
+    "implementationCommit": "076cd453a56487d5d5ffe6d88f568747aa89ac9f",
+    "sourceTree": "7812b0a0d64bf9739d472cdc208bbdf1f30f8ddf",
+    "remoteCI": "Initial run 39597251808 failed only in visual suite due to stale click coordinates; follow-up rerun required."
   }
 }
