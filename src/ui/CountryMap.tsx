@@ -5,7 +5,7 @@ import { loadArtworkStack } from '../map/artworkLoader';
 import { MAP_MODES } from '../map/atlasLayers';
 import type { City, Facility, Company, Product } from '../engine/game';
 import type { Factory, StockLot } from '../engine/operations';
-import { fitCamera, panCamera, screenToWorld, zoomCamera } from './camera';
+import { constrainCamera, fitCamera, panCamera, screenToWorld, zoomCamera } from './camera';
 import type { Camera, Viewport } from './camera';
 import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
@@ -570,6 +570,7 @@ export function CountryMap(props: Props) {
         };
         const resize = () => {
           view = { width: element.clientWidth, height: element.clientHeight };
+          camera = constrainCamera(camera, view);
           app.renderer.resize(view.width, view.height);
           applyCamera();
         };
@@ -609,7 +610,7 @@ export function CountryMap(props: Props) {
           const p = point(event);
           if (Math.hypot(p.x - gesture.startX, p.y - gesture.startY) > 5) gesture.dragged = true;
           if (gesture.dragged) {
-            camera = panCamera(camera, p.x - gesture.lastX, p.y - gesture.lastY);
+            camera = panCamera(camera, view, p.x - gesture.lastX, p.y - gesture.lastY);
             applyCamera();
           }
           gesture.lastX = p.x;
@@ -734,6 +735,7 @@ export function CountryMap(props: Props) {
             camera = zoomCamera(camera, view, center, distance / touchPinch.distance);
           camera = panCamera(
             camera,
+            view,
             center.x - touchPinch.center.x,
             center.y - touchPinch.center.y,
           );
@@ -760,10 +762,16 @@ export function CountryMap(props: Props) {
           camera =
             action === 'focus'
               ? {
-                  ...camera,
-                  ...cityWorldPoint(
-                    current.current.cities.find((c) => c.id === current.current.selectedCityId) ||
-                      current.current.cities[0],
+                  ...constrainCamera(
+                    {
+                      ...camera,
+                      ...cityWorldPoint(
+                        current.current.cities.find(
+                          (c) => c.id === current.current.selectedCityId,
+                        ) || current.current.cities[0],
+                      ),
+                    },
+                    view,
                   ),
                 }
               : action === 'reset'
@@ -782,7 +790,7 @@ export function CountryMap(props: Props) {
             event.stopPropagation();
             const dx = event.key === 'ArrowLeft' ? 40 : event.key === 'ArrowRight' ? -40 : 0,
               dy = event.key === 'ArrowUp' ? 40 : event.key === 'ArrowDown' ? -40 : 0;
-            camera = panCamera(camera, dx, dy);
+            camera = panCamera(camera, view, dx, dy);
             applyCamera();
           }
           if (['+', '=', '-', 'Home'].includes(event.key)) {

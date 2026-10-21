@@ -52,6 +52,20 @@ try {
   await page.keyboard.press('Home');
   assert.equal((await camera()).x, 960);
   assert.equal((await camera()).y, 640);
+  for (let i = 0; i < 12; i++) await page.getByRole('button', { name: 'Zoom out' }).click();
+  for (let i = 0; i < 24; i++) {
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowUp');
+  }
+  const boundedCamera = await camera();
+  const boundedMap = await page.locator('.mapSurface').boundingBox();
+  const halfWorldWidth = boundedMap.width / (2 * boundedCamera.scale);
+  const halfWorldHeight = boundedMap.height / (2 * boundedCamera.scale);
+  assert.ok(boundedCamera.x - halfWorldWidth >= -1e-6);
+  assert.ok(boundedCamera.x + halfWorldWidth <= 1920 + 1e-6);
+  assert.ok(boundedCamera.y - halfWorldHeight >= -1e-6);
+  assert.ok(boundedCamera.y + halfWorldHeight <= 1280 + 1e-6);
+  await page.keyboard.press('Home');
 
   // Illustrated landmarks are real selectable entities with operating stats.
   const mapBox = await page.locator('.mapSurface').boundingBox();
