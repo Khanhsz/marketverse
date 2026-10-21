@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "count": 38,
+  "format": "transparent-png",
+  "coordinateSystem": "world-1920x1280",
+  "pathPattern": "/maps/countries/{continent}/{countryId}.png",
+  "countries": [
+    "aldera", "norlan", "cascadia", "unita", "freyland", "solridge",
+    "frostria", "halsvik", "bjornar", "kaldor", "varsgard", "nyland",
+    "valmira", "arvan", "kaelis", "meldan", "dreval", "soran", "keshana", "talora",
+    "zahir", "miran", "qadir", "khald", "danura",
+    "liria", "orin", "sylva", "tamara", "vela", "nexis",
+    "drakon", "svarin", "thuria", "valtera",
+    "caelon", "lumara", "tavia"
+  ]
+}

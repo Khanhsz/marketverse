@@ -14,6 +14,7 @@ try {
     await page.waitForFunction(() => document.querySelector('.mapSurface')?.dataset.camera);
     assert.equal(await page.locator('.map').getAttribute('data-error'), null);
     assert.equal(await page.locator('canvas').count(), 1);
+    assert.equal(await page.locator('.mapSurface').getAttribute('data-country-artwork'), '38');
     assert.equal(await page.locator('.mapSurface').getAttribute('data-artwork'), 'ready');
   };
   const switchDepartment = async (name, layer) => {

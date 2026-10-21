@@ -18,6 +18,7 @@ try {
     );
     assert.equal(await page.locator('.map').getAttribute('data-error'), null);
     assert.equal(await page.locator('canvas').count(), 1);
+    assert.equal(await page.locator('.mapSurface').getAttribute('data-country-artwork'), '38');
   };
   const camera = async () =>
     JSON.parse(await page.locator('.mapSurface').getAttribute('data-camera'));

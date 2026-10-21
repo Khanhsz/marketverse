@@ -73,6 +73,7 @@ export function CountryMap(props: Props) {
     setFailure('');
     delete element.dataset.camera;
     delete element.dataset.artwork;
+    delete element.dataset.countryArtwork;
     let disposed = false;
     let initialized = false;
     let destroyed = false;
@@ -110,6 +111,7 @@ export function CountryMap(props: Props) {
           return;
         }
         element.dataset.artwork = 'ready';
+        element.dataset.countryArtwork = String(COUNTRIES.length);
         element.dataset.landmarks = '57';
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
@@ -207,9 +209,8 @@ export function CountryMap(props: Props) {
           for (const child of overlays.removeChildren()) child.destroy();
           const { cities, facilities, companies, selectedCityId, selection } = current.current;
           const active = layerRef.current;
-          // Illustrated cartography is loaded from a clean PNG artwork.
-          // All dynamic game entities and routes are rendered separately above it.
-          // Keep the decoded artwork mounted while only the data overlays are rebuilt.
+          artworkStack.setSelectedCountry(selection.kind === 'country' ? selection.id : undefined);
+          // Country terrain cutouts and landmarks remain mounted while only data overlays rebuild.
           const roads = new Graphics();
           for (const city of cities)
             for (const id of city.links) {
@@ -240,12 +241,6 @@ export function CountryMap(props: Props) {
           if (selection.kind === 'country') {
             const country = COUNTRIES.find((item) => item.id === selection.id);
             if (country) {
-              overlays.addChild(
-                new Graphics()
-                  .ellipse(country.center.x, country.center.y, 78, 48)
-                  .fill({ color: 0xffcf66, alpha: 0.16 })
-                  .stroke({ color: 0xffcf66, width: 4, alpha: 0.95 }),
-              );
               label(
                 country.name.toUpperCase(),
                 country.center.x + 44,

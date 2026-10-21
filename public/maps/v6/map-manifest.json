@@ -1,5 +1,5 @@
 {
-  "version": "7.0",
+  "version": "7.1",
   "style": "fictional-world-atlas-with-isometric-entities",
   "world": {
     "width": 1920,
@@ -16,9 +16,10 @@
   "layers": [
     {
       "id": "country-artwork",
-      "file": "/marketverse-v6-map-clean.png",
-      "kind": "raster",
-      "interactive": false
+      "directory": "/maps/countries",
+      "manifest": "/maps/countries/manifest.json",
+      "kind": "38-transparent-raster-layers",
+      "interactive": true
     }
   ],
   "overlays": [
@@ -35,5 +36,5 @@
     "selectionSource": "simulation-state",
     "anchors": "resolve-from-engine-city-coordinates"
   },
-  "notes": "Approved world atlas fit without distortion inside legacy camera bounds. 57 authored visual landmarks; simulation positions, economy and save schema unchanged. Countries remain part of the base artwork; reconstructed country cutouts are not exact tessellations and are not used as gameplay borders."
+  "notes": "Approved world atlas remains the geographic underlay. All 38 countries are independently decoded transparent PNG sprites in the shared world/camera coordinate system; 57 authored visual landmarks and simulation overlays render above them."
 }

@@ -120,7 +120,7 @@
     "deployment": "pending branch auto-deploy"
   },
   "countryInteractionFollowup": {
-    "status": "locally_verified_browser_pending",
+    "status": "country_artwork_locally_verified_browser_pending",
     "countries": 38,
     "continents": 7,
     "selectionKind": "country",
@@ -128,9 +128,16 @@
     "migrationRequired": false,
     "hitPriority": ["facility", "world entity", "city", "country"],
     "tests": {
-      "node": 68,
+      "node": 70,
       "verify": "passed",
       "browser": "pending remote CI runtime"
+    },
+    "artwork": {
+      "layers": 38,
+      "format": "transparent PNG",
+      "renderer": "Pixi sprites in shared 1920x1280 world coordinates",
+      "optimizedBytes": "approximately 7 MB total",
+      "selection": "selected country sprite receives a gold silhouette highlight"
     },
     "evidence": "docs/validation/COUNTRY_INTERACTION.md",
     "deployment": "pending branch auto-deploy"
