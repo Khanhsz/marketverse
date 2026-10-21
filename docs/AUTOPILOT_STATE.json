@@ -4,32 +4,15 @@
   "repository": "Khanhsz/marketverse",
   "sourceOfTruth": "github",
   "activeSprint": 16,
-  "completedSprints": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16
-  ],
+  "completedSprints": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   "status": "alpha_candidate",
-  "nextAction": "City/entity simulation is fully implemented and locally Alpha-verified; monitor the authorized branch auto-deploy and remote CI, then continue P1 onboarding.",
+  "nextAction": "Country interaction is implemented and locally verified; publish, confirm remote browser CI and verify the Render live deployment.",
   "evidence": {
     "lastPassedCICommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
     "lastPassedCITests": 56,
     "browserSmoke": "passed: entity canvas selection, general UI, production map, 104-week campaign, exact Node/Chromium replay and DPR profile",
     "lastValidatedCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4",
-    "lastLocalTests": 66,
+    "lastLocalTests": 68,
     "remoteCI": "success: https://github.com/Khanhsz/marketverse/actions/runs/39416889137 at 4574ab478b7962edac5f2ff0168f286b9a308db4",
     "alphaVersion": "0.1.0-alpha.1",
     "alphaArtifactSha256": "2aefde66830b8d3340dc2424efdb392803a8453e7beb185f9458623cbd35351e",
@@ -82,9 +65,7 @@
       "canonicalStateSha256": "17ba2b19b3e4003899d707db013e11906cdb0344e001ff45e48eb3b0ebb9d059",
       "baseCommit": "993cb8b6fa1a5aba35d4303e6b7e7e5e03041d7d"
     },
-    "completedSteps": [
-      "P0 map stability"
-    ],
+    "completedSteps": ["P0 map stability"],
     "lastValidatedRuntimeCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4"
   },
   "entityArtworkFollowup": {
@@ -136,6 +117,22 @@
       "dpr2PanP95Ms": 57.5
     },
     "evidence": "docs/validation/ENTITY_SIMULATION.md",
+    "deployment": "pending branch auto-deploy"
+  },
+  "countryInteractionFollowup": {
+    "status": "locally_verified_browser_pending",
+    "countries": 38,
+    "continents": 7,
+    "selectionKind": "country",
+    "saveVersion": 9,
+    "migrationRequired": false,
+    "hitPriority": ["facility", "world entity", "city", "country"],
+    "tests": {
+      "node": 68,
+      "verify": "passed",
+      "browser": "pending remote CI runtime"
+    },
+    "evidence": "docs/validation/COUNTRY_INTERACTION.md",
     "deployment": "pending branch auto-deploy"
   }
 }

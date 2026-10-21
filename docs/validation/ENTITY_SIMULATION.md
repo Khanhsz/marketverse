@@ -15,6 +15,8 @@ A single deterministic aggregate connects these values to the simulation:
 
 Map selection resolves stable `world` IDs. The selected landmark receives a map ring and its complete operating stats appear in both the department panel and advanced inspector. City views list every local public entity. Existing save version 9 remains compatible because the new world model is immutable rules data and facility stats are derived.
 
+Country interaction was added in the subsequent `COUNTRY_INTERACTION.md` follow-up.
+
 ## Verification
 
 - `npm run verify:alpha` passed from the final source tree.

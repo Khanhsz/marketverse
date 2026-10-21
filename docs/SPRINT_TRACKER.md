@@ -37,3 +37,7 @@ Sprint 16 remains accepted. User-requested world atlas and 57 scattered landmark
 ## Authorized city/entity simulation follow-up — 2026-10-21
 
 All eight national cities now have authored economic profiles, and all 57 map landmarks are selectable gameplay entities with complete operating stats. One audited aggregate connects local entities to demand, logistics, facility capacity/cost, payroll, R&D and annual growth while preserving deterministic replay and version-9 save compatibility. `npm run verify:alpha` passed 66 tests, production browser/map checks, a 104-week campaign, exact cross-runtime replay, DPR performance profiling and 20 balance scenarios. See `validation/ENTITY_SIMULATION.md`.
+
+## Authorized country interaction follow-up — 2026-10-21
+
+All 38 labeled countries across seven continents now resolve direct map clicks, expose complete national stats, show a selected-state overlay and remain accessible through a country selector. Facility, entity and city targets keep higher pointer priority, while continent polygons reject ocean clicks. Local verification passed 68 behavioral tests, formatting, TypeScript, artwork integrity and production build. See `validation/COUNTRY_INTERACTION.md`.

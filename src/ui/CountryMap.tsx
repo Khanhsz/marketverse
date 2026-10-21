@@ -11,6 +11,7 @@ import type { Selection } from '../engine/entities';
 import { resolveLabels } from '../map/labels';
 import { cityWorldPoint, cityLabelPoint, cityCardBounds } from '../map/cityAnchors';
 import { MAP_ENTITIES } from '../map/entityLayout';
+import { COUNTRIES, countryAtPoint } from '../data/countries';
 
 type Props = {
   cities: City[];
@@ -235,6 +236,24 @@ export function CountryMap(props: Props) {
                   .fill({ color: 0xffcf66, alpha: 0.13 })
                   .stroke({ color: 0xffcf66, width: 4, alpha: 0.95 }),
               );
+          }
+          if (selection.kind === 'country') {
+            const country = COUNTRIES.find((item) => item.id === selection.id);
+            if (country) {
+              overlays.addChild(
+                new Graphics()
+                  .ellipse(country.center.x, country.center.y, 78, 48)
+                  .fill({ color: 0xffcf66, alpha: 0.16 })
+                  .stroke({ color: 0xffcf66, width: 4, alpha: 0.95 }),
+              );
+              label(
+                country.name.toUpperCase(),
+                country.center.x + 44,
+                country.center.y - 58,
+                18,
+                0xffcf66,
+              );
+            }
           }
           // Draw selected card last so its details remain on top of compact chips.
           const drawCities =
@@ -687,7 +706,12 @@ export function CountryMap(props: Props) {
               current.current.onSelect({ kind: 'world', id: landmark.id });
               return;
             }
-            if (city) current.current.onSelect({ kind: 'city', id: city.id });
+            if (city) {
+              current.current.onSelect({ kind: 'city', id: city.id });
+              return;
+            }
+            const country = countryAtPoint(w.x, w.y);
+            if (country) current.current.onSelect({ kind: 'country', id: country.id });
           }
         };
         let touchPinch: { distance: number; center: { x: number; y: number } } | undefined;
@@ -839,6 +863,23 @@ export function CountryMap(props: Props) {
           {props.cities.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="countryPicker">
+        Quốc gia
+        <select
+          aria-label="Select country"
+          value={props.selection.kind === 'country' ? props.selection.id : ''}
+          onChange={(event) => props.onSelect({ kind: 'country', id: event.target.value })}
+        >
+          <option value="" disabled>
+            Chọn trên bản đồ
+          </option>
+          {COUNTRIES.map((country) => (
+            <option key={country.id} value={country.id}>
+              {country.name} · {country.continent}
             </option>
           ))}
         </select>

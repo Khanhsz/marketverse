@@ -49,7 +49,8 @@ export function Guide({
       <h3>Keyboard and map</h3>
       <p>
         Tab moves through controls. In the focused map, arrow keys pan, +/− zoom and Home fits the
-        country. City and entity buttons provide keyboard alternatives to map markers. Escape closes
+        country. Countries, cities and entities can all be selected directly on the map. The country
+        selector and city/entity buttons provide keyboard alternatives to map markers. Escape closes
         dialogs.
       </p>
       <p>

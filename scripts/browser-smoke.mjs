@@ -70,6 +70,17 @@ try {
   assert.match(await page.locator('#selection-panel').innerText(), /Nhân lực \/ Công suất/);
   await page.getByLabel('Select city').selectOption('central', { force: true });
 
+  await page.mouse.click(
+    mapBox.x + mapBox.width / 2 + (1300 - entityCamera.x) * entityCamera.scale,
+    mapBox.y + mapBox.height / 2 + (960 - entityCamera.y) * entityCamera.scale,
+  );
+  await page.waitForFunction(
+    () => document.querySelector('#selection-panel')?.dataset.selection === 'country:thuria',
+  );
+  assert.match(await page.locator('#selection-panel').innerText(), /Quốc gia đang chọn/);
+  assert.match(await page.locator('#selection-panel').innerText(), /Thuria/);
+  await page.getByLabel('Select city').selectOption('central', { force: true });
+
   // User-facing departments all share the same business state and illustrated map.
   for (const [button, heading, layer] of [
     ['Sản phẩm', 'Sản phẩm', 'Market'],

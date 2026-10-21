@@ -570,6 +570,31 @@ details summary {
   background: #f8faf9;
   border-radius: 4px;
 }
+.countryPicker {
+  position: absolute;
+  z-index: 5;
+  left: 14px;
+  top: 54px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border: 1px solid #456453;
+  border-radius: 6px;
+  background: #193226ed;
+  color: #d9eee1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.countryPicker select {
+  max-width: 170px;
+  border: 0;
+  background: #27483a;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+}
 .formRow label {
   font-size: 12px;
 }

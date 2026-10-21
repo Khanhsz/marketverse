@@ -113,9 +113,11 @@ export function App() {
       ? context.entity.id
       : context.kind === 'world'
         ? context.entity.cityId
-        : context.kind === 'facility'
+        : context.kind === 'country'
           ? context.entity.cityId
-          : game.facilities.find((f) => f.companyId === context.entity.id)?.cityId;
+          : context.kind === 'facility'
+            ? context.entity.cityId
+            : game.facilities.find((f) => f.companyId === context.entity.id)?.cityId;
   const city = game.cities.find((c) => c.id === cityId) || game.cities[0];
   const player = game.companies.find((c) => c.id === game.playerId)!;
   useEffect(() => {
@@ -379,7 +381,9 @@ export function App() {
               </button>
             </section>
           )}
-          <div className="mapFoot commandMapHint">Chọn cơ sở để xem dữ liệu và thao tác</div>
+          <div className="mapFoot commandMapHint">
+            Chọn quốc gia, thành phố hoặc cơ sở để xem dữ liệu
+          </div>
         </main>
         <aside
           ref={panelRef}
@@ -534,6 +538,37 @@ export function App() {
                   RETAIL <b>+{(context.entity.stats.retailBoost * 100).toFixed(1)}%</b>
                 </div>
                 <h3>LOCATION</h3>
+                {cityButton(context.entity.cityId)}
+              </>
+            )}
+            {context.kind === 'country' && (
+              <>
+                <p className="muted">
+                  {context.entity.continent.toUpperCase()} · CAPITAL{' '}
+                  {context.entity.capital.toUpperCase()}
+                </p>
+                <hr />
+                <div className="stat">
+                  POPULATION <b>{number(context.entity.stats.population)}</b>
+                </div>
+                <div className="stat">
+                  GDP INDEX <b>{context.entity.stats.gdpIndex}</b>
+                </div>
+                <div className="stat">
+                  TAX RATE <b>{(context.entity.stats.taxRate * 100).toFixed(0)}%</b>
+                </div>
+                <div className="stat">
+                  STABILITY <b>{context.entity.stats.stability}/100</b>
+                </div>
+                <div className="stat">
+                  INFRASTRUCTURE <b>{context.entity.stats.infrastructure}/100</b>
+                </div>
+                <div className="stat">
+                  TRADE OPENNESS <b>{context.entity.stats.tradeOpenness}/100</b>
+                </div>
+                <h3>ECONOMIC SPECIALTY</h3>
+                <p>{context.entity.specialty}</p>
+                <h3>NEAREST OPERATING CITY</h3>
                 {cityButton(context.entity.cityId)}
               </>
             )}

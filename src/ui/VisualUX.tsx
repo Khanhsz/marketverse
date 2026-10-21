@@ -8,6 +8,7 @@ import {
   facilityOperationalStats,
 } from '../engine/entityStats';
 import { worldEntity } from '../data/worldEntities';
+import { country } from '../data/countries';
 
 export type Department =
   | 'operations'
@@ -244,6 +245,7 @@ export function DepartmentPanel({
   const dept = DEPARTMENTS.find((d) => d.id === department);
   const cityStats = cityOperationalStats(city);
   const selectedWorld = selection.kind === 'world' ? worldEntity(selection.id) : undefined;
+  const selectedCountry = selection.kind === 'country' ? country(selection.id) : undefined;
   const selectedFacility =
     selection.kind === 'facility'
       ? game.facilities.find((asset) => asset.id === selection.id)
@@ -320,6 +322,31 @@ export function DepartmentPanel({
               '%'
             }
           />
+        </Section>
+      )}
+      {selectedCountry && (
+        <Section title="Quốc gia đang chọn">
+          <strong>{selectedCountry.name}</strong>
+          <p className="commandSupporting">
+            {selectedCountry.continent.toUpperCase()} · thủ đô {selectedCountry.capital}
+          </p>
+          <Stat
+            name="Dân số / GDP index"
+            value={fmt(selectedCountry.stats.population) + ' / ' + selectedCountry.stats.gdpIndex}
+          />
+          <Stat
+            name="Ổn định / Hạ tầng"
+            value={selectedCountry.stats.stability + ' / ' + selectedCountry.stats.infrastructure}
+          />
+          <Stat
+            name="Thuế / Mở cửa thương mại"
+            value={
+              (selectedCountry.stats.taxRate * 100).toFixed(0) +
+              '% / ' +
+              selectedCountry.stats.tradeOpenness
+            }
+          />
+          <Stat name="Thế mạnh" value={selectedCountry.specialty} />
         </Section>
       )}
       {selectedFacility && selectedFacilityStats && (

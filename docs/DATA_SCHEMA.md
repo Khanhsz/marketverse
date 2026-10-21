@@ -6,6 +6,8 @@ Current **save version 9**, **replay rules version 1**. The local save key remai
 
 The authored world model lives outside saves because it is immutable rules data. `CITY_PROFILES` defines sector, annual growth, wage, rent, tax, talent and infrastructure for every national city. `WORLD_ENTITIES` defines all 57 illustrated map entities with a stable ID, owning city, type, map position, level, condition, workforce, capacity, public upkeep and four local-effect values. UI selections reference these stable IDs with `kind: "world"`.
 
+`COUNTRIES` defines all 38 named political regions visible inside the seven illustrated continents. Each country has a stable ID, label anchor, continent, capital, nearest operating city, economic specialty and population/GDP/tax/stability/infrastructure/trade stats. Country selections use `kind: "country"`. Coarse continent land polygons constrain nearest-label hit testing so open ocean is not selectable; cities, facilities and world entities retain higher pointer priority.
+
 - Geography uses stable city IDs and world coordinates. The fixture remains three cities; national mode is eight connected cities with four distinct AI archetypes.
 - One aggregate (`cityOperationalStats`) combines each city profile with the condition-adjusted contribution of all its public entities. Demand, factory and store capacity, shipping cost/lead time, rent/tax, payroll, R&D and annual population growth consume this aggregate or its authored profile fields.
 - Company facilities expose derived level, condition, workforce, capacity, efficiency and weekly cost. Their persisted identity and placement schema remains unchanged, so version-9 saves do not need migration.
