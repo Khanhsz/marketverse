@@ -55,7 +55,7 @@
     "type": "static_site",
     "status": "live_verified",
     "serviceId": "srv-dbbfrqbbc2fs73b2cocg",
-    "workspaceName": "Khánh's workspace",
+    "workspaceName": "Kh\u00e1nh's workspace",
     "url": "https://marketverse-alpha.onrender.com",
     "blueprint": "render.yaml",
     "branch": "codex/marketverse-sprint-continuation",
@@ -67,7 +67,7 @@
     "verifiedAt": "2026-10-20T11:50:31.918610+00:00",
     "deployedBrowserEvidence": "docs/validation/P0_DEPLOYED_BROWSER.json"
   },
-  "updatedOn": "2026-10-20",
+  "updatedOn": "2026-10-21",
   "productReview": {
     "plan": "docs/PRODUCT_REVIEW_PLAN.md",
     "activeStep": "P1 first twelve weeks",
@@ -86,5 +86,22 @@
       "P0 map stability"
     ],
     "lastValidatedRuntimeCommit": "4574ab478b7962edac5f2ff0168f286b9a308db4"
+  },
+  "entityArtworkFollowup": {
+    "status": "locally_verified",
+    "authorizedScope": "World atlas and scattered map entities; simulation unchanged",
+    "testedCommit": "b9ab8aab573b4da8594f3e7ea174af87c9bde7a2",
+    "landmarks": 57,
+    "spriteTypes": 8,
+    "tests": {
+      "verify": "63 tests, formatting, artwork integrity, TypeScript and production build passed",
+      "browser": "UI regression and production map smoke passed; eight sprite images decoded"
+    },
+    "deployment": "pending push and live verification",
+    "limitations": [
+      "Country boundaries remain baked into the world atlas; country cutouts are not interactive polygons.",
+      "Landmarks are visual context, not newly simulated facilities.",
+      "Existing eight-city economy and saved logistics distances are unchanged."
+    ]
   }
 }

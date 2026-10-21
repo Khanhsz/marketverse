@@ -1,6 +1,6 @@
 {
-  "version": "6.2",
-  "style": "minimalist-transport-atlas",
+  "version": "7.0",
+  "style": "fictional-world-atlas-with-isometric-entities",
   "world": {
     "width": 1920,
     "height": 1280
@@ -9,8 +9,8 @@
     "file": "/marketverse-v6-map-clean.png",
     "width": 1536,
     "height": 1024,
-    "sizeBytes": 2262971,
-    "sha256": "14d4428c1744fefe322b7c760faa9a38e5bc4ab75da1dfb8a5a5e6d6c5e7f71a",
+    "sizeBytes": 1777150,
+    "sha256": "ba10ec232d2829b94178ef461ab482de57548de71e4dc872cc58bc03c8398aab",
     "status": "verified-clean-artwork"
   },
   "layers": [
@@ -22,6 +22,7 @@
     }
   ],
   "overlays": [
+    "isometric-landmarks",
     "economic-regions",
     "thematic",
     "city-markers",
@@ -34,5 +35,5 @@
     "selectionSource": "simulation-state",
     "anchors": "resolve-from-engine-city-coordinates"
   },
-  "notes": "Approved UI-free country PNG. Dynamic labels, cities, facilities, thematic data and logistics routes render separately in world coordinates above the persistent artwork."
+  "notes": "Approved world atlas fit without distortion inside legacy camera bounds. 57 authored visual landmarks; simulation positions, economy and save schema unchanged. Countries remain part of the base artwork; reconstructed country cutouts are not exact tessellations and are not used as gameplay borders."
 }

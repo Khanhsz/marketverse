@@ -95,3 +95,10 @@
 - React, TypeScript, PixiJS sample country UI and weekly engine.
 - Deterministic seeded RNG, validation, local save/load and calendar rollover tests.
 - CI workflow for build and tests.
+
+## 2026-10-21 — World atlas entities
+
+- Fit the approved fictional world map without stretching inside the existing camera bounds.
+- Add 57 authored landmarks across seven continents using eight transparent isometric sprite types.
+- Replace facility squares with sprites and ownership dots; preserve selection and simulation/save rules.
+- Update eight visual city anchors and production map coverage, including sprite decoding.

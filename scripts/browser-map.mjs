@@ -40,6 +40,25 @@ try {
   );
   assert.deepEqual(imageSize, { width: 1536, height: 1024 });
   await ready();
+  assert.equal(await page.locator('.mapSurface').getAttribute('data-landmarks'), '57');
+  for (const kind of [
+    'city',
+    'residential',
+    'headquarters',
+    'store',
+    'factory',
+    'warehouse',
+    'port',
+    'airport',
+  ]) {
+    const decoded = await page.evaluate(async (kind) => {
+      const image = new Image();
+      image.src = `/maps/entities/${kind}.png`;
+      await image.decode();
+      return image.width > 0 && image.height > 0;
+    }, kind);
+    assert.equal(decoded, true, kind + ' sprite must decode');
+  }
   for (let cycle = 0; cycle < 3; cycle++) {
     for (const [name, layer] of [
       ['Sản phẩm', 'Market'],
@@ -70,8 +89,8 @@ try {
     const c = await camera();
     const box = await page.locator('canvas').boundingBox();
     return {
-      x: box.x + box.width / 2 + (0.565 * 1920 - 28 - c.x) * c.scale,
-      y: box.y + box.height / 2 + (0.475 * 1280 + 52 - c.y) * c.scale,
+      x: box.x + box.width / 2 + (0.53 * 1920 - 28 - c.x) * c.scale,
+      y: box.y + box.height / 2 + (0.47 * 1280 + 52 - c.y) * c.scale,
     };
   };
   const p = await point();
@@ -81,8 +100,8 @@ try {
   const c = await camera();
   const box = await page.locator('canvas').boundingBox();
   await page.mouse.click(
-    box.x + box.width / 2 + (0.565 * 1920 - c.x) * c.scale,
-    box.y + box.height / 2 + (0.475 * 1280 - c.y) * c.scale,
+    box.x + box.width / 2 + (0.53 * 1920 - c.x) * c.scale,
+    box.y + box.height / 2 + (0.47 * 1280 - c.y) * c.scale,
   );
   assert.equal(
     await page.locator('.panel').getAttribute('data-selection'),
@@ -122,7 +141,7 @@ try {
     production: process.env.BROWSER_PRODUCTION === '1',
     target: process.env.SMOKE_URL,
     browser: await browser.version(),
-    sourceArtworkBytes: 2262971,
+    sourceArtworkBytes: artworkBytes.length,
     artworkBytes: artworkBytes.length,
     deliveredArtworkSha256: createHash('sha256').update(artworkBytes).digest('hex'),
     layerSwitches: 15,

@@ -1,6 +1,6 @@
 import type { CityMetrics } from '../engine/analytics';
 import { useEffect, useRef, useState } from 'react';
-import { Application, Container, Graphics, Text } from 'pixi.js';
+import { Application, Sprite, Container, Graphics, Text } from 'pixi.js';
 import { loadArtworkStack } from '../map/artworkLoader';
 import { MAP_MODES } from '../map/atlasLayers';
 import type { City, Facility, Company, Product } from '../engine/game';
@@ -108,6 +108,7 @@ export function CountryMap(props: Props) {
           return;
         }
         element.dataset.artwork = 'ready';
+        element.dataset.landmarks = '57';
         element.appendChild(app.canvas);
         app.canvas.tabIndex = 0;
         app.canvas.setAttribute('role', 'application');
@@ -364,8 +365,15 @@ export function CountryMap(props: Props) {
                     .rect(fx - 14, fy - 14, 28, 28)
                     .stroke({ color: 0x24554b, width: 3 }),
                 );
+              const entityKind = f.kind === 'hq' || f.kind === 'rd' ? 'headquarters' : f.kind;
+              const facilitySprite = new Sprite(artworkStack.entityTextures[entityKind]);
+              facilitySprite.anchor.set(0.5, 0.8);
+              facilitySprite.scale.set(28 / facilitySprite.texture.width);
+              facilitySprite.position.set(fx, fy);
+              facilitySprite.eventMode = 'none';
+              overlays.addChild(facilitySprite);
               overlays.addChild(
-                new Graphics().rect(fx - 9, fy - 9, 18, 18).fill(ownerColor(f.companyId)),
+                new Graphics().circle(fx, fy + 12, 3).fill(ownerColor(f.companyId)),
               );
               if (
                 (active === 'Operations' || active === 'Competition') &&

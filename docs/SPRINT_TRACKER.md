@@ -29,3 +29,7 @@ The existing Alpha review site is https://marketverse-alpha.onrender.com and aut
 - On completion, update BOTH this file and `docs/AUTOPILOT_STATE.json` in a tested commit.
 - Sprint instructions in the repository are the permanent memory handoff for new Work/Codex conversations.
 - **No background Codex runner has been configured yet.** GitHub CI will run automatically upon code pushes; it will not produce code.
+
+## Authorized artwork follow-up — 2026-10-21
+
+Sprint 16 remains accepted. User-requested world atlas and 57 scattered landmarks are implemented at `b9ab8aab573b4da8594f3e7ea174af87c9bde7a2`. Eight PNG sprite types also represent existing facilities (R&D uses the HQ silhouette). `npm run verify` passed 63 tests, format, image integrity, TypeScript and build. Production map and general UI browser suites passed. See `validation/ENTITY_ATLAS.md`.

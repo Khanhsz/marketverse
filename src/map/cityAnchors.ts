@@ -1,20 +1,20 @@
 import { WORLD_SIZE } from './atlasLayers.ts';
 
 /**
- * Visual anchors for the hand-illustrated V6 country artwork.
+ * Visual anchors for the fictional world atlas artwork.
  * Normalized 0..1 positions are independent of simulation coordinates.
  * Keeping them here preserves existing saves, command replays, logistics costs and AI behavior.
  */
 export const CITY_ARTWORK_ANCHORS = {
   // Tied to identifiable urban / port / lake / river artwork, NOT to engine geography.
-  north: { x: 0.35, y: 0.275 }, // northwest port and docks
-  lake: { x: 0.445, y: 0.355 }, // central-north lake shore (not the mountain)
-  east: { x: 0.845, y: 0.4 }, // eastern industrial gateway
-  central: { x: 0.565, y: 0.475 }, // dense central interchange
-  west: { x: 0.315, y: 0.49 }, // western developed valley
-  river: { x: 0.445, y: 0.61 }, // west bank of river bend
-  south: { x: 0.75, y: 0.69 }, // southeast urban coastal district
-  harbor: { x: 0.685, y: 0.815 }, // southern harbor shoreline
+  north: { x: 0.4, y: 0.215 }, // world atlas visual anchor
+  lake: { x: 0.15, y: 0.29 }, // world atlas visual anchor
+  east: { x: 0.86, y: 0.305 }, // world atlas visual anchor
+  central: { x: 0.53, y: 0.47 }, // world atlas visual anchor
+  west: { x: 0.16, y: 0.425 }, // world atlas visual anchor
+  river: { x: 0.21, y: 0.6725 }, // world atlas visual anchor
+  south: { x: 0.86, y: 0.7025 }, // world atlas visual anchor
+  harbor: { x: 0.55, y: 0.755 }, // world atlas visual anchor
 } as const;
 
 /** Visual offset in artwork pixels, not simulation/world units. */

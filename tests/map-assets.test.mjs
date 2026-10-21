@@ -19,7 +19,7 @@ function withImage(bytes, inspect) {
   }
 }
 test('approved country artwork is a complete decoded PNG with the recorded checksum', () => {
-  assert.equal(checkMapAssets().bytes, 2262971);
+  assert.equal(checkMapAssets().bytes, 1777150);
 });
 test('map gate rejects the original two-byte upload and HTML masquerading as an image', () => {
   for (const invalid of [Buffer.from('\r\n'), Buffer.from('<html>Not found</html>')])
